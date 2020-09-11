@@ -71,8 +71,8 @@ class Forecast:
     
     def __init__(self, connection, in_temp):
         print("Reading forecast data")
-        from config import ui
-        from ltime import Time
+        from config import ui, pins
+        from ltime import  Time
         
         url = "http://api.openweathermap.org/data/2.5/{}?q={},{}&APPID={}&mode=json&units={}&lang={}"
         
@@ -163,7 +163,7 @@ class Forecast:
         from machine import Pin
         
         try:
-            sensor = dht.DHT22(Pin(23))
+            sensor = dht.DHT22(Pin(pins.DHT))
             sensor.measure()
             self.home = Forecast.Home(sensor.temperature(), sensor.humidity())
         except OSError:

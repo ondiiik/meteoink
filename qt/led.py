@@ -13,7 +13,8 @@ class Led():
     def __init__(self):
         from machine import Pin
         from _thread import start_new_thread
-        self.pin     = Pin(2, Pin.OUT)
+        from config  import pins
+        self.pin     = Pin(pins.LED, Pin.OUT)
         self.running = True
         self._mode   = Led.OFF
         self._code   = ((0, 100),)

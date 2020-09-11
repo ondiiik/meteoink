@@ -1,5 +1,6 @@
 import                  heap
 import                  framebuf
+from config      import pins
 from micropython import const
 
 
@@ -128,13 +129,13 @@ class Canvas:
         spi.init(baudrate = 2000000,
                  polarity = 0,
                  phase    = 0,
-                 sck      = Pin(13),
-                 mosi     = Pin(14),
-                 miso     = Pin(12))
-        cs                = Pin(15)
-        dc                = Pin(27)
-        rst               = Pin(26)
-        busy              = Pin(25)
+                 sck      = Pin(pins.SCK),
+                 mosi     = Pin(pins.MOSI),
+                 miso     = Pin(pins.MISO))
+        cs                = Pin(pins.CS)
+        dc                = Pin(pins.DC)
+        rst               = Pin(pins.RST)
+        busy              = Pin(pins.BUSY)
         print("\tSPI - [ OK ]")
         heap.refresh()
         

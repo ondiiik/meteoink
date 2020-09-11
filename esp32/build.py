@@ -50,6 +50,7 @@ command('mkdir  {}'.format(dwd))
 
 copy('config')
 copy('bitmap')
+copy('boot.py')
 copy('main.py')
 
 convert(find(''))
@@ -59,7 +60,9 @@ convert(find('web'))
 convert(find('config'))
 
 command('rm {}'.format(os.path.join(dwd, 'main.mpy')))
+command('rm {}'.format(os.path.join(dwd, 'boot.mpy')))
 command('rm {}'.format(os.path.join(dwd, 'config/__init__.py')))
 command('rm {}'.format(os.path.join(dwd, 'config/connection.mpy')))
 command('rm {}'.format(os.path.join(dwd, 'config/spot.mpy')))
 command('rm {}'.format(os.path.join(dwd, 'config/ui.mpy')))
+command('rm {}'.format(os.path.join(dwd, 'config/pins.mpy')))
