@@ -96,6 +96,7 @@ class Ui:
         
         if not status.redraw == self.forecast.TEMPERATURE:
             inside_dr(self, Vect(105, 50), Vect(295, 50), l, self.connection)
+            vbat_dr(  self, Vect(284, 87), Vect(14, 10))
             
         intemp_dr(self, Vect(105, 50), Vect(295, 50))
         
@@ -147,6 +148,8 @@ class Ui:
         
         url_dr(self,  Vect(0,   self.canvas.dim.y // 2), Vect(self.canvas.dim.x - 132, self.canvas.dim.y // 2), url)
         wifi_dr(self, Vect(200, 0),                      Vect(self.canvas.dim.x - 132, self.canvas.dim.y // 2), hotspot)
+        
+        vbat_dr(self,  Vect(self.canvas.dim.x // 2 - 10, self.canvas.dim.y // 2),  Vect(20, 10))
         
         print('Flushing ...')
         self.canvas.flush()
@@ -211,3 +214,7 @@ def wifi_dr(ui, p, d, h):
 def url_dr(ui, p, d, u):
     from ui.url import UiUrl
     UiUrl(p, d, u).repaint(ui)
+    
+def vbat_dr(ui, p, d):
+    from ui.vbat import UiVBat
+    UiVBat(p, d).repaint(ui)

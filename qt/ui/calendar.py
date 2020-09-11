@@ -1,5 +1,4 @@
 from ui          import UiFrame, Vect, Color
-from forecast    import id2icon
 from micropython import const
 
 
@@ -10,13 +9,7 @@ class UiCalendar(UiFrame):
         
     def draw(self, ui, title):
         if title:
-            wday2str = ('Pondělí',
-                        'Úterý',
-                        'Středa',
-                        'Čtvrtek',
-                        'Pátek',
-                        'Sobota',
-                        'Neděle')
+            from lang import day_of_week
         
         forecast = ui.forecast.forecast
         cnt     = len(forecast)
@@ -61,4 +54,4 @@ class UiCalendar(UiFrame):
                 
                 # Draw day of week text
                 if (hour + 12) % 24 == 0:
-                    ui.text_center(10, wday2str[dt[6]], Vect(xx, h_space))
+                    ui.text_center(10, day_of_week[dt[6]], Vect(xx, h_space))

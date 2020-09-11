@@ -18,3 +18,6 @@ HOTSPOT = const(16)
 
 # LED pin
 LED     = const(2) 
+
+# Battery voltage
+VBAT    = const(32) 

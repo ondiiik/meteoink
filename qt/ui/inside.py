@@ -16,8 +16,8 @@ class UiInside(UiFrame):
         else:
             t = '{:.0f}'.format(ui.forecast.home.rh)
             
-        ui.text(25, t, Vect(175, 1))
-        ui.text(10, '%',  Vect(175 + tab, 13))
+        ui.text(25, t, Vect(175, -8))
+        ui.text(10, '%',  Vect(175 + tab, 3))
         
         
         # Type weather details

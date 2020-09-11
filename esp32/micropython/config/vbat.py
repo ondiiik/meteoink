@@ -1,0 +1,2 @@
+VBAT_LOW      = 3.6
+VBAT_CRITICAL = VBAT_LOW - 0.4

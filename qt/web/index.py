@@ -7,7 +7,8 @@ _spaces = const(4)
 
 
 def page(web):
-    from config import connection, ui, hotspot
+    from config import connection, ui, hotspot, vbat
+    from vbat   import voltage
     
     pg  = web.heading( 2, 'Locations setup')
     pg += web.table_head(('SSID', 'BSSID', 'Country', 'Location', '', ''), 'frame="hsides"', 'style="text-align:left"')
@@ -48,6 +49,13 @@ def page(web):
     pg += web.table_head(None, 'frame="hsides"')
     pg += web.table_row(('SSID',     hotspot.ssid,   web.button('Edit', 'ssid')),   _spaces)
     pg += web.table_row(('Password', hotspot.passwd, web.button('Edit', 'passwd')), _spaces)
+    pg += web.table_tail()
+    
+    pg += web.heading(   2,    'Battery  setup')
+    pg += web.table_head(None, 'frame="hsides"')
+    pg += web.table_row(('Current voltage',  '{:.2f} V'.format(voltage()), ''),                                 _spaces)
+    pg += web.table_row(('Warning voltage',  '{:.2f} V'.format(vbat.VBAT_LOW),      web.button('Edit', 'low')), _spaces)
+    pg += web.table_row(('Critical voltage', '{:.2f} V'.format(vbat.VBAT_CRITICAL), web.button('Edit', 'low')), _spaces)
     pg += web.table_tail()
     
     web.write(pg)

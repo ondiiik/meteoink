@@ -59,12 +59,12 @@ class FrameBuffer:
     
     
     def rect(self, x, y, w, h, c):
-        for yy in range(y, y + h):
+        for yy in range(y, y + h - 1):
             self.pixel(x,     yy, c)
-            self.pixel(x + w, yy, c)
-        for xx in range(x, x + w):
+            self.pixel(x + w - 1, yy, c)
+        for xx in range(x, x + w - 1):
             self.pixel(xx, y,     c)
-            self.pixel(xx, y + h, c)
+            self.pixel(xx, y + h - 1, c)
     
     
     def fill_rect(self, x, y, w, h, c):

@@ -33,6 +33,19 @@ class Pin:
         return _pins[self.n]
 
 
+class ADC:
+    ATTN_6DB = 1
+    
+    def __init__(self, pin):
+        pass
+    
+    def atten(self, at):
+        pass
+    
+    def read(self):
+        return 3985
+
+
 def deepsleep(t):
     pass
 
