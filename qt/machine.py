@@ -9,6 +9,7 @@ _pins = [1] * 256
 
 
 _pins[16] = 1
+_pins[23] = 0
 
 
 class Pin:
@@ -44,6 +45,14 @@ class ADC:
     
     def read(self):
         return 3985
+
+
+class PWM:
+    def __init__(self, pin, freq, duty):
+        print('BEEP', freq)
+    
+    def deinit(self):
+        pass
 
 
 def deepsleep(t):

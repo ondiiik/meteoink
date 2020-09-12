@@ -1,5 +1,6 @@
 import socket
-from heap import refresh
+from heap   import refresh
+from buzzer import play
 
 
 class Server():
@@ -30,7 +31,7 @@ class Server():
                 # Parse HTTP request
                 request   = self.client.makefile('rwb', 0)
                 self.args = {}
-            
+                
                 while True:
                     line = request.readline()
                     
@@ -83,7 +84,16 @@ class Server():
     
     
     def write(self, txt):
-        self.client.send(txt.encode())
+        retry = True
+        
+        while retry:
+            try:
+                self.client.send(txt.encode())
+                retry = False
+            except OSError as err:
+                from errno import ECONNRESET
+                if not err == ECONNRESET:
+                    raise err
     
     
     @staticmethod
@@ -189,7 +199,10 @@ class Server():
     def _send_page(self):
         self._head()
         
-        if   self.page == 'add':
+        print('*** PAGE ***', self.page)
+        if   self.page == '':
+            from .index import page
+        elif self.page == 'add':
             from .add import page
         elif self.page == 'use':
             from .use import page
@@ -204,8 +217,10 @@ class Server():
         elif self.page == 'delete':
             from .delete import page
         else:
-            from .index import page
+            self._tail()
+            return
         
+        play(((1047,30), (0,120), (1568,30)))
         page(self)
         self._tail()
         

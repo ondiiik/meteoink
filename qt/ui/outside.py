@@ -17,9 +17,9 @@ class UiOutside(UiFrame):
         
         # Type humidity
         t = '{:.0f}'.format(weather.rh)
-        ui.text(25, t, Vect(175, 19))
+        ui.text(25, t, Vect(175, 18))
         l = ui.textLength(25, t) + 6
-        ui.text(10, '%',  Vect(175 + l, 32))
+        ui.text(10, '%',  Vect(175 + l, 31))
         
         # Type wind speed
         ui.text(25, '{:.1f}'.format(weather.speed), Vect(175, -5))

@@ -868,7 +868,7 @@ def create_data(version, error_correction, data_list):
 """
 Main
 
-Formerly in main.py
+Formerly in app.py
 """
 
 def make(data=None, **kwargs):

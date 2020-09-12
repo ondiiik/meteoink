@@ -11,13 +11,17 @@ RST     = const(26)
 BUSY    = const(25)
 
 # DHT22 related pins
-DHT     = const(23)
+DHT     = const(22)
 
 # Jumpers pins
 HOTSPOT = const(16)
+ALERT   = const(23)
 
 # LED pin
 LED     = const(2) 
 
 # Battery voltage
 VBAT    = const(32) 
+
+# Battery voltage
+BUZZER  = const(12) 

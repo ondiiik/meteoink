@@ -40,6 +40,6 @@ def flush_connections():
     f.close()
 
 
-from   .connection import connection
-from   .spot       import hotspot
-from   .ui         import ui
+from .connection import connection
+from .spot       import hotspot
+from .ui         import ui
