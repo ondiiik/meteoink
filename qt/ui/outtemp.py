@@ -1,4 +1,5 @@
-from ui import UiFrame, Vect, Color
+from ui     import UiFrame, Vect, Color
+from config import temp
 
 class UiOutTemp(UiFrame):
     def __init__(self, ofs, dim):
@@ -8,7 +9,7 @@ class UiOutTemp(UiFrame):
     def draw(self, ui, d):
         t = ui.forecast.weather.temp
         
-        if t >= 27.0:
+        if t >= temp.OUTDOOR_HIGH:
             hl = Color.YELLOW
         else:
             hl = None

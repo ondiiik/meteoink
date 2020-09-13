@@ -1,4 +1,5 @@
-from ui import UiFrame, Vect, Color
+from ui     import UiFrame, Vect, Color
+from config import temp
 
 class UiInTemp(UiFrame):
     def __init__(self, ofs, dim):
@@ -10,7 +11,7 @@ class UiInTemp(UiFrame):
         hl = None
         
         if not None == t:
-            if t >= 27.0:
+            if t >= temp.INDOOR_HIGH:
                 hl = Color.YELLOW
             
             t = '{:.1f}'.format(t)
