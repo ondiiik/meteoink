@@ -1,22 +1,30 @@
 #!/usr/bin/python3
 import glob, os
+import struct
+import zlib
+import git
+    
 
-cwd = os.path.join(os.getcwd(), "../micropython")
-dwd = os.path.abspath('micropython')
-mpc = os.path.abspath('./mpy-cross')
+cwd  = os.path.join(os.getcwd(), "../micropython")
+dwd  = os.path.abspath('micropython')
+fw   = os.path.abspath('meteoink.fw')
+mpc  = os.path.abspath('./mpy-cross')
+repo = git.Repo(search_parent_directories = True)
+sha  = repo.head.object.hexsha.encode()
+    
 
-def command(cmd):
+def command(  cmd):
     print(    cmd)
     os.system(cmd)
 
 
-def find(p):
-    s = os.path.join(cwd, p)
+def find(p, w = "*.py", d = cwd):
+    s = os.path.join(d, p)
     os.chdir(s)
     
     l = []
     
-    for f in glob.glob("*.py"):
+    for f in glob.glob(w):
         l.append((p, f))
     
     return l
@@ -40,10 +48,36 @@ def convert(l):
     os.chdir(cwd)
     
     for f in l:
-        src = os.path.relpath(os.path.join(cwd, f[0], f[1]))
+        src = os.path.relpath(os.path.join(cwd, *f))
         dst = os.path.abspath(os.path.join(dwd, f[0], f[1][:-2] + 'mpy'))
         command('{} {} -o {}'.format(mpc, src, dst))
 
+
+def packfw(l):
+    f = open(fw, 'wb')
+    f.write(struct.pack('<IH', 0x31415926, len(sha)))
+    f.write(sha)
+    
+    for d in l:
+        fl = find(*d, dwd)
+        for pf in fl:
+            pf = os.path.relpath(os.path.join(dwd, *pf))
+            print('Compress "{}"'.format(pf))
+            wf = open(pf, 'rb')
+            pf = pf.encode()
+            f.write(struct.pack('<H', len(pf)))
+            f.write(pf)
+            d = zlib.compress(wf.read())
+            f.write(struct.pack('<I', len(d)))
+            f.write(d)
+            wf.close()
+    f.close()
+
+
+f = open(os.path.join(cwd, 'main.py'), 'w')
+f.write('from app import run\n')
+f.write('run({})\n'.format(sha))
+f.close()
 
 command('rm -Rf {}'.format(dwd))
 command('mkdir  {}'.format(dwd))
@@ -60,12 +94,15 @@ convert(find('web'))
 convert(find('config'))
 convert(find('lang'))
 
-command('rm {}'.format(os.path.join(dwd, 'main.mpy')))
 command('rm {}'.format(os.path.join(dwd, 'boot.mpy')))
+command('rm {}'.format(os.path.join(dwd, 'main.mpy')))
 command('rm {}'.format(os.path.join(dwd, 'config/__init__.py')))
 command('rm {}'.format(os.path.join(dwd, 'config/connection.mpy')))
-command('rm {}'.format(os.path.join(dwd, 'config/spot.mpy')))
-command('rm {}'.format(os.path.join(dwd, 'config/ui.mpy')))
 command('rm {}'.format(os.path.join(dwd, 'config/pins.mpy')))
-command('rm {}'.format(os.path.join(dwd, 'config/vbat.mpy')))
+command('rm {}'.format(os.path.join(dwd, 'config/spot.mpy')))
+command('rm {}'.format(os.path.join(dwd, 'config/sys.mpy')))
 command('rm {}'.format(os.path.join(dwd, 'config/temp.mpy')))
+command('rm {}'.format(os.path.join(dwd, 'config/ui.mpy')))
+command('rm {}'.format(os.path.join(dwd, 'config/vbat.mpy')))
+
+packfw((('', '*.py'), ('', '*.mpy'), ('config', '*.mpy'), ('display', '*.mpy'), ('ui', '*.mpy'), ('web', '*.mpy'), ('lang', '*.mpy')))

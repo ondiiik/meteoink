@@ -1,4 +1,4 @@
-def run():
+def run(sha):
     try:
 #     if True:
         # Reads internal temerature just after wake-up to reduce
@@ -42,6 +42,13 @@ def run():
         from net import Connection
         net = Connection()
         heap.refresh()
+        
+        # Network is running ... we can checks for updates
+        from config import sys
+        
+        if sys.AUTOUPDATE:
+            from autoupdate import do_update
+            do_update(sha)
         
         # Following parts are relevant in normal mode (draw forecast)
         from jumpers import meteostation, alert
