@@ -5,6 +5,7 @@ def do_update(sha):
 #     if not implementation.name == 'micropython':
 #         return
     
-    from urequests import get
-    response = get('https://github.com/ondiiik/meteoink/raw/master/esp32/meteoink.fw')
-    print(response.content)
+    pass
+    #from urequests import get
+    #response = get('https://github.com/ondiiik/meteoink/raw/master/esp32/meteoink.fw')
+    #print(response.content)

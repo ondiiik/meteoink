@@ -1,11 +1,14 @@
+from micropython import const
+
 class Connection:
-    def __init__(self, country, location, ssid, passwd, bssid = None):
-        __slots__     = ('ssid', 'bssid', 'passwd', 'country', 'location')
+    def __init__(self, location, lat, lon, ssid, passwd, bssid = None):
+        __slots__     = ('ssid', 'bssid', 'passwd', 'country', 'location', 'lat', 'lon')
         self.ssid     = ssid
         self.bssid    = bssid
         self.passwd   = passwd
-        self.country  = country
         self.location = location
+        self.lat      = lat
+        self.lon      = lon
 
 
 class Spot:
@@ -16,11 +19,15 @@ class Spot:
 
 
 class Ui:
-    def __init__(self, apikey, units, language):
-        __slots__     = ('apikey', 'units', 'language')
+    VARIANT_2DAYS = const(2)
+    VARIANT_5DAYS = const(5)
+    
+    def __init__(self, apikey, units, language, variant):
+        __slots__     = ('apikey', 'units', 'language', 'variant')
         self.apikey   = apikey
         self.units    = units
         self.language = language
+        self.variant  = variant
 
 
 def flush_connections():

@@ -55,6 +55,10 @@ class PWM:
         pass
 
 
+def freq(max_freq):
+    pass
+
+
 def deepsleep(t):
     pass
 

@@ -1,6 +1,8 @@
-import                  heap
-from display     import Color, Vect, Bitmap
-from micropython import const
+import                    heap
+import                    machine
+from   config      import sys
+from   display     import Color, Vect, Bitmap
+from   micropython import const
 
 
 heap.refresh()
@@ -77,7 +79,10 @@ class Ui:
         return l
     
     
-    def repaint_weather(self):
+    def repaint_weather(self, debug_write):
+        # For drawing burst CPU to full power
+        machine.freq(sys.FREQ_MAX)
+        
         # Redraw display
         print('Drawing ...')
         self.canvas.fill(Color.WHITE)
@@ -85,22 +90,22 @@ class Ui:
         
         status = self.forecast.status
         
-        if not status.redraw == self.forecast.TEMPERATURE:
+        if not status.refresh == self.forecast.TEMPERATURE:
             weather_dr(self, Vect(0,   0), Vect(400, 100))
             l = outside_dr(self, Vect(105, 0), Vect(295, 50))
             
         outtemp_dr(self, Vect(105, 0), Vect(295, 50))
         
-        if status.redraw == self.forecast.ALL:
+        if status.refresh == self.forecast.ALL:
             cal_dr(self, Vect(0, 100), Vect(400, 20))
         
-        if not status.redraw == self.forecast.TEMPERATURE:
+        if not status.refresh == self.forecast.TEMPERATURE:
             inside_dr(self, Vect(105, 50), Vect(295, 50), l, self.connection)
             vbat_dr(  self, Vect(284, 87), Vect(14, 10))
             
         intemp_dr(self, Vect(105, 50), Vect(295, 50))
         
-        if status.redraw == self.forecast.ALL:
+        if status.refresh == self.forecast.ALL:
             chart_height = const(100)
             cal_dr(  self, Vect(0, 170), Vect(400, chart_height + 5), False)
             tempg_dr(self, Vect(0, 170), Vect(400, chart_height))
@@ -111,12 +116,16 @@ class Ui:
         
         heap.refresh()
         
+        # For flushing we can slow down as this uses busy wait and
+        # SPI communication
+        machine.freq(sys.FREQ_MIN)
+        
         # Flush drawing on display (upper or all parts)
         print('Flushing ...')
-        
-        if status.redraw == self.forecast.TEMPERATURE:
+        debug_write() # DEBUG - DEVEL
+        if status.refresh == self.forecast.TEMPERATURE:
             self.canvas.flush((124, 0, 92, 98))
-        elif status.redraw == self.forecast.WEATHER:
+        elif status.refresh == self.forecast.WEATHER:
             self.canvas.flush((0, 0, 400, 98))
         else:
             self.canvas.flush()

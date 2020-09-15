@@ -93,6 +93,7 @@ convert(find('ui'))
 convert(find('web'))
 convert(find('config'))
 convert(find('lang'))
+convert(find('lib'))
 
 command('rm {}'.format(os.path.join(dwd, 'boot.mpy')))
 command('rm {}'.format(os.path.join(dwd, 'main.mpy')))

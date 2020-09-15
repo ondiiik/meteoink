@@ -5,3 +5,7 @@ def localtime(sec):
 def sleep_ms(ms):
     import time
     time.sleep(0.001 * ms)
+
+def ticks_ms():
+    import time
+    return int(round(time.time() * 1000))

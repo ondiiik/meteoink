@@ -77,8 +77,7 @@ class Connection:
         if network is None:
             raise RuntimeError("No suitable network found")
         
-        self.country  = network.country
-        self.location = network.location
+        self.config = network
         
         self._ifc.connect(network.ssid, network.passwd, bssid = network.bssid)
         

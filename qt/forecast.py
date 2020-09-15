@@ -61,9 +61,9 @@ id2icon = { 200 : '200',
 
 
 class Forecast:
-    Weather     = namedtuple('Weather', ('id', 'dt', 'temp', 'feel', 'min', 'max', 'rh', 'rain', 'speed', 'dir'))
+    Weather     = namedtuple('Weather', ('id', 'dt', 'temp', 'feel', 'rh', 'rain', 'speed', 'dir'))
     Home        = namedtuple('Home',    ('temp', 'rh'))
-    Status      = namedtuple('Status',  ('redraw', 'refresh', 'first'))
+    Status      = namedtuple('Status',  ('refresh', 'sleep_time', 'first'))
     
     WEATHER     = const(1)
     TEMPERATURE = const(2)
@@ -71,35 +71,87 @@ class Forecast:
     
     def __init__(self, connection, in_temp):
         print("Reading forecast data")
-        from config import ui, pins
-        from ltime import  Time
+        from config import ui
         
-        url = "http://api.openweathermap.org/data/2.5/{}?q={},{}&APPID={}&mode=json&units={}&lang={}"
+        if ui.variant == ui.VARIANT_2DAYS:
+            fcast = self._read1_2days(connection)
+        else:
+            raise NotImplementedError('5 days not implemented yet')
         
-        # Download current weather situation
-        weather = connection.http_get_json(url.format("weather",
-                                                      connection.location,
-                                                      connection.country,
-                                                      ui.apikey,
-                                                      ui.units,
-                                                      ui.language))
+        self._get_status(ui)
+        
+        if self.status.refresh == Forecast.ALL:
+            if ui.variant == ui.VARIANT_2DAYS:
+                self._read2_2days(fcast)
+            else:
+                raise NotImplementedError('5 days not implemented yet')
+        
+        self._get_dht(in_temp)
+    
+    
+    def _read1_2days(self, connection):
+        print("Reading forecast data")
+        from config import ui
+        from ltime  import Time
+        
+        # Download hourly weather forecast for 2 days
+        url   = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude=minutely,daily'
+        fcast = connection.http_get_json(url.format(connection.config.lat,
+                                                    connection.config.lon,
+                                                    ui.apikey,
+                                                    ui.units,
+                                                    ui.language))
+        connection.disconnect()
         heap.refresh()
         
+        # Parse todays forecast
+        current = fcast['current']
         try:
-            r = weather['rain']['1h']
+            rain = current['rain']['1h']
         except KeyError:
-            r = 0.0
+            rain = 0.0
         
-        m              = weather['main']
-        e              = weather['weather'][0]
-        w              = weather['wind']
-        self.time_zone = weather['timezone']
-        dsc            = e['description']
+        self.time_zone = fcast['timezone_offset']
+        
+        weather        = current['weather'][0]
+        dsc            = weather['description']
         self.descr     = dsc[0].upper() + dsc[1:]
-        self.weather   = Forecast.Weather(e['id'], weather['dt'], m['temp'], m['feels_like'], m['temp_min'], m['temp_max'], m['humidity'], r, w['speed'], w['deg'])
+        
+        self.weather   = Forecast.Weather(weather['id'],
+                                          current['dt'],
+                                          current['temp'],
+                                          current['feels_like'],
+                                          current['humidity'],
+                                          rain,
+                                          current['wind_speed'],
+                                          current['wind_deg'])
         self.time      = Time(self.time_zone)
         
+        return fcast
+    
+    
+    def _read2_2days(self, fcast):
+        self.forecast = []
         
+        for current in fcast['hourly']:
+            weather = current['weather'][0]
+            
+            try:
+                rain = current['rain']['3h']
+            except KeyError:
+                rain = 0.0
+            
+            self.forecast.append(Forecast.Weather(weather['id'],
+                                                  current['dt'],
+                                                  current['temp'],
+                                                  current['feels_like'],
+                                                  current['humidity'],
+                                                  rain,
+                                                  current['wind_speed'],
+                                                  current['wind_deg']))
+    
+    
+    def _get_status(self, ui):
         # Set forecast redraw status
         refresh = Forecast.TEMPERATURE
         
@@ -116,8 +168,8 @@ class Forecast:
         if (0 <= ta) and (ta < sleep_time):
             refresh = Forecast.WEATHER
         
-        # Refresh all once per 90 minutes
-        ta = t % 90
+        # Refresh all once per 90 or 60 minutes minutes
+        ta = t % (60 if ui.variant == ui.VARIANT_2DAYS else 90)
         if (0 <= ta) and (ta < sleep_time):
             refresh = Forecast.ALL
         
@@ -129,38 +181,14 @@ class Forecast:
             refresh = Forecast.ALL
             first   = True
         
+        #sleep_time  = 3 # DEVEL - DEBUG
         self.status = Forecast.Status(refresh, sleep_time, first)
-        
-        
-        # Download weather forecast
-        if refresh == Forecast.ALL:
-            forecast = connection.http_get_json(url.format("forecast",
-                                                           connection.location,
-                                                           connection.country,
-                                                           ui.apikey,
-                                                           ui.units,
-                                                           ui.language))
-            connection.disconnect()
-            heap.refresh()
-            
-            self.forecast = []
-            
-            for i in forecast['list']:
-                m = i['main']
-                e = i['weather'][0]
-                w = i['wind']
-                
-                try:
-                    r = i['rain']['3h']
-                except KeyError:
-                    r = 0.0
-                
-                self.forecast.append(Forecast.Weather(e['id'], i['dt'], m['temp'], m['feels_like'], m['temp_min'], m['temp_max'], m['humidity'], r, w['speed'], w['deg']))
-        
-        
-        # And last is home temperature
+    
+    
+    def _get_dht(self, in_temp):
         import              dht
         from machine import Pin
+        from config  import pins
         
         try:
             sensor = dht.DHT22(Pin(pins.DHT))

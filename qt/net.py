@@ -11,9 +11,8 @@ class Wifi:
 class Connection:
     def __init__(self):
         from config import connection
-        self.country  = connection[0].country
-        self.location = connection[0].location
-        self.nets     = [ Wifi('mynet1', b'aaaaaa'), Wifi('mynet2', b'bbbbbb') ]
+        self.config = connection[0]
+        self.nets   = [ Wifi('mynet1', b'aaaaaa'), Wifi('mynet2', b'bbbbbb') ]
     
     @property
     def ifconfig(self):

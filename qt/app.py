@@ -1,6 +1,40 @@
+# DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
+import vbat # DEVEL - DEBUG
+import utime # DEVEL - DEBUG
+
+debug_time0 = utime.ticks_ms()
+
+try:
+    temp_log = open('temp.log', 'a')
+except:
+    temp_log = open('temp.log', 'w')
+
+def debug_time():
+    return utime.ticks_ms() - debug_time0
+
+
+def debug_vbat():
+    v = vbat.voltage()
+    
+    for i in range(7):
+        v += vbat.voltage()
+    
+    return v / 8
+
+
+def debug_write(tail = ''):
+    temp_log.write('{}={}, {}'.format(debug_time(), debug_vbat(), tail)) # DEVEL - DEBUG
+# DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
+
+
 def run(sha):
-    try:
-#     if True:
+    from config import sys
+    import machine
+    
+#     try:
+    if True:
+        debug_time0 = utime.ticks_ms() # DEVEL - DEBUG
+        debug_write() # DEVEL - DEBUG
         # Reads internal temerature just after wake-up to reduce
         # influence of chip warm-up and use some kind of ambient
         # reduction to get more close to indoor temperature. This
@@ -43,6 +77,7 @@ def run(sha):
         net = Connection()
         heap.refresh()
         
+        
         # Network is running ... we can checks for updates
         from config import sys
         
@@ -61,13 +96,7 @@ def run(sha):
             from forecast import Forecast
             forecast = Forecast(net, temp)
             heap.refresh()
-            
-            # We extract time of current weather from obtained data. Special
-            # object for this purposes is used because obtained time is in
-            # unix 'since epoch' format (related to year 1970) but ESP32 uses
-            # epoch year 2000. We also shall correct according to time zone. 
-            from ltime import Time
-            time = Time(forecast.time_zone)
+            debug_write() # DEVEL - DEBUG
             
             # Most time consuming part when we have all data is to draw them
             # on user interface - screen.
@@ -75,8 +104,9 @@ def run(sha):
             from ui import Ui
             ui = Ui(canvas, forecast, net)
             heap.refresh()
-            ui.repaint_weather()
+            ui.repaint_weather(debug_write)
             heap.refresh()
+            debug_write() # DEVEL - DEBUG
             
             # Forecast is painted. Now we shall checks how about temperature
             # or low battery notification and produce alert sound if needed.
@@ -86,9 +116,11 @@ def run(sha):
             
             # When all is displayed, then go to deep sleep. Sleep time is obtained
             # according to current weather forecast and UI needs ans is in minutes.
-            import machine
             led.running = False
-            machine.deepsleep(forecast.status.refresh * 60000)
+            dt = ui.forecast.time.get_date_time(ui.forecast.weather.dt) # DEVEL - DEBUG
+            debug_write('{:d}.{:d}.{:d} {:d}:{:02d}\n'.format(dt[2], dt[1], dt[0], dt[3], dt[4])) # DEVEL - DEBUG
+            temp_log.close() # DEVEL - DEBUG
+            machine.deepsleep(forecast.status.sleep_time * 60000)
             
         # It may happen that user wants to attach with HTTP for
         # update of firmware or configuration
@@ -97,7 +129,6 @@ def run(sha):
             led.mode(Led.FLASH2)
             
             from web     import Server
-            from machine import reset
             from ui      import Ui
             
             ui = Ui(canvas, None, net)
@@ -110,18 +141,17 @@ def run(sha):
             play(((1047, 30), (0, 120), (1319, 30), (0, 120), (1568, 30), (0, 120), (2093, 30)))
             server.run()
             
-            reset()
+            machine.reset()
     
-    except:
-        import heap
-        heap.refresh()
-         
-        from machine import reset
-        from buzzer  import play
-         
-        led.mode(Led.ALERT)
-         
-        for i in range(6):
-            play(((784, 500), (523, 500)))
-         
-        reset()
+#     except:
+#         import heap
+#         heap.refresh()
+#          
+#         from buzzer  import play
+#          
+#         led.mode(Led.ALERT)
+#          
+#         for i in range(6):
+#             play(((784, 500), (523, 500)))
+#          
+#         machine.reset()

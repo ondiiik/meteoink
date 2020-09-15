@@ -16,8 +16,8 @@ class UiTempGr(UiFrame):
         for i1 in range(cnt):
             xx       = ui.canvas.dim.x * i1 // (cnt + 1)
             weather  = forecast[i1]
-            temp_max = max(weather.max, temp_max)
-            temp_min = min(weather.min, temp_min)
+            temp_max = max(weather.temp, weather.feel, temp_max)
+            temp_min = min(weather.temp, weather.feel, temp_min)
         
         chart_space    = const(30)
         chart_min      = const(chart_space // 2)
@@ -54,10 +54,10 @@ class UiTempGr(UiFrame):
                 v1 = Vect(x1, chart_y(forecast[i1].temp))
                 v2 = Vect(x2, chart_y(forecast[i2].temp))
                 
-                if (forecast[i1].max > 27) or \
-                   (forecast[i2].max > 27) or \
-                   (forecast[i1].min < -5) or \
-                   (forecast[i2].min < -5):
+                if (forecast[i1].feel > 27) or \
+                   (forecast[i2].feel > 27) or \
+                   (forecast[i1].feel < -5) or \
+                   (forecast[i2].feel < -5):
                     ui.canvas.line(v1, v2, Color.YELLOW, 6)
         
         for i1 in range(cnt):

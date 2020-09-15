@@ -25,7 +25,6 @@
 
 # also works for black/white/yellow GDEW042C37?
 
-
 # Display commands
 class EPD:
     def __init__(self, spi, cs, dc, rst, busy):
@@ -69,15 +68,6 @@ class EPD:
         x  &= 0xFFF8;               # Byte boundary
         xe |= 0x0007
         self._command(0x90, pack('!HHHH', x, xe, y, ye))  # Resolution setting
-        #self._command(0x90, bytes([x //  256,  # Resolution setting
-        #                           x %   256,
-        #                           xe // 256,
-        #                           xe %  256,
-        #                           y //  256,
-        #                           y %   256,
-        #                           ye // 256,
-        #                           ye %  256]))
-        #self._command(0x01) # Distortion on full right half
         self._command(0x00) # Distortion on right half
 
     def _reset(self):

@@ -16,8 +16,8 @@ class UiTempTxt(UiFrame):
         for i in range(cnt):
             x1       = ui.canvas.dim.x * i // (cnt + 1)
             weather  = forecast[i]
-            temp_max = max(weather.max, temp_max)
-            temp_min = min(weather.min, temp_min)
+            temp_max = max(weather.temp, weather.feel, temp_max)
+            temp_min = min(weather.temp, weather.feel, temp_min)
         
         chart_space  = const(30)
         chart_min    = const(chart_space // 2)
@@ -38,8 +38,8 @@ class UiTempTxt(UiFrame):
                 # Draw temperature text
                 f = (forecast[i-1], forecast[i], forecast[i+1])
                 
-                if (f[0].max < f[1].max) and (f[1].max > f[2].max):
-                    ui.text_center(10, '{:.0f}°C'.format(f[1].max), Vect(x1, chart_y(f[1].max) - 12), Color.BLACK, Color.WHITE)
+                if (f[0].temp < f[1].temp) and (f[1].temp > f[2].temp):
+                    ui.text_center(10, '{:.0f}°C'.format(f[1].temp), Vect(x1, chart_y(f[1].temp) - 12), Color.BLACK, Color.WHITE)
                     
-                if (f[0].min > f[1].min) and (f[1].min < f[2].min):
-                    ui.text_center(10, '{:.0f}°C'.format(f[1].min), Vect(x1, chart_y(f[1].min) + 4),  Color.BLACK, Color.WHITE)
+                if (f[0].temp > f[1].temp) and (f[1].temp < f[2].temp):
+                    ui.text_center(10, '{:.0f}°C'.format(f[1].temp), Vect(x1, chart_y(f[1].temp) + 4),  Color.BLACK, Color.WHITE)
