@@ -114,8 +114,37 @@ class Connection:
     
     def http_get_json(self, url):
         print("HTTP GET: " + url)
-        import urequests
-        return urequests.get(url).json()
+        import socket
+        from   ujson import load
+         
+        # Send GET request
+        _, _, host, path = url.split('/', 3)
+        addr             = socket.getaddrinfo(host, 80)[0][-1]
+        s                = socket.socket()
+        s.connect(addr)
+        s.send(bytes('GET /%s HTTP/1.0\nHost: %s\n\n' % (path, host), 'utf8'))
+         
+        data0 = ' '
+         
+        # Strip response head
+        while True:
+            data1 = s.recv(1)
+             
+            if data1 == b'\r':
+                continue
+             
+            if data0 == b'\n' and data1 == b'\n':
+                break
+             
+            data0 = data1
+         
+        # Parse JSON data
+        print("Parsing JSON from stream ...")
+        j = load(s) 
+        s.close()
+        return j
+#         import urequests
+#         return urequests.get(url).json()
     
     
     def disconnect(self):

@@ -20,7 +20,7 @@ class Spot:
 
 class Ui:
     VARIANT_2DAYS = const(2)
-    VARIANT_5DAYS = const(5)
+    VARIANT_4DAYS = const(4)
     
     def __init__(self, apikey, units, language, variant):
         __slots__     = ('apikey', 'units', 'language', 'variant')

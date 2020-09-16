@@ -73,35 +73,35 @@ class Forecast:
         print("Reading forecast data")
         from config import ui
         
-        if ui.variant == ui.VARIANT_2DAYS:
-            fcast = self._read1_2days(connection)
-        else:
-            raise NotImplementedError('5 days not implemented yet')
+        self._read1(connection, ui)
+        heap.refresh()
         
         self._get_status(ui)
+        heap.refresh()
         
         if self.status.refresh == Forecast.ALL:
             if ui.variant == ui.VARIANT_2DAYS:
-                self._read2_2days(fcast)
+                self._read2_short(connection, ui)
             else:
-                raise NotImplementedError('5 days not implemented yet')
+                self._read2_long(connection, ui, 96)
+        heap.refresh()
         
         self._get_dht(in_temp)
+        heap.refresh()
     
     
-    def _read1_2days(self, connection):
+    def _read1(self, connection, ui):
         print("Reading forecast data")
-        from config import ui
-        from ltime  import Time
+        from ltime import Time
         
-        # Download hourly weather forecast for 2 days
-        url   = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude=minutely,daily'
+        # Download hourly weather forecast for today
+        url   = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}'
         fcast = connection.http_get_json(url.format(connection.config.lat,
                                                     connection.config.lon,
                                                     ui.apikey,
                                                     ui.units,
-                                                    ui.language))
-        connection.disconnect()
+                                                    ui.language,
+                                                    'minutely,hourly,daily'))
         heap.refresh()
         
         # Parse todays forecast
@@ -126,18 +126,28 @@ class Forecast:
                                           current['wind_speed'],
                                           current['wind_deg'])
         self.time      = Time(self.time_zone)
+    
+    
+    def _read2_short(self, connection, ui):
+        # Download hourly weather forecast for today
+        url   = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}'
+        fcast = connection.http_get_json(url.format(connection.config.lat,
+                                                    connection.config.lon,
+                                                    ui.apikey,
+                                                    ui.units,
+                                                    'EN',
+                                                    'current,minutely,daily'))
+        connection.disconnect()
+        heap.refresh()
         
-        return fcast
-    
-    
-    def _read2_2days(self, fcast):
+        # Build 2 days forecast
         self.forecast = []
         
         for current in fcast['hourly']:
             weather = current['weather'][0]
             
             try:
-                rain = current['rain']['3h']
+                rain = current['rain']['1h']
             except KeyError:
                 rain = 0.0
             
@@ -149,6 +159,51 @@ class Forecast:
                                                   rain,
                                                   current['wind_speed'],
                                                   current['wind_deg']))
+    
+    
+    def _read2_long(self, connection, ui, hours):
+        # Download hourly weather forecast for 5 days
+        url   = "http://api.openweathermap.org/data/2.5/forecast?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}"
+        
+        fcast = connection.http_get_json(url.format(connection.config.lat,
+                                                    connection.config.lon,
+                                                    ui.apikey,
+                                                    ui.units,
+                                                    'EN'))
+        connection.disconnect()
+        heap.refresh()
+        
+        # Build 2 days forecast
+        self.forecast = []
+        
+        hourMax = None
+        
+        for current in fcast['list']:
+            main    = current['main']
+            weather = current['weather'][0]
+            wind    = current['wind']
+            
+            try:
+                rain = current['rain']['3h']
+            except KeyError:
+                rain = 0.0
+            
+            dt = current['dt']
+            
+            if hourMax is None:
+                hourMax = dt + 3600 * hours
+            
+            if hourMax < dt:
+                break
+            
+            self.forecast.append(Forecast.Weather(weather['id'],
+                                                  dt,
+                                                  main[   'temp'],
+                                                  main[   'feels_like'],
+                                                  main[   'humidity'],
+                                                  rain,
+                                                  wind[   'speed'],
+                                                  wind[   'deg']))
     
     
     def _get_status(self, ui):

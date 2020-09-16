@@ -28,8 +28,8 @@ def debug_write(tail = ''):
 
 
 def run(sha):
-    from config import sys
     import machine
+    from   config import sys
     
 #     try:
     if True:
@@ -46,6 +46,9 @@ def run(sha):
         # humidity.
         from esp32 import raw_temperature
         temp = ((raw_temperature() - 32) / 1.8) - 34.0
+        
+        # Slow nown a bit and save piece of battery
+        machine.freq(sys.FREQ_MIN)
         
         # As we use bi-color E-Ink display, it consumes big amount
         # of memory for frame buffers. Therefore we have to call
@@ -69,6 +72,9 @@ def run(sha):
         canvas = Canvas()
         heap.refresh()
         
+        # We have to set high CPU speed due to compatibility with WiFi HW
+        machine.freq(sys.FREQ_MAX)
+        
         # Once we have canvas established (large object needs
         # to be created first to prevent from memory fragmentation),
         # we can establish WiFi connection and connect to network.
@@ -79,8 +85,6 @@ def run(sha):
         
         
         # Network is running ... we can checks for updates
-        from config import sys
-        
         if sys.AUTOUPDATE:
             from autoupdate import do_update
             do_update(sha)
