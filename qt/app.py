@@ -120,6 +120,7 @@ def run(sha):
             
             # When all is displayed, then go to deep sleep. Sleep time is obtained
             # according to current weather forecast and UI needs ans is in minutes.
+            print('Going to deep sleep ...')
             led.running = False
             dt = ui.forecast.time.get_date_time(ui.forecast.weather.dt) # DEVEL - DEBUG
             debug_write('{:d}.{:d}.{:d} {:d}:{:02d}\n'.format(dt[2], dt[1], dt[0], dt[3], dt[4])) # DEVEL - DEBUG

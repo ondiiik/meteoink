@@ -115,6 +115,7 @@ class Connection:
     def http_get_json(self, url):
         print("HTTP GET: " + url)
         import socket
+        from   jread import JsonRead
         from   ujson import load
          
         # Send GET request
@@ -139,9 +140,16 @@ class Connection:
             data0 = data1
          
         # Parse JSON data
-        print("Parsing JSON from stream ...")
-        j = load(s) 
+        print("Parsing JSON from stream ...", end='')
+#         j = JsonRead(s, 2048)
+#         refresh() 
+#         s.close()
+#         print('')
+#         return j.data
+        j = load(s)
+        refresh() 
         s.close()
+        print('')
         return j
 #         import urequests
 #         return urequests.get(url).json()
