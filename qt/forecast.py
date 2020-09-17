@@ -163,20 +163,19 @@ class Forecast:
     
     def _read2_long(self, connection, ui, hours):
         # Download hourly weather forecast for 5 days
-        url   = "http://api.openweathermap.org/data/2.5/forecast?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}"
+        url   = "http://api.openweathermap.org/data/2.5/forecast?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&cnt={}"
         
         fcast = connection.http_get_json(url.format(connection.config.lat,
                                                     connection.config.lon,
                                                     ui.apikey,
                                                     ui.units,
-                                                    'EN'))
+                                                    'EN',
+                                                    (hours + 2) // 3))
         connection.disconnect()
         heap.refresh()
         
         # Build 2 days forecast
         self.forecast = []
-        
-        hourMax = None
         
         for current in fcast['list']:
             main    = current['main']
@@ -188,16 +187,8 @@ class Forecast:
             except KeyError:
                 rain = 0.0
             
-            dt = current['dt']
-            
-            if hourMax is None:
-                hourMax = dt + 3600 * hours
-            
-            if hourMax < dt:
-                break
-            
             self.forecast.append(Forecast.Weather(weather['id'],
-                                                  dt,
+                                                  current['dt'],
                                                   main[   'temp'],
                                                   main[   'feels_like'],
                                                   main[   'humidity'],

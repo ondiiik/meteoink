@@ -12,6 +12,14 @@ _pins[16] = 1
 _pins[23] = 0
 
 
+class WDT:
+    def __init__(self, timeout):
+        pass
+    
+    def feed(self):
+        pass
+
+
 class Pin:
     OUT       = 1
     IN        = 2
@@ -50,6 +58,12 @@ class ADC:
 class PWM:
     def __init__(self, pin, freq, duty):
         print('BEEP', freq)
+    
+    def duty(self, v):
+        pass
+    
+    def freq(self, v):
+        pass
     
     def deinit(self):
         pass

@@ -79,12 +79,15 @@ class Ui:
         return l
     
     
-    def repaint_weather(self, debug_write):
+    def repaint_weather(self, led, wdt):
         # For drawing burst CPU to full power
         machine.freq(sys.FREQ_MAX)
         
         # Redraw display
         print('Drawing ...')
+        led.mode(led.DRAWING)
+        wdt.feed()
+        
         self.canvas.fill(Color.WHITE)
         heap.refresh()
         
@@ -106,6 +109,7 @@ class Ui:
         intemp_dr(self, Vect(105, 50), Vect(295, 50))
         
         if status.refresh == self.forecast.ALL:
+            wdt.feed()
             chart_height = const(100)
             cal_dr(  self, Vect(0, 170), Vect(400, chart_height + 5), False)
             tempg_dr(self, Vect(0, 170), Vect(400, chart_height))
@@ -113,6 +117,7 @@ class Ui:
             wind_dr( self, Vect(0, 282), Vect(400, 20))
             rain_dr( self, Vect(0, 170), Vect(400, chart_height))
             tempt_dr(self, Vect(0, 170), Vect(400, chart_height))
+            wdt.feed()
         
         heap.refresh()
         
@@ -122,7 +127,9 @@ class Ui:
         
         # Flush drawing on display (upper or all parts)
         print('Flushing ...')
-        debug_write() # DEBUG - DEVEL
+        led.mode(led.FLUSHING)
+        wdt.feed()
+        
         if status.refresh == self.forecast.TEMPERATURE:
             self.canvas.flush((124, 0, 92, 98))
         elif status.refresh == self.forecast.WEATHER:
@@ -132,9 +139,11 @@ class Ui:
         
         if self.forecast.status.first:
             open('~', 'w').close()
+        
+        wdt.feed()
     
     
-    def repaint_config(self):
+    def repaint_config(self, led):
         from os          import remove
         from config.spot import hotspot
         try:
@@ -143,6 +152,7 @@ class Ui:
             pass
         
         print('Drawing ...')
+        led.mode(led.DRAWING)
         self.canvas.fill(Color.WHITE)
         
         qr_dr(self,
@@ -161,6 +171,7 @@ class Ui:
         vbat_dr(self,  Vect(self.canvas.dim.x // 2 - 10, self.canvas.dim.y // 2),  Vect(20, 10))
         
         print('Flushing ...')
+        led.mode(led.FLUSHING)
         self.canvas.flush()
 
 

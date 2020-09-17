@@ -1,55 +1,32 @@
-def led_task(led):
-    while led.running:
-        led.process()
-
-
 class Led():
     OFF      = 0
-    ON       = 1
-    FLASH1   = 2
-    FLASH2   = 3
+    WARM_UP  = 1
+    DOWNLOAD = 2
+    DRAWING  = 3
+    FLUSHING = 3
     ALERT    = 4
     
     def __init__(self):
-        from machine import Pin
-        from _thread import start_new_thread
+        from machine import Pin, PWM
         from config  import pins
-        self.pin     = Pin(pins.LED, Pin.OUT)
-        self.running = True
-        self._mode   = Led.OFF
-        self._code   = ((0, 100),)
-        self._idx    = 0
-        start_new_thread(led_task, (self,))
+        self._pin = PWM(Pin(pins.LED), freq=1, duty=10)
     
     def mode(self, m):
-        self._idx = 0;
-        
-        if m == Led.ON:
-            self._code = ((1, 100),)
-        elif m == Led.FLASH1:
-            self._code = ((1, 250), (1, 250), (0, 250), (0, 250))
-        elif m == Led.FLASH2:
-            self._code = ((1, 50), (0, 50), (1, 50), (0, 250), (0, 250), (0, 250), (0, 250))
+        if   m == Led.WARM_UP:
+            self._pin.duty(256)
+            self._pin.freq(400)
+        elif m == Led.DOWNLOAD:
+            self._pin.duty(8)
+            self._pin.freq(1)
+        elif m == Led.DRAWING:
+            self._pin.duty(4)
+            self._pin.freq(400)
+        elif m == Led.FLUSHING:
+            self._pin.duty(1)
+            self._pin.freq(4)
         elif m == Led.ALERT:
-            self._code = ((1, 30), (0, 30))
+            self._pin.duty(16)
+            self._pin.freq(10)
         else:
-            self._code = ((0, 100),)
-    
-    
-    def process(self):
-        from utime import sleep_ms
-        
-        if self._idx >= len(self._code):
-            self._idx = 0
-        
-        cmd = self._code[self._idx]
-        
-        if 0 == cmd[0]:
-            self.pin.off()
-        else:
-            self.pin.on()
-        
-        sleep_ms(cmd[1])
-        
-        self._idx += 1
-
+            self._pin.duty(0)
+            self._pin.freq(10)

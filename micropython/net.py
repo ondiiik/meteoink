@@ -140,16 +140,10 @@ class Connection:
             data0 = data1
          
         # Parse JSON data
-        print("Parsing JSON from stream ...", end='')
-#         j = JsonRead(s, 2048)
-#         refresh() 
-#         s.close()
-#         print('')
-#         return j.data
+        print("Parsing JSON from stream ...")
         j = load(s)
         refresh() 
         s.close()
-        print('')
         return j
 #         import urequests
 #         return urequests.get(url).json()

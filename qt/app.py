@@ -1,40 +1,9 @@
-# DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
-import vbat # DEVEL - DEBUG
-import utime # DEVEL - DEBUG
-
-debug_time0 = utime.ticks_ms()
-
-try:
-    temp_log = open('temp.log', 'a')
-except:
-    temp_log = open('temp.log', 'w')
-
-def debug_time():
-    return utime.ticks_ms() - debug_time0
-
-
-def debug_vbat():
-    v = vbat.voltage()
-    
-    for i in range(7):
-        v += vbat.voltage()
-    
-    return v / 8
-
-
-def debug_write(tail = ''):
-    temp_log.write('{}={}, {}'.format(debug_time(), debug_vbat(), tail)) # DEVEL - DEBUG
-# DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
-
-
 def run(sha):
     import machine
     from   config import sys
     
 #     try:
     if True:
-        debug_time0 = utime.ticks_ms() # DEVEL - DEBUG
-        debug_write() # DEVEL - DEBUG
         # Reads internal temerature just after wake-up to reduce
         # influence of chip warm-up and use some kind of ambient
         # reduction to get more close to indoor temperature. This
@@ -46,6 +15,11 @@ def run(sha):
         # humidity.
         from esp32 import raw_temperature
         temp = ((raw_temperature() - 32) / 1.8) - 34.0
+        
+        # Activates watchdog - just to be sure we will be rebooted
+        # instead of draining battery in infinite loop somewhere
+        # in software
+        wdt = machine.WDT(timeout = 30000)
         
         # Slow nown a bit and save piece of battery
         machine.freq(sys.FREQ_MIN)
@@ -67,7 +41,7 @@ def run(sha):
         # As we uses E-Ink display, the most comfortable way
         # how to work with it is to define canvas object for
         # drawing objects and flushing them later to screen.
-        led.mode(Led.ON)
+        led.mode(Led.WARM_UP)
         from display import Canvas
         canvas = Canvas()
         heap.refresh()
@@ -78,7 +52,7 @@ def run(sha):
         # Once we have canvas established (large object needs
         # to be created first to prevent from memory fragmentation),
         # we can establish WiFi connection and connect to network.
-        led.mode(Led.FLASH1)
+        led.mode(Led.DOWNLOAD)
         from net import Connection
         net = Connection()
         heap.refresh()
@@ -93,6 +67,9 @@ def run(sha):
         from jumpers import meteostation, alert
         from buzzer  import play
         
+        # Refresh watchdog
+        wdt.feed()
+        
         if meteostation():
             # Once we are connected on network, we can download forecast.
             # Just note that once forecast is download, WiFi is disconnected
@@ -100,17 +77,16 @@ def run(sha):
             from forecast import Forecast
             forecast = Forecast(net, temp)
             heap.refresh()
-            debug_write() # DEVEL - DEBUG
+            wdt.feed()
             
             # Most time consuming part when we have all data is to draw them
             # on user interface - screen.
-            led.mode(Led.FLASH2)
             from ui import Ui
             ui = Ui(canvas, forecast, net)
             heap.refresh()
-            ui.repaint_weather(debug_write)
+            ui.repaint_weather(led, wdt)
             heap.refresh()
-            debug_write() # DEVEL - DEBUG
+            wdt.feed()
             
             # Forecast is painted. Now we shall checks how about temperature
             # or low battery notification and produce alert sound if needed.
@@ -121,27 +97,23 @@ def run(sha):
             # When all is displayed, then go to deep sleep. Sleep time is obtained
             # according to current weather forecast and UI needs ans is in minutes.
             print('Going to deep sleep ...')
-            led.running = False
-            dt = ui.forecast.time.get_date_time(ui.forecast.weather.dt) # DEVEL - DEBUG
-            debug_write('{:d}.{:d}.{:d} {:d}:{:02d}\n'.format(dt[2], dt[1], dt[0], dt[3], dt[4])) # DEVEL - DEBUG
-            temp_log.close() # DEVEL - DEBUG
             machine.deepsleep(forecast.status.sleep_time * 60000)
             
         # It may happen that user wants to attach with HTTP for
         # update of firmware or configuration
         else:
             play(((2093, 30), (0, 120),(2093, 30)))
-            led.mode(Led.FLASH2)
+            led.mode(Led.DOWNLOAD)
             
             from web     import Server
             from ui      import Ui
             
             ui = Ui(canvas, None, net)
-            ui.repaint_config()
+            ui.repaint_config(led)
             heap.refresh()
             
-            led.mode(Led.ON)
-            server = Server(net)
+            led.mode(Led.DOWNLOAD)
+            server = Server(net, wdt)
             
             play(((1047, 30), (0, 120), (1319, 30), (0, 120), (1568, 30), (0, 120), (2093, 30)))
             server.run()

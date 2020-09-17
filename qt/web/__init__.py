@@ -1,15 +1,17 @@
 import socket
 from heap   import refresh
 from buzzer import play
+from utime  import sleep_ms
 
 
 class Server():
-    def __init__(self, net):
-        __slots__   = ('net', 'client', 'page', 'args')
+    def __init__(self, net, wdt):
+        __slots__   = ('net', 'client', 'page', 'args', 'wdt')
         self.net    = net
         self.client = None
         self.page   = ''
         self.args   = {}
+        self.wdt    = wdt
     
     
     def run(self):
@@ -17,13 +19,26 @@ class Server():
         addr = socket.getaddrinfo('0.0.0.0', 5555)[0][-1]
         sck  = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sck.bind(addr)
+        sck.setblocking(False)
         sck.listen(1)
         
         print('Web server listening on', addr)
         
         # Wait for incomming connection
         while True:
-            self.client, addr = sck.accept()
+            while True:
+                try:
+                    self.client, addr = sck.accept()
+                    break
+                except OSError as e:
+                    from uerrno import EAGAIN
+                    if EAGAIN == e.args[0]:
+                        self.wdt.feed()
+                        sleep_ms(50)
+                    else:
+                        break
+            
+            self.wdt.feed()
             self.client.settimeout(8.0)
             print('Accepted client from', addr)
             
