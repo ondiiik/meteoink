@@ -1,2 +1,2 @@
-VBAT_LOW      = 3.9
-VBAT_CRITICAL = VBAT_LOW - 0.1
+VBAT_LOW     = 3.8
+SHOW_VOLTAGE = False

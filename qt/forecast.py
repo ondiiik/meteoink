@@ -1,6 +1,7 @@
 import                  heap
 from collections import namedtuple
 from micropython import const
+from config      import display_get, DISPLAY_JUST_REPAINT
 
 # See https://openweathermap.org/weather-conditions
 id2icon = { 200 : '200',
@@ -63,7 +64,7 @@ id2icon = { 200 : '200',
 class Forecast:
     Weather     = namedtuple('Weather', ('id', 'dt', 'temp', 'feel', 'rh', 'rain', 'speed', 'dir'))
     Home        = namedtuple('Home',    ('temp', 'rh'))
-    Status      = namedtuple('Status',  ('refresh', 'sleep_time', 'first'))
+    Status      = namedtuple('Status',  ('refresh', 'sleep_time'))
     
     WEATHER     = const(1)
     TEMPERATURE = const(2)
@@ -220,15 +221,10 @@ class Forecast:
             refresh = Forecast.ALL
         
         # Regardless on result - refresh all on first run
-        try:
-            open('~')
-            first = False
-        except:
+        if not display_get() == DISPLAY_JUST_REPAINT:
             refresh = Forecast.ALL
-            first   = True
         
-        #sleep_time  = 3 # DEVEL - DEBUG
-        self.status = Forecast.Status(refresh, sleep_time, first)
+        self.status = Forecast.Status(refresh, sleep_time)
     
     
     def _get_dht(self, in_temp):

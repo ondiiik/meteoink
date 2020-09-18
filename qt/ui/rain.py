@@ -1,4 +1,5 @@
 from ui import UiFrame, Vect, Color
+import         heap
 
 class UiRain(UiFrame):
     def __init__(self, ofs, dim):
@@ -15,6 +16,7 @@ class UiRain(UiFrame):
         ui.canvas.hline(Vect(0, self.dim.y - 1), self.dim.x - 1, Color.BLACK)
         
         for i in range(cnt):
+            heap.refresh()
             xx      = int(block * i)
             weather = forecast[i]
             dt      = ui.forecast.time.get_date_time(weather.dt)

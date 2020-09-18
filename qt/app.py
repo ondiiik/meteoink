@@ -1,6 +1,7 @@
 def run(sha):
     import machine
-    from   config import sys
+    from   config import sys, reset_counter_get, reset_counter_set
+    from   buzzer import play
     
 #     try:
     if True:
@@ -15,11 +16,6 @@ def run(sha):
         # humidity.
         from esp32 import raw_temperature
         temp = ((raw_temperature() - 32) / 1.8) - 34.0
-        
-        # Activates watchdog - just to be sure we will be rebooted
-        # instead of draining battery in infinite loop somewhere
-        # in software
-        wdt = machine.WDT(timeout = 30000)
         
         # Slow nown a bit and save piece of battery
         machine.freq(sys.FREQ_MIN)
@@ -38,6 +34,11 @@ def run(sha):
         led = Led()
         heap.refresh()
         
+        # Disable LED when brown-out (too low battery reset)
+        # is detected
+        if (machine.reset_cause() == machine.PWRON_RESET) and (reset_counter_get() > 0):
+            led.disable()
+        
         # As we uses E-Ink display, the most comfortable way
         # how to work with it is to define canvas object for
         # drawing objects and flushing them later to screen.
@@ -45,6 +46,24 @@ def run(sha):
         from display import Canvas
         canvas = Canvas()
         heap.refresh()
+        
+        # Checks reset cause for potential brown-out
+        # (too low battery) reset. This is considered when two
+        # consecutive resets are detected.
+        if machine.reset_cause() == machine.PWRON_RESET:
+            if reset_counter_get() > 0:
+                from ui import Ui
+                led.mode(Led.ALERT)
+                
+                ui = Ui(canvas, None, None)
+                heap.refresh()
+                ui.repaint_lowbat()
+                heap.refresh()
+                
+                print('Going to deep sleep ...')
+                machine.deepsleep(120000)
+            else:
+                reset_counter_set(1)
         
         # We have to set high CPU speed due to compatibility with WiFi HW
         machine.freq(sys.FREQ_MAX)
@@ -65,10 +84,6 @@ def run(sha):
         
         # Following parts are relevant in normal mode (draw forecast)
         from jumpers import meteostation, alert
-        from buzzer  import play
-        
-        # Refresh watchdog
-        wdt.feed()
         
         if meteostation():
             # Once we are connected on network, we can download forecast.
@@ -77,22 +92,23 @@ def run(sha):
             from forecast import Forecast
             forecast = Forecast(net, temp)
             heap.refresh()
-            wdt.feed()
             
             # Most time consuming part when we have all data is to draw them
             # on user interface - screen.
             from ui import Ui
             ui = Ui(canvas, forecast, net)
             heap.refresh()
-            ui.repaint_weather(led, wdt)
+            ui.repaint_weather(led)
             heap.refresh()
-            wdt.feed()
             
             # Forecast is painted. Now we shall checks how about temperature
             # or low battery notification and produce alert sound if needed.
             if alert():
                 for i in range(3):
                     play(((1000,30), (0,30),(1000,30), (0,30),(1000,30), (0,100)))
+            
+            # All runs fine - annulate counter reset
+            reset_counter_set(0)
             
             # When all is displayed, then go to deep sleep. Sleep time is obtained
             # according to current weather forecast and UI needs ans is in minutes.
@@ -105,15 +121,15 @@ def run(sha):
             play(((2093, 30), (0, 120),(2093, 30)))
             led.mode(Led.DOWNLOAD)
             
-            from web     import Server
-            from ui      import Ui
+            from web import Server
+            from ui  import Ui
             
             ui = Ui(canvas, None, net)
             ui.repaint_config(led)
             heap.refresh()
             
             led.mode(Led.DOWNLOAD)
-            server = Server(net, wdt)
+            server = Server(net)
             
             play(((1047, 30), (0, 120), (1319, 30), (0, 120), (1568, 30), (0, 120), (2093, 30)))
             server.run()
@@ -123,8 +139,6 @@ def run(sha):
 #     except:
 #         import heap
 #         heap.refresh()
-#          
-#         from buzzer  import play
 #          
 #         led.mode(Led.ALERT)
 #          

@@ -1,5 +1,7 @@
 # Some meteostation runtime files
 /qt/~
+/qt/config/display.py
+/qt/config/resets.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

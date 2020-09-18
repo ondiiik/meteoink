@@ -1,5 +1,5 @@
 from micropython import const
-from heap        import refresh
+import                  heap
 
 
 _spaces = const(4)
@@ -15,6 +15,6 @@ def page(web):
     pg += web.form_input('Country',  'country')
     pg += web.form_input('City',     'city')
     pg += web.form_tail()
-    refresh()
+    heap.refresh()
     
     web.write(pg)

@@ -1,3 +1,6 @@
+import sys
+
+
 class SPI:
     def __init__(self, n):
         pass
@@ -74,8 +77,17 @@ def freq(max_freq):
 
 
 def deepsleep(t):
-    pass
+    print('Deep sleep ....')
+    sys.exit()
 
 
 def reset():
-    pass
+    print('Reset ....')
+    sys.exit()
+
+
+def reset_cause():
+    return 0
+
+
+PWRON_RESET = 1

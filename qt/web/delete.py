@@ -1,5 +1,5 @@
 from micropython import const
-from heap        import refresh
+import                  heap
 from config      import connection
 from .           import bytes2bssid
 
@@ -18,6 +18,6 @@ def page(web):
     pg += web.form_label('Country',  'country', config.country)
     pg += web.form_label('City',     'city',    config.location)
     pg += web.form_tail()
-    refresh()
+    heap.refresh()
     
     web.write(pg)

@@ -1,17 +1,16 @@
 import socket
-from heap   import refresh
-from buzzer import play
-from utime  import sleep_ms
+import               heap
+from   buzzer import play
+from   utime  import sleep_ms
 
 
 class Server():
-    def __init__(self, net, wdt):
-        __slots__   = ('net', 'client', 'page', 'args', 'wdt')
+    def __init__(self, net):
+        __slots__   = ('net', 'client', 'page', 'args')
         self.net    = net
         self.client = None
         self.page   = ''
         self.args   = {}
-        self.wdt    = wdt
     
     
     def run(self):
@@ -33,12 +32,12 @@ class Server():
                 except OSError as e:
                     from uerrno import EAGAIN
                     if EAGAIN == e.args[0]:
-                        self.wdt.feed()
+                        heap.refresh()
                         sleep_ms(50)
                     else:
                         break
             
-            self.wdt.feed()
+            heap.refresh()
             self.client.settimeout(8.0)
             print('Accepted client from', addr)
             

@@ -1,5 +1,5 @@
 from micropython import const
-from heap        import refresh
+import                  heap
 
 
 class Wifi:
@@ -18,7 +18,7 @@ class Connection:
         from network import WLAN, STA_IF
         
         self._ifc = WLAN(STA_IF)
-        refresh()
+        heap.refresh()
         
         if not self._ifc.active(True):
             raise RuntimeError("Wifi activation failed")
@@ -45,7 +45,7 @@ class Connection:
         
         # Activate WiFi interface
         self._ifc = WLAN(STA_IF)
-        refresh()
+        heap.refresh()
         
         if not self._ifc.active(True):
             raise RuntimeError("Wifi activation failed")
@@ -83,11 +83,11 @@ class Connection:
         
         for i in range(8):
             if self._ifc.isconnected():
-                refresh()
+                heap.refresh()
                 print("Connected: " + str(self.ifconfig))
                 return
             
-            refresh()
+            heap.refresh()
             sleep(1)
             
         raise RuntimeError("Wifi connection refused")
@@ -114,39 +114,39 @@ class Connection:
     
     def http_get_json(self, url):
         print("HTTP GET: " + url)
-        import socket
-        from   jread import JsonRead
-        from   ujson import load
-         
-        # Send GET request
-        _, _, host, path = url.split('/', 3)
-        addr             = socket.getaddrinfo(host, 80)[0][-1]
-        s                = socket.socket()
-        s.connect(addr)
-        s.send(bytes('GET /%s HTTP/1.0\nHost: %s\n\n' % (path, host), 'utf8'))
-         
-        data0 = ' '
-         
-        # Strip response head
-        while True:
-            data1 = s.recv(1)
-             
-            if data1 == b'\r':
-                continue
-             
-            if data0 == b'\n' and data1 == b'\n':
-                break
-             
-            data0 = data1
-         
-        # Parse JSON data
-        print("Parsing JSON from stream ...")
-        j = load(s)
-        refresh() 
-        s.close()
-        return j
-#         import urequests
-#         return urequests.get(url).json()
+#         import socket
+#         from   jread import JsonRead
+#         from   ujson import load
+#          
+#         # Send GET request
+#         _, _, host, path = url.split('/', 3)
+#         addr             = socket.getaddrinfo(host, 80)[0][-1]
+#         s                = socket.socket()
+#         s.connect(addr)
+#         s.send(bytes('GET /%s HTTP/1.0\nHost: %s\n\n' % (path, host), 'utf8'))
+#          
+#         data0 = ' '
+#          
+#         # Strip response head
+#         while True:
+#             data1 = s.recv(1)
+#              
+#             if data1 == b'\r':
+#                 continue
+#              
+#             if data0 == b'\n' and data1 == b'\n':
+#                 break
+#              
+#             data0 = data1
+#          
+#         # Parse JSON data
+#         print("Parsing JSON from stream ...")
+#         j = load(s)
+#         heap.refresh() 
+#         s.close()
+#         return j
+        import urequests
+        return urequests.get(url).json()
     
     
     def disconnect(self):

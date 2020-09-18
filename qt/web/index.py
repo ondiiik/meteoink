@@ -1,5 +1,5 @@
 from micropython import const
-from heap        import refresh
+import                  heap
 from .           import bytes2bssid
 
 
@@ -14,7 +14,7 @@ def page(web):
     pg += web.table_head(('SSID', 'BSSID', 'Country', 'Location', '', ''), 'frame="hsides"', 'style="text-align:left"')
     
     for place in connection:
-        refresh()
+        heap.refresh()
         
         if place.bssid is None:
             bssid = ''
@@ -31,12 +31,12 @@ def page(web):
                              _spaces)
     
     pg += web.table_tail()
-    refresh()
+    heap.refresh()
     
     pg += web.br()
     pg += web.button('Add new location', 'add')
     pg += web.br()
-    refresh()
+    heap.refresh()
     
     pg += web.heading(   2,    'General setup')
     pg += web.table_head(None, 'frame="hsides"')
@@ -54,8 +54,7 @@ def page(web):
     pg += web.heading(   2,    'Battery  setup')
     pg += web.table_head(None, 'frame="hsides"')
     pg += web.table_row(('Current voltage',  '{:.2f} V'.format(voltage()), ''),                                 _spaces)
-    pg += web.table_row(('Warning voltage',  '{:.2f} V'.format(vbat.VBAT_LOW),      web.button('Edit', 'low')), _spaces)
-    pg += web.table_row(('Critical voltage', '{:.2f} V'.format(vbat.VBAT_CRITICAL), web.button('Edit', 'low')), _spaces)
+    pg += web.table_row(('Critical voltage', '{:.2f} V'.format(vbat.VBAT_LOW), web.button('Edit', 'low')), _spaces)
     pg += web.table_tail()
     
     web.write(pg)

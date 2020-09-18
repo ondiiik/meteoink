@@ -26,6 +26,9 @@
 # also works for black/white/yellow GDEW042C37?
 
 # Display commands
+import heap
+
+
 class EPD:
     def __init__(self, spi, cs, dc, rst, busy):
         self.spi  = spi
@@ -41,7 +44,7 @@ class EPD:
         
         self.width  = 400
         self.height = 300
-
+    
     def _command(self, command, data=None):
         self.dc(0)
         self.cs(0)
@@ -49,18 +52,18 @@ class EPD:
         self.cs(1)
         if data is not None:
             self._data(data)
-
+    
     def _data(self, data):
         self.dc(1)
         self.cs(0)
         self.spi.write(data)
         self.cs(1)
-
+        
     # draw the current frame memory
     def _flush_frame(self, fb_black, fb_yellow):
         self._command(0x10, fb_black)   # Black buffer transmission
         self._command(0x13, fb_yellow)  # Yellow buffer transmission
-
+    
     def _set_window(self, x, y, w, h):
         from struct import pack
         xe  = (x + w - 1) | 0x0007; # Byte boundary inclusive (last byte)
@@ -69,14 +72,14 @@ class EPD:
         xe |= 0x0007
         self._command(0x90, pack('!HHHH', x, xe, y, ye))  # Resolution setting
         self._command(0x00) # Distortion on right half
-
+    
     def _reset(self):
         from time import sleep_ms
         self.rst(0)
         sleep_ms(200)
         self.rst(1)
         sleep_ms(200)
-
+    
     def _init(self):
         from struct import pack
         self._reset()
@@ -86,18 +89,24 @@ class EPD:
         self._command(0x50, b'\xF7')                              # Data setting: WBmode:VBDF 17|D7 VBDW 97 VBDB 57, WBRmode:VBDF F7 VBDW 77 VBDB 37  VBDR B7
         self._command(0x04)                                       # Power ON
         self._wait_until_idle()
-
+        
     # to wake call _init()
     def _sleep(self):
         self._command(0x02)          # Power off display
         self._wait_until_idle()
         self._command(0x07, b'\xA5') # Deep sleep
-
+    
     def _wait_until_idle(self):
         from time import sleep_ms
-        while self.busy.value() == 0:
-            sleep_ms(100)
-
+        for i in range(150):
+            if not self.busy.value() == 0:
+                return
+            
+            heap.refresh()
+            sleep_ms(250)
+        
+        raise RuntimeError('EPD Timeout')
+    
     # draw the current frame memory
     def display_frame(self, fb_black, fb_yellow):
         self._init()
@@ -105,7 +114,7 @@ class EPD:
         self._command(0x12)                     # Refresh display
         self._wait_until_idle()
         self._sleep()                           # Suspend display
-
+        
     # draw just part of display
     def display_window(self, fb_black, fb_yellow, x, y, w, h):
         x  -= x % 8

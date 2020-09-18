@@ -1,5 +1,5 @@
 from micropython import const
-from heap        import refresh
+import                  heap
 from .           import bytes2bssid
 
 
@@ -11,7 +11,7 @@ def page(web):
     pg += web.table_head(('SSID', 'BSSID', ''), 'frame="hsides"', 'style="text-align:left"')
     
     for w in web.net.nets:
-        refresh()
+        heap.refresh()
         bssid = bytes2bssid(w.bssid)
         pg   += web.table_row((w.ssid,
                                bssid,
@@ -19,6 +19,6 @@ def page(web):
                                _spaces)
     
     pg += web.table_tail()
-    refresh()
+    heap.refresh()
     
     web.write(pg)

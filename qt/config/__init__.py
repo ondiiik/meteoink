@@ -47,6 +47,41 @@ def flush_connections():
     f.close()
 
 
+DISPLAY_REQUIRES_FULL_REFRESH = const(0)
+DISPLAY_JUST_REPAINT          = const(1)
+DISPLAY_DONT_REFRESH          = const(2)
+
+def display_set(val, force = False):
+    if force or (not display_get() == val):
+        f = open('config/display.py', 'w')
+        f.write('DISPLAY_STATE = {}'.format(val))
+        f.close()
+
+def display_get():
+    try:
+        from config import display
+        return display.DISPLAY_STATE
+    except:
+        display_set(DISPLAY_REQUIRES_FULL_REFRESH, True)
+        return      DISPLAY_REQUIRES_FULL_REFRESH 
+
+
+def reset_counter_set(val, force = False):
+    if force or (not reset_counter_get() == val):
+        f = open('config/resets.py', 'w')
+        f.write('RESET_COUNT = {}'.format(val))
+        f.close()
+
+def reset_counter_get():
+    try:
+        from config import resets
+        return resets.RESET_COUNT
+    except:
+        reset_counter_set(0, True)
+        return            0 
+        
+
+
 from .connection import connection
 from .spot       import hotspot
 from .ui         import ui

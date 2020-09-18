@@ -1,11 +1,14 @@
 import                    heap
 import                    machine
-from   config      import sys
-from   display     import Color, Vect, Bitmap
+from   config      import sys, display_set, display_get, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_JUST_REPAINT, DISPLAY_DONT_REFRESH
+from   display     import Color, Vect, Bitmap 
 from   micropython import const
 
 
 heap.refresh()
+
+
+_CHART_HEIGHT = const(100)
 
 
 class UiFrame:
@@ -79,14 +82,13 @@ class Ui:
         return l
     
     
-    def repaint_weather(self, led, wdt):
+    def repaint_weather(self, led):
         # For drawing burst CPU to full power
         machine.freq(sys.FREQ_MAX)
         
         # Redraw display
         print('Drawing ...')
         led.mode(led.DRAWING)
-        wdt.feed()
         
         self.canvas.fill(Color.WHITE)
         heap.refresh()
@@ -95,31 +97,40 @@ class Ui:
         
         if not status.refresh == self.forecast.TEMPERATURE:
             weather_dr(self, Vect(0,   0), Vect(400, 100))
+            heap.refresh()
             l = outside_dr(self, Vect(105, 0), Vect(295, 50))
-            
+            heap.refresh()
+        
         outtemp_dr(self, Vect(105, 0), Vect(295, 50))
+        heap.refresh()
         
         if status.refresh == self.forecast.ALL:
             cal_dr(self, Vect(0, 100), Vect(400, 20))
+            heap.refresh()
         
         if not status.refresh == self.forecast.TEMPERATURE:
             inside_dr(self, Vect(105, 50), Vect(295, 50), l, self.connection)
+            heap.refresh()
             vbat_dr(  self, Vect(284, 87), Vect(14, 10))
+            heap.refresh()
             
         intemp_dr(self, Vect(105, 50), Vect(295, 50))
-        
-        if status.refresh == self.forecast.ALL:
-            wdt.feed()
-            chart_height = const(100)
-            cal_dr(  self, Vect(0, 170), Vect(400, chart_height + 5), False)
-            tempg_dr(self, Vect(0, 170), Vect(400, chart_height))
-            icons_dr(self, Vect(0, 128), Vect(400, 40))
-            wind_dr( self, Vect(0, 282), Vect(400, 20))
-            rain_dr( self, Vect(0, 170), Vect(400, chart_height))
-            tempt_dr(self, Vect(0, 170), Vect(400, chart_height))
-            wdt.feed()
+        heap.refresh()
         
         heap.refresh()
+        if status.refresh == self.forecast.ALL:
+            cal_dr(  self, Vect(0, 170), Vect(400, _CHART_HEIGHT + 5), False)
+            heap.refresh()
+            tempg_dr(self, Vect(0, 170), Vect(400, _CHART_HEIGHT))
+            heap.refresh()
+            icons_dr(self, Vect(0, 128), Vect(400, 40))
+            heap.refresh()
+            wind_dr( self, Vect(0, 282), Vect(400, 20))
+            heap.refresh()
+            rain_dr( self, Vect(0, 170), Vect(400, _CHART_HEIGHT))
+            heap.refresh()
+            tempt_dr(self, Vect(0, 170), Vect(400, _CHART_HEIGHT))
+            heap.refresh()
         
         # For flushing we can slow down as this uses busy wait and
         # SPI communication
@@ -128,7 +139,6 @@ class Ui:
         # Flush drawing on display (upper or all parts)
         print('Flushing ...')
         led.mode(led.FLUSHING)
-        wdt.feed()
         
         if status.refresh == self.forecast.TEMPERATURE:
             self.canvas.flush((124, 0, 92, 98))
@@ -137,19 +147,15 @@ class Ui:
         else:
             self.canvas.flush()
         
-        if self.forecast.status.first:
-            open('~', 'w').close()
-        
-        wdt.feed()
+        # Display is repainted, so next can be just partial repaint
+        display_set(DISPLAY_JUST_REPAINT)
     
     
     def repaint_config(self, led):
-        from os          import remove
         from config.spot import hotspot
-        try:
-            remove('~')
-        except:
-            pass
+        
+        # After config we will need to repaint all
+        display_set(DISPLAY_REQUIRES_FULL_REFRESH)
         
         print('Drawing ...')
         led.mode(led.DRAWING)
@@ -173,6 +179,20 @@ class Ui:
         print('Flushing ...')
         led.mode(led.FLUSHING)
         self.canvas.flush()
+    
+    
+    def repaint_lowbat(self):
+        if not display_get() == DISPLAY_DONT_REFRESH:
+            print('Drawing ...')
+            self.canvas.fill(Color.WHITE)
+            vbat_dr(self, Vect(self.canvas.dim.x // 2 - 30, self.canvas.dim.y // 2), Vect(60, 30))
+            
+            print('Flushing ...')
+            self.canvas.flush()
+            
+            display_set(DISPLAY_DONT_REFRESH)
+        else:
+            print('Already painted ... saving battery')
 
 
 def weather_dr(ui, p, d):
