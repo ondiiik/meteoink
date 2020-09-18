@@ -1,4 +1,5 @@
 from micropython import const
+from platform    import IS_MICROPYTHON
 
 class Connection:
     def __init__(self, location, lat, lon, ssid, passwd, bssid = None):
@@ -31,11 +32,9 @@ class Ui:
 
 
 def flush_connections():
-    from sys import implementation
-    
     cfg_path = '/config/connection.py'
     
-    if not implementation.name == 'micropython':
+    if not IS_MICROPYTHON:
         cfg_path = '/home/ondiiik/Development/meteo/meteo_ink/meteo_ink/pyPc/config/connection.py'
     
     f = open(cfg_path, 'w')
@@ -64,22 +63,6 @@ def display_get():
     except:
         display_set(DISPLAY_REQUIRES_FULL_REFRESH, True)
         return      DISPLAY_REQUIRES_FULL_REFRESH 
-
-
-def reset_counter_set(val, force = False):
-    if force or (not reset_counter_get() == val):
-        f = open('config/resets.py', 'w')
-        f.write('RESET_COUNT = {}'.format(val))
-        f.close()
-
-def reset_counter_get():
-    try:
-        from config import resets
-        return resets.RESET_COUNT
-    except:
-        reset_counter_set(0, True)
-        return            0 
-        
 
 
 from .connection import connection

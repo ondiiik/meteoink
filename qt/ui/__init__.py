@@ -82,7 +82,7 @@ class Ui:
         return l
     
     
-    def repaint_weather(self, led):
+    def repaint_weather(self, led, volt):
         # For drawing burst CPU to full power
         machine.freq(sys.FREQ_MAX)
         
@@ -111,7 +111,7 @@ class Ui:
         if not status.refresh == self.forecast.TEMPERATURE:
             inside_dr(self, Vect(105, 50), Vect(295, 50), l, self.connection)
             heap.refresh()
-            vbat_dr(  self, Vect(284, 87), Vect(14, 10))
+            vbat_dr(  self, Vect(284, 87), Vect(14, 10), volt)
             heap.refresh()
             
         intemp_dr(self, Vect(105, 50), Vect(295, 50))
@@ -151,7 +151,7 @@ class Ui:
         display_set(DISPLAY_JUST_REPAINT)
     
     
-    def repaint_config(self, led):
+    def repaint_config(self, led, volt):
         from config.spot import hotspot
         
         # After config we will need to repaint all
@@ -174,21 +174,23 @@ class Ui:
         url_dr(self,  Vect(0,   self.canvas.dim.y // 2), Vect(self.canvas.dim.x - 132, self.canvas.dim.y // 2), url)
         wifi_dr(self, Vect(200, 0),                      Vect(self.canvas.dim.x - 132, self.canvas.dim.y // 2), hotspot)
         
-        vbat_dr(self,  Vect(self.canvas.dim.x // 2 - 10, self.canvas.dim.y // 2),  Vect(20, 10))
+        vbat_dr(self,  Vect(self.canvas.dim.x // 2 - 10, self.canvas.dim.y // 2),  Vect(20, 10), volt)
         
         print('Flushing ...')
         led.mode(led.FLUSHING)
         self.canvas.flush()
     
     
-    def repaint_lowbat(self):
+    def repaint_lowbat(self, volt):
         if not display_get() == DISPLAY_DONT_REFRESH:
             print('Drawing ...')
             self.canvas.fill(Color.WHITE)
-            vbat_dr(self, Vect(self.canvas.dim.x // 2 - 30, self.canvas.dim.y // 2), Vect(60, 30))
+            v = Vect(self.canvas.dim.x // 2 - 30, self.canvas.dim.y // 2)
+            d = Vect(60, 30)
+            vbat_dr(self, v, d, volt)
             
             print('Flushing ...')
-            self.canvas.flush()
+            self.canvas.flush((v.x - 20, v.y - 26, d.x + 46, d.y + 40))
             
             display_set(DISPLAY_DONT_REFRESH)
         else:
@@ -255,6 +257,6 @@ def url_dr(ui, p, d, u):
     from ui.url import UiUrl
     UiUrl(p, d, u).repaint(ui)
     
-def vbat_dr(ui, p, d):
+def vbat_dr(ui, p, d, volt):
     from ui.vbat import UiVBat
-    UiVBat(p, d).repaint(ui)
+    UiVBat(p, d).repaint(ui, volt)

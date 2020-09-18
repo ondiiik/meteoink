@@ -1,4 +1,5 @@
 from micropython import const
-AUTOUPDATE = True
-FREQ_MAX   = const(240000000)
-FREQ_MIN   = const(20000000)
+DISABLE_WATCHDOG = False
+AUTOUPDATE       = False
+FREQ_MAX         = const(240000000)
+FREQ_MIN         = const(80000000)

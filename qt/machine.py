@@ -55,7 +55,7 @@ class ADC:
         pass
     
     def read(self):
-        return 3985
+        return 3287
 
 
 class PWM:

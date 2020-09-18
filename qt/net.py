@@ -20,8 +20,8 @@ class Connection:
     
     def http_get_json(self, url):
         print("HTTP GET: " + url)
-        import requests
-        return requests.get(url).json()
+        import urequests
+        return urequests.get(url).json()
     
     def disconnect(self):
         pass

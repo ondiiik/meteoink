@@ -150,4 +150,7 @@ class Connection:
     
     
     def disconnect(self):
-        self._ifc.active(False)
+        from network import WLAN, STA_IF, AP_IF
+        WLAN(STA_IF).active(False)
+        WLAN(AP_IF).active(False)
+        self._ifc = None

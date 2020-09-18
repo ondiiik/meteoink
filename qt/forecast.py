@@ -92,11 +92,11 @@ class Forecast:
     
     
     def _read1(self, connection, ui):
-        print("Reading forecast data")
         from ltime import Time
         
         # Download hourly weather forecast for today
         url   = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}'
+        heap.refresh()
         fcast = connection.http_get_json(url.format(connection.config.lat,
                                                     connection.config.lon,
                                                     ui.apikey,
@@ -132,12 +132,14 @@ class Forecast:
     def _read2_short(self, connection, ui):
         # Download hourly weather forecast for today
         url   = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}'
+        heap.refresh()
         fcast = connection.http_get_json(url.format(connection.config.lat,
                                                     connection.config.lon,
                                                     ui.apikey,
                                                     ui.units,
                                                     'EN',
                                                     'current,minutely,daily'))
+        heap.refresh()
         connection.disconnect()
         heap.refresh()
         
@@ -165,13 +167,14 @@ class Forecast:
     def _read2_long(self, connection, ui, hours):
         # Download hourly weather forecast for 5 days
         url   = "http://api.openweathermap.org/data/2.5/forecast?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&cnt={}"
-        
+        heap.refresh()
         fcast = connection.http_get_json(url.format(connection.config.lat,
                                                     connection.config.lon,
                                                     ui.apikey,
                                                     ui.units,
                                                     'EN',
                                                     (hours + 2) // 3))
+        heap.refresh()
         connection.disconnect()
         heap.refresh()
         

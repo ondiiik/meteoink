@@ -1,8 +1,9 @@
-from sys     import implementation
-from jumpers import hotspot
+from jumpers  import hotspot
+from platform import IS_MICROPYTHON
+from config   import sys
 
 
-if hotspot():
+if sys.DISABLE_WATCHDOG or hotspot():
     # Don't use watchdog for hotspot (back doors)
     class WDT:
         def __init__(self, timeout):
@@ -18,7 +19,7 @@ else:
 wdt = WDT(timeout = 7000)
 
 
-if implementation.name == 'micropython':
+if IS_MICROPYTHON:
     def refresh():
         wdt.feed()
         from gc import collect, threshold, mem_free, mem_alloc

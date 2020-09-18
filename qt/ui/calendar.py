@@ -1,5 +1,6 @@
 from ui          import UiFrame, Vect, Color
 from micropython import const
+from config      import ui as cfg
 
 
 class UiCalendar(UiFrame):
@@ -15,6 +16,11 @@ class UiCalendar(UiFrame):
         cnt     = len(forecast)
         block   = ui.canvas.dim.x / cnt
         h_space = const(4)
+        
+        if cfg.variant == cfg.VARIANT_2DAYS:
+            dblock = int(block * 24)
+        else:
+            dblock = int(block * 8)
         
         # Draw upper horizontal lines
         if title:
@@ -40,7 +46,7 @@ class UiCalendar(UiFrame):
             if 0 == hour:
                 if title:
                     if (dt[6] == 5) or (dt[6] == 6):
-                        ui.canvas.trect(Vect(xx, 1), Vect(int(block * 8), 4), Color.BLACK)
+                        ui.canvas.trect(Vect(xx, 1), Vect(dblock, 4), Color.BLACK)
                 
                 if (dt[6] == 5) or (dt[6] == 0):
                     ui.canvas.vline(Vect(xx + 1, 0), self.dim.y - 10 + h_space, Color.BLACK)
