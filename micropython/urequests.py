@@ -49,8 +49,16 @@ def request(method, url, data=None, json=None, headers={}, stream=None):
     if ":" in host:
         host, port = host.split(":", 1)
         port = int(port)
-
-    ai = usocket.getaddrinfo(host, port, 0, usocket.SOCK_STREAM)
+    
+    # Patch required due to strange behavior of ESP32 socket
+    while True:
+        try:
+            ai = usocket.getaddrinfo(host, port, 0, usocket.SOCK_STREAM)
+            break
+        except OSError as e:
+            if not e == -202:
+                raise e
+    
     ai = ai[0]
 
     s = usocket.socket(ai[0], ai[1], ai[2])
