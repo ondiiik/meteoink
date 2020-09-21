@@ -51,13 +51,12 @@ def request(method, url, data=None, json=None, headers={}, stream=None):
         port = int(port)
     
     # Patch required due to strange behavior of ESP32 socket
-    while True:
-        try:
-            ai = usocket.getaddrinfo(host, port, 0, usocket.SOCK_STREAM)
-            break
-        except OSError as e:
-            if not e == -202:
-                raise e
+    try:
+        ai = usocket.getaddrinfo(host, port, 0, usocket.SOCK_STREAM)
+    except:
+        print('Get address info failed - SOCKET BUG - restarting')
+        from machine import reset
+        reset()
     
     ai = ai[0]
 

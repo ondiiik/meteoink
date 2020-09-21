@@ -28,10 +28,11 @@ class UiFrame:
     
 class Ui:
     def __init__(self, canvas, forecast, connection):
-        __slots__ = ('canvas', 'forecast', 'time', 'connection')
+        __slots__ = ('canvas', 'forecast', 'time', 'connection', 'numbers')
         self.canvas     = canvas
         self.forecast   = forecast
         self.connection = connection
+        self.numbers    = { 10 : [None] * 12, 25 : [None] * 12, 50 : [None] * 12 } 
     
     
     def bitmap(self, size, name):
@@ -63,7 +64,15 @@ class Ui:
             if ' ' == char:
                 pos.x += int(0.3 * size) + 1
             else:
-                bitmap = Bitmap('bitmap/f/{}/{}.bim'.format(size, ord(char)))
+                if char in './0123456789':
+                    f = self.numbers[size]
+                    n = ord(char) - 0x2E
+                    if f[n] == None:
+                        f[n] = Bitmap('bitmap/f/{}/{}.bim'.format(size, ord(char)))
+                    bitmap = f[n]
+                else:
+                    bitmap = Bitmap('bitmap/f/{}/{}.bim'.format(size, ord(char)))
+                
                 self.canvas.bitmap(pos, bitmap, color)
                 pos.x += bitmap.dim.x + 1
         
@@ -76,8 +85,14 @@ class Ui:
             if ' ' == char:
                 l     += int(0.3 * size) + 1
             else:
-                bitmap = Bitmap('bitmap/f/{}/{}.bim'.format(size, ord(char)), True)
-                l     += bitmap.dim.x + 1
+                if char in './0123456789':
+                    f = self.numbers[size]
+                    n = ord(char) - 0x2E
+                    if f[n] == None:
+                        f[n] = Bitmap('bitmap/f/{}/{}.bim'.format(size, ord(char)))
+                    l += f[n].dim.x + 1
+                else:
+                    l += Bitmap('bitmap/f/{}/{}.bim'.format(size, ord(char)), True).dim.x + 1
         
         return l
     

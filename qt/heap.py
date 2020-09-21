@@ -16,7 +16,7 @@ else:
     from machine import WDT
 
 
-wdt = WDT(timeout = 7000)
+wdt = WDT(timeout = 8000)
 
 
 if IS_MICROPYTHON:
