@@ -11,6 +11,8 @@ class Color:
 
 
 class Vect:
+    __slots__ = ('x', 'y')
+    
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -33,6 +35,8 @@ class Vect:
 
 
 class Bitmap:
+    __slots__ = ('dim', 'buf_width', 'buf', 'fb')
+    
     def __init__(self, file_name, no_load = False):
         f        = open(file_name, 'rb')
         hdr      = f.read(2)
@@ -64,7 +68,11 @@ class Bitmap:
 
 
 class Canvas:
+    __slots__ = ('dim', 'ofs', 'fb')
+    
     class Fb:
+        __slots__ = ('buf', 'bit', 'canvas', 'epd')
+        
         def __init__(self, color, epd):
             print("\tFB%d - [ OK ]" % color)
             

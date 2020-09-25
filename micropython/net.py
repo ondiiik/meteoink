@@ -3,16 +3,17 @@ import                  heap
 
 
 class Wifi:
+    __slots__  = ('ssid', 'bssid')
+    
     def __init__(self, ssid, bssid):
-        __slots__  = ('ssid', 'bssid')
         self.ssid  = ssid
         self.bssid = bssid
 
 
 class Connection:
+    __slots__ = ('country', 'location', 'nets', '_ifc')
+    
     def __init__(self):
-        __slots__ = ('country', 'location', 'nets', '_ifc')
-        
         # Scan networks in surrounding
         from jumpers import hotspot
         from network import WLAN, STA_IF

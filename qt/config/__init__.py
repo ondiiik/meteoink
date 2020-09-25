@@ -2,8 +2,9 @@ from micropython import const
 from platform    import IS_MICROPYTHON
 
 class Connection:
+    __slots__ = ('ssid', 'bssid', 'passwd', 'country', 'location', 'lat', 'lon')
+    
     def __init__(self, location, lat, lon, ssid, passwd, bssid = None):
-        __slots__     = ('ssid', 'bssid', 'passwd', 'country', 'location', 'lat', 'lon')
         self.ssid     = ssid
         self.bssid    = bssid
         self.passwd   = passwd
@@ -13,18 +14,19 @@ class Connection:
 
 
 class Spot:
+    __slots__   = ('ssid', 'passwd')
+    
     def __init__(self, ssid, passwd):
-        __slots__   = ('ssid', 'passwd')
         self.ssid   = ssid
         self.passwd = passwd
 
 
 class Ui:
+    __slots__     = ('apikey', 'units', 'language', 'variant')
     VARIANT_2DAYS = const(2)
     VARIANT_4DAYS = const(4)
     
     def __init__(self, apikey, units, language, variant):
-        __slots__     = ('apikey', 'units', 'language', 'variant')
         self.apikey   = apikey
         self.units    = units
         self.language = language
@@ -41,7 +43,7 @@ def flush_connections():
     f.write('from config import Connection\nconnection = [\n')
     
     for c in connection:
-        f.write('Connection("{}", "{}", "{}", "{}", {}),\n'.format(c.country, c.location, c.ssid, c.passwd, c.bssid))
+        f.write('Connection("{}", "{}", "{}", "{}", "{}", {}),\n'.format(c.location, c.lat, c.lon, c.ssid, c.passwd, c.bssid))
     f.write(']')
     f.close()
 

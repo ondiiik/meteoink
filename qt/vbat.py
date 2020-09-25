@@ -3,6 +3,6 @@ def voltage():
     from config  import pins
     adc = ADC(Pin(pins.VBAT))
     adc.atten(ADC.ATTN_6DB)
-    return adc.read() / 877.619
+    return adc.read() / 833.738
 
 

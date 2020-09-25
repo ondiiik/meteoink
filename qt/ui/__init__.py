@@ -27,8 +27,9 @@ class UiFrame:
     
     
 class Ui:
+    __slots__ = ('canvas', 'forecast', 'time', 'connection', 'numbers')
+    
     def __init__(self, canvas, forecast, connection):
-        __slots__ = ('canvas', 'forecast', 'time', 'connection', 'numbers')
         self.canvas     = canvas
         self.forecast   = forecast
         self.connection = connection

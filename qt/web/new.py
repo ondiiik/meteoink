@@ -17,7 +17,7 @@ def page(web):
             return
     
     # Connection is still not there - add new
-    connection.append(Connection(web.args['country'], web.args['city'], web.args['ssid'], web.args['psw'], bssid))
+    connection.append(Connection(web.args['location'], web.args['lat'], web.args['lon'], web.args['ssid'], web.args['psw'], bssid))
     flush_connections()
     
     from .index import page

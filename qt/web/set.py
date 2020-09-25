@@ -13,8 +13,9 @@ def page(web):
     for i in range(len(connection)):
         if connection[i].bssid == bssid:
             connection[i].passwd   = web.args['psw']
-            connection[i].country  = web.args['country']
-            connection[i].location = web.args['city']
+            connection[i].location = web.args['location']
+            connection[i].lat      = web.args['lat']
+            connection[i].lon      = web.args['lon']
             break
     
     # Write result to configuration

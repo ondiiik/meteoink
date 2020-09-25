@@ -95,6 +95,7 @@ def run(sha):
         ui = Ui(canvas, forecast, net)
         heap.refresh()
         ui.repaint_weather(led, volt)
+        del net, ui, canvas
         heap.refresh()
         
         # Forecast is painted. Now we shall checks how about temperature
@@ -119,6 +120,7 @@ def run(sha):
         
         ui = Ui(canvas, None, net)
         ui.repaint_config(led, volt)
+        del ui, canvas, led, volt
         heap.refresh()
         
         led.mode(Led.DOWNLOAD)

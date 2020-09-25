@@ -2,8 +2,9 @@ import gc
 
 
 class Wifi:
+    __slots__ = ('ssid', 'bssid')
+    
     def __init__(self, ssid, bssid):
-        __slots__  = ('ssid', 'bssid')
         self.ssid  = ssid
         self.bssid = bssid
 

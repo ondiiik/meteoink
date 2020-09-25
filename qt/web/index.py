@@ -11,7 +11,7 @@ def page(web):
     from vbat   import voltage
     
     pg  = web.heading( 2, 'Locations setup')
-    pg += web.table_head(('SSID', 'BSSID', 'Country', 'Location', '', ''), 'frame="hsides"', 'style="text-align:left"')
+    pg += web.table_head(('SSID', 'BSSID', 'Location', 'Latitude', 'Longitude','', ''), 'frame="hsides"', 'style="text-align:left"')
     
     for place in connection:
         heap.refresh()
@@ -24,8 +24,9 @@ def page(web):
         idx = (('idx', connection.index(place)),)
         pg += web.table_row((place.ssid,
                              bssid,
-                             place.country,
                              place.location,
+                             place.lat,
+                             place.lon,
                              web.button('Edit',   'edit',   idx),
                              web.button('Delete', 'delete', idx)),
                              _spaces)
@@ -53,7 +54,7 @@ def page(web):
     
     pg += web.heading(   2,    'Battery  setup')
     pg += web.table_head(None, 'frame="hsides"')
-    pg += web.table_row(('Current voltage',  '{:.2f} V'.format(voltage()), ''),                                 _spaces)
+    pg += web.table_row(('Current voltage',  '{:.2f} V'.format(voltage()), ''),                            _spaces)
     pg += web.table_row(('Critical voltage', '{:.2f} V'.format(vbat.VBAT_LOW), web.button('Edit', 'low')), _spaces)
     pg += web.table_tail()
     

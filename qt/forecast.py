@@ -233,11 +233,11 @@ class Forecast:
     def _get_dht(self, in_temp):
         import              dht
         from machine import Pin
-        from config  import pins
+        from config  import pins, sys
         
         try:
             sensor = dht.DHT22(Pin(pins.DHT))
             sensor.measure()
-            self.home = Forecast.Home(sensor.temperature(), sensor.humidity())
+            self.home = Forecast.Home(sensor.temperature(), sensor.humidity() * sys.DHT_HUMI_CALIB[0] + sys.DHT_HUMI_CALIB[1])
         except OSError:
             self.home = Forecast.Home(in_temp, None)

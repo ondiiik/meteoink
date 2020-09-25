@@ -5,8 +5,9 @@ from   utime  import sleep_ms
 
 
 class Server():
+#     __slots__ = ('net', 'client', 'page', 'args')
+    
     def __init__(self, net):
-        __slots__   = ('net', 'client', 'page', 'args')
         self.net    = net
         self.client = None
         self.page   = ''

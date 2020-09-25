@@ -14,4 +14,4 @@ from config import Connection
 #     Connection('Ben Nevis', 56.7968261, 5.0037003, 'my_wifi_name', 'my_great_password', b'\x01\x22\xF2\x55a\xef')
 #
 # When connection succeedes, then it load forecast for related location
-connection = (Connection('Ben Nevis', 56.7968261, 5.0037003, 14.5217564, 'my_wifi_name', 'my_great_password'),)
+connection = [Connection('Ben Nevis', 56.7968261, 5.0037003, 'my_wifi_name', 'my_great_password'),]
