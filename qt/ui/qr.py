@@ -15,11 +15,11 @@ class UiQr(UiFrame):
         qr.add_data(self.txt)
         matrix = qr.get_matrix()
         
-        for y in range(len(matrix)):
-            for x in range(len(matrix[0])):
+        for y in range(matrix[1]):
+            for x in range(matrix[1]):
                 ui.canvas.fill_rect(Vect(x * 3, y * 3),
                                     Vect(    3,     3),
-                                    Color.BLACK if matrix[y][x] else Color.WHITE)
+                                    Color.BLACK if matrix[0].pixel(x, y) else Color.WHITE)
         
         l = len(matrix) * 3
         if self.above:

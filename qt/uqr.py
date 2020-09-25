@@ -1,4 +1,5 @@
-import re
+import               re
+from framebuf import FrameBuffer, MONO_HLSB
 
 ERROR_CORRECT_L = 1
 ERROR_CORRECT_M = 0
@@ -1168,22 +1169,23 @@ class QRCode:
                     break
 
     def get_matrix(self):
-        """
-        Return the QR Code as a multidimensonal array, including the border.
-
-        To return the array without a border, set ``self.border`` to 0 first.
-        """
         if self.data_cache is None:
             self.make()
-
+        
         if not self.border:
             return self.modules
-
-        width = len(self.modules) + self.border*2
-        code = [[False]*width] * self.border
-        x_border = [False]*self.border
+        
+        width = len(self.modules) + self.border * 2
+        buf   = bytearray(width * (width + 7) // 8)
+        fb    = FrameBuffer(buf, width, width, MONO_HLSB)
+        fb.fill(0)
+        
+        y = self.border
         for module in self.modules:
-            code.append(x_border + module + x_border)
-        code += [[False]*width] * self.border
-
-        return code
+            x = self.border
+            for p in module:
+                fb.pixel(x, y, p)
+                x += 1
+            y += 1
+        
+        return (fb, width)
