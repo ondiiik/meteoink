@@ -1,76 +1,60 @@
 from ui          import UiFrame, Vect, Color
 from micropython import const
+from config      import temp
 
 class UiTempGr(UiFrame):
+    __slot__ = ('chart_max', 'k_temp', 'temp_min', 'block')
+    
     def __init__(self, ofs, dim):
         super().__init__(ofs, dim)
-        
+        self.temp_min =  273.0
+    
+    
     def draw(self, ui, d):
-        # Pre-calculates some range values and draw icons bar
-        forecast = ui.forecast.forecast
-        cnt      = len(forecast)
-        block    = ui.canvas.dim.x / cnt
-        temp_max = -273.0
-        temp_min =  273.0
+        # Pre-calculates some range values
+        forecast   = ui.forecast.forecast
+        cnt        = len(forecast)
+        self.block = ui.canvas.dim.x / cnt
+        temp_max   = -273.0
         
         for i1 in range(cnt):
-            xx       = ui.canvas.dim.x * i1 // (cnt + 1)
-            weather  = forecast[i1]
-            temp_max = max(weather.temp, weather.feel, temp_max)
-            temp_min = min(weather.temp, weather.feel, temp_min)
+            weather       = forecast[i1]
+            temp_max      = max(weather.temp, weather.feel, temp_max)
+            self.temp_min = min(weather.temp, weather.feel, self.temp_min)
         
         chart_space    = const(30)
         chart_min      = const(chart_space // 2)
         self.chart_max = self.dim.y - chart_space
-        self.k_temp    = (self.chart_max - chart_min) / (temp_max - temp_min)
+        self.k_temp    = (self.chart_max - chart_min) / (temp_max - self.temp_min)
         
-        
-        # Get chart position according to temperature
-        def chart_y(temp):
-            return int(self.chart_max - (temp - temp_min) * self.k_temp)
+        # Draw charts
+        self.chart_draw(ui, 3, Color.WHITE)
+        self.chart_draw(ui, 3, Color.YELLOW, temp.OUTDOOR_HIGH, temp.OUTDOOR_LOW)
+        self.chart_draw(ui, 1, Color.BLACK)
+    
+    
+    def chart_draw(self, ui, w, c, th = None, tl = None):
+        forecast = ui.forecast.forecast
+        cnt      = len(forecast)
         
         for i1 in range(cnt):
-            # Draw temp and temp feels like chart shadow
             if i1 > 0:
-                x1 = int(block  * i1)
-                x2 = int(x1 - block)
+                x1 = int(self.block  * i1)
+                x2 = int(x1 - self.block)
                 i2 = i1 - 1
+                f1 = forecast[i1].feel
+                f2 = forecast[i2].feel
                 
-                v1 = Vect(x1, chart_y(forecast[i1].feel))
-                v2 = Vect(x2, chart_y(forecast[i2].feel))
-                ui.canvas.line(v1, v2, Color.WHITE, 2)
+                if (th is None):
+                    v1 = Vect(x1, self.chart_y(f1))
+                    v2 = Vect(x2, self.chart_y(f2))
+                    ui.canvas.line(v1, v2, c, w)
                 
-                v1 = Vect(x1, chart_y(forecast[i1].temp))
-                v2 = Vect(x2, chart_y(forecast[i2].temp))
-                ui.canvas.line(v1, v2, Color.WHITE, 4)
-        
-        for i1 in range(cnt):
-            # Highlight extremes in temp chart
-            if i1 > 0:
-                x1 = int(block  * i1)
-                x2 = int(x1 - block)
-                i2 = i1 - 1
-                
-                v1 = Vect(x1, chart_y(forecast[i1].temp))
-                v2 = Vect(x2, chart_y(forecast[i2].temp))
-                
-                if (forecast[i1].feel > 27) or \
-                   (forecast[i2].feel > 27) or \
-                   (forecast[i1].feel < -5) or \
-                   (forecast[i2].feel < -5):
-                    ui.canvas.line(v1, v2, Color.YELLOW, 6)
-        
-        for i1 in range(cnt):
-            x1 = int(block  * i1)
-            x2 = int(x1 - block)
-            i2 = i1 - 1
-            
-            # Draw temp and temp feels like chart
-            if i1 > 0:
-                v1 = Vect(x1, chart_y(forecast[i1].feel))
-                v2 = Vect(x2, chart_y(forecast[i2].feel))
-                ui.canvas.line(v1, v2, Color.BLACK, 1)
-                
-                v1 = Vect(x1, chart_y(forecast[i1].temp))
-                v2 = Vect(x2, chart_y(forecast[i2].temp))
-                ui.canvas.line(v1, v2, Color.BLACK, 2)
+                if (th is None) or (f1 > th) or (f2 > th) or (f1 < tl) or (f2 < tl):
+                    v1 = Vect(x1, self.chart_y(forecast[i1].temp))
+                    v2 = Vect(x2, self.chart_y(forecast[i2].temp))
+                    ui.canvas.line(v1, v2, c, w * 2)
+    
+    
+    def chart_y(self, temp):
+        return int(self.chart_max - (temp - self.temp_min) * self.k_temp)

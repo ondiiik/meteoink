@@ -76,7 +76,7 @@ def freq(max_freq):
     pass
 
 
-def deepsleep(t):
+def deepsleep(t = 0):
     print('Deep sleep ....')
     sys.exit()
 

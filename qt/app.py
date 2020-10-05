@@ -115,16 +115,16 @@ def run(sha):
         play(((2093, 30), (0, 120),(2093, 30)))
         led.mode(Led.DOWNLOAD)
         
-        from web import Server
-        from ui  import Ui
+        from web.server import WebServer
+        from ui         import Ui
         
         ui = Ui(canvas, None, net)
         ui.repaint_config(led, volt)
+        led.mode(Led.DOWNLOAD)
         del ui, canvas, led, volt
         heap.refresh()
         
-        led.mode(Led.DOWNLOAD)
-        server = Server(net)
+        server = WebServer(net)
         
         play(((1047, 30), (0, 120), (1319, 30), (0, 120), (1568, 30), (0, 120), (2093, 30)))
         server.run()

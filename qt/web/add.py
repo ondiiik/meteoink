@@ -1,6 +1,6 @@
 from micropython import const
 import                  heap
-from .           import bytes2bssid
+from .server     import bytes2bssid
 
 
 _spaces = const(4)

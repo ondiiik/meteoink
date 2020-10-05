@@ -1,0 +1,43 @@
+from .      import Server
+from buzzer import play
+
+
+class WebServer(Server):
+    __slot__ = ('last')
+    
+    def __init__(self, net):
+        super().__init__(net)
+        self.last  = ''
+    
+    
+    def process(self):
+        print('*** PAGE ***', self.page)
+        
+        if (self.page == '') or (self.last == self.page):
+            self.page = 'index'
+        
+        try:
+            page = __import__('web.{}'.format(self.page), None, None, ('page',), 0).page
+        except ImportError:
+            print('!!! Page {} not found !!!'.format(self.page))
+            return
+        
+        if not self.last == self.page:
+            self.last = self.page
+        
+        play(((1047,30), (0,120), (1568,30)))
+        if page(self):
+            page = __import__('web.index', None, None, ('page',), 0).page
+            page(self)
+
+
+def bssid2bytes(bssid):
+    b1 = bssid.split(':')
+    b2 = []
+    for i in range(6):
+        b2.append(int(b1[i], 16))
+    return bytes(b2)
+
+
+def bytes2bssid(bssid):
+    return ":".join("{:02x}".format(b) for b in bssid)

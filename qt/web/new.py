@@ -1,6 +1,6 @@
 from micropython import const
-from config      import connection, Connection, flush_connections
-from .           import bssid2bytes
+from config      import connection, Connection, flush_con
+from .server     import bssid2bytes
 
 
 _spaces = const(4)
@@ -17,8 +17,8 @@ def page(web):
             return
     
     # Connection is still not there - add new
-    connection.append(Connection(web.args['location'], web.args['lat'], web.args['lon'], web.args['ssid'], web.args['psw'], bssid))
-    flush_connections()
+    connection.append(Connection(int(web.args['location']), web.args['ssid'], web.args['psw'], bssid))
+    flush_con()
     
     from .index import page
     page(web)

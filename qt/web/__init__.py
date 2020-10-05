@@ -1,17 +1,16 @@
-import socket
+import               socket
 import               heap
-from   buzzer import play
 from   utime  import sleep_ms
 
 
 class Server():
-#     __slots__ = ('net', 'client', 'page', 'args')
+    __slots__ = ('net', 'client', 'args', 'page')
     
     def __init__(self, net):
         self.net    = net
         self.client = None
-        self.page   = ''
         self.args   = {}
+        self.page  = ''
     
     
     def run(self):
@@ -122,6 +121,21 @@ class Server():
     
     
     @staticmethod
+    def select_head(label, name):
+        return '<label for="{1}">{0}</label><select name="{1}" id="{1}">'.format(label, name)
+    
+    
+    @staticmethod
+    def select_option(value, name, selected = False):
+        return '<option value="{}"{}>{}</option>'.format(value, ' selected' if selected else '', name)
+    
+    
+    @staticmethod
+    def select_tail():
+        return '</select>'
+    
+    
+    @staticmethod
     def table_head(cells, table_attr = '', heading_attr = ''):
         ret = '<table {}><thead>'.format(table_attr)
         
@@ -158,7 +172,7 @@ class Server():
         
         
     @staticmethod
-    def args(args_list):
+    def mk_args(args_list):
         if args_list is None:
             ret = ''
         else:
@@ -179,7 +193,7 @@ class Server():
     
     @staticmethod
     def button(caption, url, args_list = None):
-        return '<button type="button" onclick="location.href=\'{}{}\'">{}</button>'.format(url, Server.args(args_list), caption)
+        return '<button type="button" onclick="location.href=\'{}{}\'">{}</button>'.format(url, Server.mk_args(args_list), caption)
     
     
     @staticmethod
@@ -213,30 +227,7 @@ class Server():
     
     def _send_page(self):
         self._head()
-        
-        print('*** PAGE ***', self.page)
-        if   self.page == '':
-            from .index import page
-        elif self.page == 'add':
-            from .add import page
-        elif self.page == 'use':
-            from .use import page
-        elif self.page == 'new':
-            from .new import page
-        elif self.page == 'set':
-            from .set import page
-        elif self.page == 'remove':
-            from .remove import page
-        elif self.page == 'edit':
-            from .edit import page
-        elif self.page == 'delete':
-            from .delete import page
-        else:
-            self._tail()
-            return
-        
-        play(((1047,30), (0,120), (1568,30)))
-        page(self)
+        self.process()
         self._tail()
         
         
@@ -250,16 +241,3 @@ class Server():
         
     def _tail(self):
         self.client.send(b'</body></html>')
-
-
-def bssid2bytes(bssid):
-    b1 = bssid.split(':')
-    b2 = []
-    for i in range(6):
-        b2.append(int(b1[i], 16))
-    return bytes(b2)
-
-
-def bytes2bssid(bssid):
-    return ":".join("{:02x}".format(b) for b in bssid)
-    

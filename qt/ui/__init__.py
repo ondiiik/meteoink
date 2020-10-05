@@ -223,7 +223,7 @@ def outside_dr(ui, p, d):
 
 def outtemp_dr(ui, p, d):
     from ui.outtemp import UiOutTemp
-    return UiOutTemp(p, d).repaint(ui)
+    UiOutTemp(p, d).repaint(ui)
 
 def inside_dr(ui, p, d, tab, connection):
     from ui.inside import UiInside

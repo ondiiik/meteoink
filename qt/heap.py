@@ -3,7 +3,7 @@ from platform import IS_MICROPYTHON
 from config   import sys
 
 
-if sys.DISABLE_WATCHDOG or hotspot():
+if sys.WATCHDOG_TIME <= 0 or hotspot():
     # Don't use watchdog for hotspot (back doors)
     class WDT:
         def __init__(self, timeout):
@@ -16,8 +16,7 @@ else:
     from machine import WDT
 
 
-wdt = WDT(timeout = 8000)
-
+wdt = WDT(timeout = sys.WATCHDOG_TIME)
 
 if IS_MICROPYTHON:
     def refresh():

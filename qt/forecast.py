@@ -1,7 +1,7 @@
 import                  heap
 from collections import namedtuple
 from micropython import const
-from config      import display_get, DISPLAY_JUST_REPAINT
+from config      import display_get, DISPLAY_JUST_REPAINT, location
 
 # See https://openweathermap.org/weather-conditions
 id2icon = { 200 : '200',
@@ -97,8 +97,8 @@ class Forecast:
         # Download hourly weather forecast for today
         url   = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}'
         heap.refresh()
-        fcast = connection.http_get_json(url.format(connection.config.lat,
-                                                    connection.config.lon,
+        fcast = connection.http_get_json(url.format(location[connection.config.location].lat,
+                                                    location[connection.config.location].lon,
                                                     ui.apikey,
                                                     ui.units,
                                                     ui.language,
@@ -168,8 +168,8 @@ class Forecast:
         # Download hourly weather forecast for 5 days
         url   = "http://api.openweathermap.org/data/2.5/forecast?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&cnt={}"
         heap.refresh()
-        fcast = connection.http_get_json(url.format(connection.config.lat,
-                                                    connection.config.lon,
+        fcast = connection.http_get_json(url.format(location[connection.config.location].lat,
+                                                    location[connection.config.location].lon,
                                                     ui.apikey,
                                                     ui.units,
                                                     'EN',

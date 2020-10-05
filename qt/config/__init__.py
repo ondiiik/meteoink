@@ -1,16 +1,24 @@
 from micropython import const
 from platform    import IS_MICROPYTHON
 
-class Connection:
-    __slots__ = ('ssid', 'bssid', 'passwd', 'country', 'location', 'lat', 'lon')
+
+class Location:
+    __slots__ = ('name', 'lat', 'lon')
     
-    def __init__(self, location, lat, lon, ssid, passwd, bssid = None):
+    def __init__(self, name, lat, lon):
+        self.name = name
+        self.lat  = lat
+        self.lon  = lon
+
+
+class Connection:
+    __slots__ = ('ssid', 'bssid', 'passwd', 'location')
+    
+    def __init__(self, location, ssid, passwd, bssid = None):
         self.ssid     = ssid
         self.bssid    = bssid
         self.passwd   = passwd
         self.location = location
-        self.lat      = lat
-        self.lon      = lon
 
 
 class Spot:
@@ -33,17 +41,32 @@ class Ui:
         self.variant  = variant
 
 
-def flush_connections():
+def flush_con():
     cfg_path = '/config/connection.py'
     
     if not IS_MICROPYTHON:
-        cfg_path = '/home/ondiiik/Development/meteo/meteo_ink/meteo_ink/pyPc/config/connection.py'
+        cfg_path = '/home/ondiiik/Development/meteo/meteo_py/qt/config/connection.py'
     
     f = open(cfg_path, 'w')
     f.write('from config import Connection\nconnection = [\n')
     
     for c in connection:
-        f.write('Connection("{}", "{}", "{}", "{}", "{}", {}),\n'.format(c.location, c.lat, c.lon, c.ssid, c.passwd, c.bssid))
+        f.write('Connection({}, "{}", "{}", {}),\n'.format(c.location, c.ssid, c.passwd, c.bssid))
+    f.write(']')
+    f.close()
+
+
+def flush_loc():
+    cfg_path = '/config/location.py'
+    
+    if not IS_MICROPYTHON:
+        cfg_path = '/home/ondiiik/Development/meteo/meteo_py/qt/config/location.py'
+    
+    f = open(cfg_path, 'w')
+    f.write('from config import Location\nlocation = [\n')
+    
+    for c in location:
+        f.write('Location("{}", {}, {}),\n'.format(c.name, c.lat, c.lon))
     f.write(']')
     f.close()
 
@@ -68,5 +91,6 @@ def display_get():
 
 
 from .connection import connection
+from .location   import location
 from .spot       import hotspot
 from .ui         import ui

@@ -1,6 +1,6 @@
 from micropython import const
-from config      import connection, flush_connections
-from .           import bssid2bytes
+from config      import connection, flush_con
+from .server     import bssid2bytes
 
 
 _spaces = const(4)
@@ -16,7 +16,5 @@ def page(web):
             break
     
     # Write result to configuration
-    flush_connections()
-    
-    from .index import page
-    page(web)
+    flush_con()
+    return True

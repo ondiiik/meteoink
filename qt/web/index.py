@@ -1,41 +1,59 @@
 from micropython import const
 import                  heap
-from .           import bytes2bssid
+from .server     import bytes2bssid
 
 
 _spaces = const(4)
 
 
 def page(web):
-    from config import connection, ui, hotspot, vbat
+    from config import connection, location, ui, hotspot, vbat
     from vbat   import voltage
     
-    pg  = web.heading( 2, 'Locations setup')
-    pg += web.table_head(('SSID', 'BSSID', 'Location', 'Latitude', 'Longitude','', ''), 'frame="hsides"', 'style="text-align:left"')
+    pg  = web.heading( 2,'Locations setup')
     
-    for place in connection:
+    pg += web.table_head(('Location', 'Latitude', 'Longitude', '', ''), 'frame="hsides"', 'style="text-align:left"')
+    
+    for i in location:
         heap.refresh()
         
-        if place.bssid is None:
-            bssid = ''
-        else:
-            bssid = bytes2bssid(place.bssid)
-        
-        idx = (('idx', connection.index(place)),)
-        pg += web.table_row((place.ssid,
-                             bssid,
-                             place.location,
-                             place.lat,
-                             place.lon,
-                             web.button('Edit',   'edit',   idx),
-                             web.button('Delete', 'delete', idx)),
+        idx = (('idx', location.index(i)),)
+        pg += web.table_row((i.name, i.lat, i.lon,
+                             web.button('Edit',   'led',  idx),
+                             web.button('Delete', 'ldlt', idx)),
                              _spaces)
     
     pg += web.table_tail()
     heap.refresh()
     
     pg += web.br()
-    pg += web.button('Add new location', 'add')
+    pg += web.button('Add new location', 'lnew')
+    pg += web.br()
+    
+    pg += web.heading( 2,'WiFi setup')
+    pg += web.table_head(('SSID', 'BSSID', 'Location','', ''), 'frame="hsides"', 'style="text-align:left"')
+    
+    for i in connection:
+        heap.refresh()
+        
+        if i.bssid is None:
+            bssid = ''
+        else:
+            bssid = bytes2bssid(i.bssid)
+        
+        idx = (('idx', connection.index(i)),)
+        pg += web.table_row((i.ssid,
+                             bssid,
+                             location[int(i.location)].name,
+                             web.button('Edit',   'ed',  idx),
+                             web.button('Delete', 'dlt', idx)),
+                             _spaces)
+    
+    pg += web.table_tail()
+    heap.refresh()
+    
+    pg += web.br()
+    pg += web.button('Add new WiFi', 'add')
     pg += web.br()
     heap.refresh()
     
@@ -57,5 +75,8 @@ def page(web):
     pg += web.table_row(('Current voltage',  '{:.2f} V'.format(voltage()), ''),                            _spaces)
     pg += web.table_row(('Critical voltage', '{:.2f} V'.format(vbat.VBAT_LOW), web.button('Edit', 'low')), _spaces)
     pg += web.table_tail()
+    
+    pg += web.heading(   2,    'Misc')
+    pg += web.button('Go to travel mode', 'zzz')
     
     web.write(pg)
