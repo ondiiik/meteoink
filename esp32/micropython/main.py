@@ -1,2 +1,2 @@
 from app import run
-run(b'ffe92bde8604a8225e20f66cba000f27e5259e12')
+run(b'4ed8e126576002fe7026b248d4f9771a9762a26c')

@@ -11,7 +11,7 @@ class SPI:
 _pins = [1] * 256
 
 
-_pins[16] = 0 # 1 - Meteostation, 0 - Config server
+_pins[16] = 1 # 1 - Meteostation, 0 - Config server
 _pins[23] = 1 # 1 - no alert,     0 - alert
 
 

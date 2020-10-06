@@ -1,5 +1,4 @@
-from ui          import UiFrame, Vect, Color
-from micropython import const
+from ui import UiFrame, Vect
 
 
 class UiUrl(UiFrame):

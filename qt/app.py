@@ -1,8 +1,24 @@
 def run(sha):
     import               machine
-    from   config import sys, vbat
-    from   buzzer import play
-    from   vbat   import voltage
+    from config import   sys, vbat
+    from buzzer import   play
+    from vbat   import   voltage
+    
+    # Checks if we are running right micropython firmware
+    try:
+        from platform import KERNEL_VARIANT
+    except:
+        print('Incompatible micropython firmware found!')
+        print('Please download right one here:')
+        print('\t\thttps://github.com/ondiiik/meteoink/blob/master/esp32/esp32-idf3-v1.13.bin')
+        machine.deepsleep()
+    
+    if not 1 == KERNEL_VARIANT:
+        print('Incompatible micropython firmware version found!')
+        print('Please download right one here:')
+        print('\t\thttps://github.com/ondiiik/meteoink/blob/master/esp32/esp32-idf3-v1.13.bin')
+        machine.deepsleep()
+    
     
     # Reads internal temerature just after wake-up to reduce
     # influence of chip warm-up and use some kind of ambient
@@ -50,10 +66,10 @@ def run(sha):
     # When battery voltage is too low, just draw low battery
     # error on screen and go to deep sleep.
     if (volt < vbat.VBAT_LOW):
-        from ui import Ui
+        from ui import MeteoUi
         led.mode(Led.ALERT)
         
-        ui = Ui(canvas, None, None)
+        ui = MeteoUi(canvas, None, None)
         heap.refresh()
         ui.repaint_lowbat(volt)
         heap.refresh()
@@ -91,8 +107,8 @@ def run(sha):
         
         # Most time consuming part when we have all data is to draw them
         # on user interface - screen.
-        from ui import Ui
-        ui = Ui(canvas, forecast, net)
+        from ui.main import MeteoUi
+        ui = MeteoUi(canvas, forecast, net)
         heap.refresh()
         ui.repaint_weather(led, volt)
         del net, ui, canvas
@@ -115,10 +131,10 @@ def run(sha):
         play(((2093, 30), (0, 120),(2093, 30)))
         led.mode(Led.DOWNLOAD)
         
-        from web.server import WebServer
-        from ui         import Ui
+        from web.main import WebServer
+        from ui.main  import MeteoUi
         
-        ui = Ui(canvas, None, net)
+        ui = MeteoUi(canvas, None, net)
         ui.repaint_config(led, volt)
         led.mode(Led.DOWNLOAD)
         del ui, canvas, led, volt

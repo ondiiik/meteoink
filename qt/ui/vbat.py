@@ -1,4 +1,4 @@
-from ui import UiFrame, Vect, Color
+from ui import UiFrame, Vect, BLACK, WHITE, YELLOW
 
 
 class UiVBat(UiFrame):
@@ -15,9 +15,9 @@ class UiVBat(UiFrame):
         l = int(p * w)
         
         if p < 0.2:
-            ui.canvas.fill_rect(Vect(-6, -13), Vect(w + 16, h + 18), Color.YELLOW)
+            ui.canvas.fill_rect(Vect(-6, -13), Vect(w + 16, h + 18), YELLOW)
         else:
-            ui.canvas.fill_rect(Vect(-4, -11), Vect(w + 9, h + 14), Color.WHITE)
+            ui.canvas.fill_rect(Vect(-4, -11), Vect(w + 9, h + 14), WHITE)
         
         ui.canvas.rect(Vect(0, 0), Vect(w + 3, h))
         ui.canvas.fill_rect(Vect(-3, h // 2 - 2), Vect(3, 5))
@@ -29,6 +29,6 @@ class UiVBat(UiFrame):
             ui.text_center(10, '{:.0%}'.format(p), Vect(w // 2 + 2, -12))
         
         if (volt < vbat.VBAT_LOW):
-            ui.canvas.line(Vect(0,0), self.dim, Color.YELLOW, w = 6)
-            ui.canvas.line(Vect(0,0), self.dim, Color.BLACK,  w = 2)
+            ui.canvas.line(Vect(0,0), self.dim, YELLOW, w = 6)
+            ui.canvas.line(Vect(0,0), self.dim, BLACK,  w = 2)
 

@@ -1,5 +1,4 @@
-from micropython import const
-import                  heap
+import heap
 
 
 class Wifi:

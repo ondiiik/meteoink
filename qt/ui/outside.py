@@ -1,6 +1,5 @@
-from ui          import UiFrame, Vect, Color
+from ui          import UiFrame, Vect
 from ui.wind     import drawWind
-from micropython import const
 
 
 class UiOutside(UiFrame):

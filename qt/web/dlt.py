@@ -1,10 +1,6 @@
-from micropython import const
 import                  heap
 from config      import connection, location
-from .server     import bytes2bssid
-
-
-_spaces = const(4)
+from .main       import bytes2bssid
 
 
 def page(web):

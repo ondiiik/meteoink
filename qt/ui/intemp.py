@@ -1,4 +1,4 @@
-from ui     import UiFrame, Vect, Color
+from ui     import UiFrame, Vect, BLACK, YELLOW
 from config import temp
 
 class UiInTemp(UiFrame):
@@ -12,13 +12,13 @@ class UiInTemp(UiFrame):
         
         if not None == t:
             if t >= temp.INDOOR_HIGH:
-                hl = Color.YELLOW
+                hl = YELLOW
             
             t = '{:.1f}'.format(t)
         else:
             t = '--'
             
-        ui.text(50, t, Vect(21, -5), Color.BLACK, hl, 3)
+        ui.text(50, t, Vect(21, -5), BLACK, hl, 3)
         
         bitmap = ui.bitmap(1, 'in')
         ui.canvas.bitmap(Vect(0, 30), bitmap)

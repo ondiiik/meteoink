@@ -1,5 +1,13 @@
-from micropython import const
 from platform    import IS_MICROPYTHON
+from micropython import const
+
+VARIANT_2DAYS                 = const(2)
+VARIANT_4DAYS                 = const(4)
+
+DISPLAY_REQUIRES_FULL_REFRESH = const(0)
+DISPLAY_JUST_REPAINT          = const(1)
+DISPLAY_DONT_REFRESH          = const(2)
+
 
 
 class Location:
@@ -31,8 +39,6 @@ class Spot:
 
 class Ui:
     __slots__     = ('apikey', 'units', 'language', 'variant')
-    VARIANT_2DAYS = const(2)
-    VARIANT_4DAYS = const(4)
     
     def __init__(self, apikey, units, language, variant):
         self.apikey   = apikey
@@ -70,10 +76,6 @@ def flush_loc():
     f.write(']')
     f.close()
 
-
-DISPLAY_REQUIRES_FULL_REFRESH = const(0)
-DISPLAY_JUST_REPAINT          = const(1)
-DISPLAY_DONT_REFRESH          = const(2)
 
 def display_set(val, force = False):
     if force or (not display_get() == val):

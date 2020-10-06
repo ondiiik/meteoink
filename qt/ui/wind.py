@@ -1,4 +1,4 @@
-from ui import Vect, Color, UiFrame
+from ui import Vect, UiFrame, BLACK, WHITE, YELLOW
 import         heap
 
 
@@ -9,7 +9,7 @@ def drawWind(ui, pos, weather, scale = 16, arrow = False):
     if weather.speed < 2.5:
         ui.canvas.fill_rect(Vect(rescale(-2), rescale(-2)) + pos,
                             Vect(rescale( 4), rescale( 4)),
-                            Color.BLACK)
+                            BLACK)
         return
     
     from cmath import rect, pi
@@ -34,9 +34,9 @@ def drawWind(ui, pos, weather, scale = 16, arrow = False):
         ui.canvas.line(Vect(int(d1.real), int(d1.imag)), Vect(int(o.real),  int(o.imag)),  c, w)
     
     if weather.speed > 10:
-        c = Color.YELLOW
+        c = YELLOW
     else:
-        c = Color.WHITE
+        c = WHITE
     
     if weather.speed > 16:
         w = 6
@@ -44,7 +44,7 @@ def drawWind(ui, pos, weather, scale = 16, arrow = False):
         w = 3
         
     drawArrow(r, c,           w)
-    drawArrow(r, Color.BLACK, 1)
+    drawArrow(r, BLACK, 1)
     
     if not arrow:
         d1 = o - 0.4 * d
@@ -61,8 +61,8 @@ def drawWind(ui, pos, weather, scale = 16, arrow = False):
                 ui.canvas.line(Vect(int(b.real), int(b.imag)), Vect(int(e.real), int(e.imag)), c, w)
                 
         w = rescale(2) + 1
-        drawWindSpeed(w + 1, Color.WHITE)
-        drawWindSpeed(w,     Color.BLACK)
+        drawWindSpeed(w + 1, WHITE)
+        drawWindSpeed(w,     BLACK)
 
 
 class UiWind(UiFrame):

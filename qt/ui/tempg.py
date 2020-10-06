@@ -1,4 +1,4 @@
-from ui          import UiFrame, Vect, Color
+from ui          import UiFrame, Vect, BLACK, WHITE, YELLOW
 from micropython import const
 from config      import temp
 
@@ -28,9 +28,9 @@ class UiTempGr(UiFrame):
         self.k_temp    = (self.chart_max - chart_min) / (temp_max - self.temp_min)
         
         # Draw charts
-        self.chart_draw(ui, 3, Color.WHITE)
-        self.chart_draw(ui, 3, Color.YELLOW, temp.OUTDOOR_HIGH, temp.OUTDOOR_LOW)
-        self.chart_draw(ui, 1, Color.BLACK)
+        self.chart_draw(ui, 3, WHITE)
+        self.chart_draw(ui, 3, YELLOW, temp.OUTDOOR_HIGH, temp.OUTDOOR_LOW)
+        self.chart_draw(ui, 1, BLACK)
     
     
     def chart_draw(self, ui, w, c, th = None, tl = None):

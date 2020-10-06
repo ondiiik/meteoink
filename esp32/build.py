@@ -55,7 +55,7 @@ def convert(l):
 
 def packfw(l):
     f = open(fw, 'wb')
-    f.write(struct.pack('<IH', 0x31415926, len(sha)))
+    f.write(struct.pack('<IHH', 0x31415926, 1, len(sha)))
     f.write(sha)
     
     for d in l:
@@ -89,14 +89,20 @@ copy('boot.py')
 copy('main.py')
 
 convert(find(''))
-convert(find('display'))
 convert(find('ui'))
 convert(find('web'))
 convert(find('config'))
 convert(find('lang'))
 
 command('rm {}'.format(os.path.join(dwd, 'boot.mpy')))
+command('rm {}'.format(os.path.join(dwd, 'forecast.mpy')))
+command('rm {}'.format(os.path.join(dwd, 'heap.mpy')))
+command('rm {}'.format(os.path.join(dwd, 'ltime.mpy')))
 command('rm {}'.format(os.path.join(dwd, 'main.mpy')))
+command('rm {}'.format(os.path.join(dwd, 'net.mpy')))
+command('rm {}'.format(os.path.join(dwd, 'platform.mpy')))
+command('rm {}'.format(os.path.join(dwd, 'uqr.mpy')))
+command('rm {}'.format(os.path.join(dwd, 'urequests.mpy')))
 command('rm {}'.format(os.path.join(dwd, 'config/__init__.py')))
 command('rm {}'.format(os.path.join(dwd, 'config/connection.mpy')))
 command('rm {}'.format(os.path.join(dwd, 'config/display.mpy')))
@@ -109,5 +115,6 @@ command('rm {}'.format(os.path.join(dwd, 'config/sys.mpy')))
 command('rm {}'.format(os.path.join(dwd, 'config/temp.mpy')))
 command('rm {}'.format(os.path.join(dwd, 'config/ui.mpy')))
 command('rm {}'.format(os.path.join(dwd, 'config/vbat.mpy')))
+command('rm {}'.format(os.path.join(dwd, 'web/__init__.mpy')))
 
-packfw((('', '*.py'), ('', '*.mpy'), ('config', '*.mpy'), ('display', '*.mpy'), ('ui', '*.mpy'), ('web', '*.mpy'), ('lang', '*.mpy')))
+packfw((('', '*.py'), ('', '*.mpy'), ('config', '*.mpy'), ('ui', '*.mpy'), ('web', '*.mpy'), ('lang', '*.mpy')))

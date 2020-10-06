@@ -1,8 +1,4 @@
-from micropython import const
-import                  heap
-
-
-_spaces = const(4)
+import heap
 
 
 def page(web):

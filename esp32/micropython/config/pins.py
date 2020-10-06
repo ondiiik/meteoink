@@ -1,5 +1,6 @@
 from micropython import const
 
+
 # Display related pins
 SCK     = const(13)
 MOSI    = const(14)

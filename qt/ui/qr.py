@@ -1,4 +1,4 @@
-from ui import UiFrame, Vect, Color
+from ui import UiFrame, Vect, BLACK, WHITE
 
 
 class UiQr(UiFrame):
@@ -21,7 +21,7 @@ class UiQr(UiFrame):
             for x in range(matrix[1]):
                 ui.canvas.fill_rect(Vect(x * 3, y * 3),
                                     Vect(    3,     3),
-                                    Color.BLACK if matrix[0].pixel(x, y) else Color.WHITE)
+                                    BLACK if matrix[0].pixel(x, y) else WHITE)
         
         l = matrix[1] * 3
         if self.above:

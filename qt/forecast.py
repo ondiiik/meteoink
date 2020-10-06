@@ -1,7 +1,7 @@
 import                  heap
 from collections import namedtuple
 from micropython import const
-from config      import display_get, DISPLAY_JUST_REPAINT, location
+from config      import display_get, location, DISPLAY_JUST_REPAINT, VARIANT_2DAYS
 
 # See https://openweathermap.org/weather-conditions
 id2icon = { 200 : '200',
@@ -61,14 +61,15 @@ id2icon = { 200 : '200',
             804 : '804' }
 
 
+WEATHER     = const(1)
+TEMPERATURE = const(2)
+ALL         = const(3)
+
+
 class Forecast:
     Weather     = namedtuple('Weather', ('id', 'dt', 'temp', 'feel', 'rh', 'rain', 'speed', 'dir'))
     Home        = namedtuple('Home',    ('temp', 'rh'))
     Status      = namedtuple('Status',  ('refresh', 'sleep_time'))
-    
-    WEATHER     = const(1)
-    TEMPERATURE = const(2)
-    ALL         = const(3)
     
     def __init__(self, connection, in_temp):
         print("Reading forecast data")
@@ -80,8 +81,8 @@ class Forecast:
         self._get_status(ui)
         heap.refresh()
         
-        if self.status.refresh == Forecast.ALL:
-            if ui.variant == ui.VARIANT_2DAYS:
+        if self.status.refresh == ALL:
+            if ui.variant == VARIANT_2DAYS:
                 self._read2_short(connection, ui)
             else:
                 self._read2_long(connection, ui, 96)
@@ -203,7 +204,7 @@ class Forecast:
     
     def _get_status(self, ui):
         # Set forecast redraw status
-        refresh = Forecast.TEMPERATURE
+        refresh = TEMPERATURE
         
         dt = self.time.get_date_time(self.weather.dt)
         if (dt[3] < 6):
@@ -216,16 +217,16 @@ class Forecast:
         
         ta = t % 30
         if (0 <= ta) and (ta < sleep_time):
-            refresh = Forecast.WEATHER
+            refresh = WEATHER
         
         # Refresh all once per 90 or 60 minutes minutes
-        ta = t % (60 if ui.variant == ui.VARIANT_2DAYS else 90)
+        ta = t % (60 if ui.variant == VARIANT_2DAYS else 90)
         if (0 <= ta) and (ta < sleep_time):
-            refresh = Forecast.ALL
+            refresh = ALL
         
         # Regardless on result - refresh all on first run
         if not display_get() == DISPLAY_JUST_REPAINT:
-            refresh = Forecast.ALL
+            refresh = ALL
         
         self.status = Forecast.Status(refresh, sleep_time)
     

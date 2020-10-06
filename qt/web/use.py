@@ -1,9 +1,5 @@
-from micropython import const
-import                  heap
-from config      import location
-
-
-_spaces = const(4)
+import             heap
+from config import location
 
 
 def page(web):

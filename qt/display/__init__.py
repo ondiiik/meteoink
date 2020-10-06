@@ -4,10 +4,9 @@ from config      import pins
 from micropython import const
 
 
-class Color:
-    WHITE  = const(3)
-    BLACK  = const(2)
-    YELLOW = const(1)
+WHITE  = const(3)
+BLACK  = const(2)
+YELLOW = const(1)
 
 
 class Vect:
@@ -77,7 +76,7 @@ class Canvas:
             print("\tFB%d - [ OK ]" % color)
             
             self.buf    = bytearray((epd.width * epd.height + 7) // 8)
-            self.bit    = 1 if color == Color.YELLOW else 0
+            self.bit    = 1 if color == YELLOW else 0
             self.canvas = framebuf.FrameBuffer(self.buf, epd.width, epd.height, framebuf.MONO_HLSB)
             self.epd    = epd
             heap.refresh()
@@ -87,7 +86,7 @@ class Canvas:
             self.canvas.fill(self._val(c))
         
         def htline(self, x, y, w, c):
-            a = 0 if c == Color.BLACK else 1
+            a = 0 if c == BLACK else 1
             c = self._val(c)
             for xx in range (x, x + w):
                 if (xx + y + a) % 2 == 0:
@@ -97,7 +96,7 @@ class Canvas:
             self.canvas.hline(x, y, w, self._val(c))
         
         def vtline(self, x, y, h, c):
-            a = 0 if c == Color.BLACK else 1
+            a = 0 if c == BLACK else 1
             c = self._val(c)
             for yy in range (y, y + h):
                 if (yy + x + 1) % 2 == 0:
@@ -154,13 +153,13 @@ class Canvas:
         print("\tEPD - [ OK ]")
         heap.refresh()
         
-        self.fb = ( Canvas.Fb(Color.BLACK,  epd),
-                    Canvas.Fb(Color.YELLOW, epd) )
+        self.fb = ( Canvas.Fb(BLACK,  epd),
+                    Canvas.Fb(YELLOW, epd) )
         heap.refresh()
     
     
     def clear(self):
-        self.fill(Color.WHITE)
+        self.fill(WHITE)
     
     def fill(self, c):
         for fb in self.fb:
@@ -172,27 +171,27 @@ class Canvas:
         else:
             self.fb[0].epd.display_window(self.fb[0].buf, self.fb[1].buf, sector[0], sector[1], sector[2], sector[3])
     
-    def hline(self, v, w, c = Color.BLACK):
+    def hline(self, v, w, c = BLACK):
         v += self.ofs
         for fb in self.fb:
             fb.hline(v.x, v.y, w, c)
     
-    def htline(self, v, w, c = Color.BLACK):
+    def htline(self, v, w, c = BLACK):
         v += self.ofs
         for fb in self.fb:
             fb.htline(v.x, v.y, w, c)
     
-    def vtline(self, v, h, c = Color.BLACK):
+    def vtline(self, v, h, c = BLACK):
         v += self.ofs
         for fb in self.fb:
             fb.vtline(v.x, v.y, h, c)
     
-    def vline(self, v, h, c = Color.BLACK):
+    def vline(self, v, h, c = BLACK):
         v += self.ofs
         for fb in self.fb:
             fb.vline(v.x, v.y, h, c)
     
-    def line(self, v1, v2, c = Color.BLACK, w = 1):
+    def line(self, v1, v2, c = BLACK, w = 1):
         if w == 2:
             for a in (Vect(1, 0), Vect(0, 1), Vect(1, 1)):
                 self.line(v1 + a, v2 + a, c)
@@ -207,22 +206,22 @@ class Canvas:
         for fb in self.fb:
             fb.line(v1.x, v1.y, v2.x, v2.y, c)
     
-    def rect(self, v, d, c = Color.BLACK):
+    def rect(self, v, d, c = BLACK):
         v += self.ofs
         for fb in self.fb:
             fb.rect(v.x, v.y, d.x, d.y, c)
     
-    def trect(self, v, d, c = Color.BLACK):
+    def trect(self, v, d, c = BLACK):
         v += self.ofs
         for fb in self.fb:
             fb.trect(v.x, v.y, d.x, d.y, c)
     
-    def fill_rect(self, v, d, c = Color.BLACK):
+    def fill_rect(self, v, d, c = BLACK):
         v += self.ofs
         for fb in self.fb:
             fb.fill_rect(v.x, v.y, d.x, d.y, c)
         
-    def text(self, s, v, c = Color.BLACK):
+    def text(self, s, v, c = BLACK):
         v += self.ofs
         for fb in self.fb:
             fb.text(s, v.x, v.y, c)
@@ -236,10 +235,10 @@ class Canvas:
             self.fb[1].canvas.blit(bitmap.fb[2], v.x, v.y, 1)
             self.fb[1].canvas.blit(bitmap.fb[3], v.x, v.y, 0)
         else:
-            if   color == Color.BLACK:
+            if   color == BLACK:
                 self.fb[0].canvas.blit(bitmap.fb[0],      v.x, v.y, 1)
                 self.fb[1].canvas.blit(bitmap.inverted(), v.x, v.y, 0)
-            elif color == Color.YELLOW:
+            elif color == YELLOW:
                 self.fb[1].canvas.blit(bitmap.fb[0], v.x, v.y, 1)
             else:
                 self.fb[0].canvas.blit(bitmap.inverted(), v.x, v.y, 0)

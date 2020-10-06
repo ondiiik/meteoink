@@ -1,6 +1,7 @@
-from ui          import UiFrame, Vect, Color
+from ui          import UiFrame, Vect, BLACK
 from micropython import const
 from config      import ui as cfg
+from config      import VARIANT_2DAYS
 
 
 class UiCalendar(UiFrame):
@@ -17,14 +18,14 @@ class UiCalendar(UiFrame):
         block   = ui.canvas.dim.x / cnt
         h_space = const(4)
         
-        if cfg.variant == cfg.VARIANT_2DAYS:
+        if cfg.variant == VARIANT_2DAYS:
             dblock = int(block * 24)
         else:
             dblock = int(block * 8)
         
         # Draw upper horizontal lines
         if title:
-            ui.canvas.hline(Vect(0, 0), self.dim.x - 1, Color.BLACK)
+            ui.canvas.hline(Vect(0, 0), self.dim.x - 1, BLACK)
         
         # Find time raleted to next day
         week_day = ui.forecast.time.get_date_time(forecast[0].dt)[6]
@@ -46,12 +47,12 @@ class UiCalendar(UiFrame):
             if 0 == hour:
                 if title:
                     if (dt[6] == 5) or (dt[6] == 6):
-                        ui.canvas.trect(Vect(xx, 1), Vect(dblock, 4), Color.BLACK)
+                        ui.canvas.trect(Vect(xx, 1), Vect(dblock, 4), BLACK)
                 
                 if (dt[6] == 5) or (dt[6] == 0):
-                    ui.canvas.vline(Vect(xx + 1, 0), self.dim.y - 10 + h_space, Color.BLACK)
+                    ui.canvas.vline(Vect(xx + 1, 0), self.dim.y - 10 + h_space, BLACK)
                 
-                ui.canvas.vline(Vect(xx, 0), self.dim.y - 10 + h_space, Color.BLACK)
+                ui.canvas.vline(Vect(xx, 0), self.dim.y - 10 + h_space, BLACK)
             
             if title:
                 # Draw hours text

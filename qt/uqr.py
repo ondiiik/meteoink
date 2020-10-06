@@ -1,10 +1,11 @@
-import               re
-from framebuf import FrameBuffer, MONO_HLSB
+import                  re
+from framebuf    import FrameBuffer, MONO_HLSB
+from micropython import const
 
-ERROR_CORRECT_L = 1
-ERROR_CORRECT_M = 0
-ERROR_CORRECT_Q = 3
-ERROR_CORRECT_H = 2
+ERROR_CORRECT_L = const(1)
+ERROR_CORRECT_M = const(0)
+ERROR_CORRECT_Q = const(3)
+ERROR_CORRECT_H = const(2)
 
 rsPoly_LUT = {
     10: [1, 216, 194, 159, 111, 199, 94, 95, 113, 157, 193],
@@ -19,11 +20,11 @@ rsPoly_LUT = {
     26: [1, 246, 51, 183, 4, 136, 98, 199, 152, 77, 56, 206, 24, 145, 40, 209, 117, 233, 42, 135, 68, 70, 144, 146, 77, 43, 94]
               }
 
-"""
-Base
-
-Formerly in base.py
-"""
+###
+# Base
+# 
+# Formerly in base.py
+###
 gexp = b'\x01\x02\x04\x08\x10 @\x80\x1d:t\xe8\xcd\x87\x13&L\x98-Z\xb4u\xea\xc9\x8f\x03\x06\x0c\x180`\xc0\x9d\'N\x9c%J\x945j\xd4\xb5w\xee\xc1\x9f#F\x8c\x05\n\x14(P\xa0]\xbai\xd2\xb9o\xde\xa1_\xbea\xc2\x99/^\xbce\xca\x89\x0f\x1e<x\xf0\xfd\xe7\xd3\xbbk\xd6\xb1\x7f\xfe\xe1\xdf\xa3[\xb6q\xe2\xd9\xafC\x86\x11"D\x88\r\x1a4h\xd0\xbdg\xce\x81\x1f>|\xf8\xed\xc7\x93;v\xec\xc5\x973f\xcc\x85\x17.\\\xb8m\xda\xa9O\x9e!B\x84\x15*T\xa8M\x9a)R\xa4U\xaaI\x929r\xe4\xd5\xb7s\xe6\xd1\xbfc\xc6\x91?~\xfc\xe5\xd7\xb3{\xf6\xf1\xff\xe3\xdb\xabK\x961b\xc4\x957n\xdc\xa5W\xaeA\x82\x192d\xc8\x8d\x07\x0e\x1c8p\xe0\xdd\xa7S\xa6Q\xa2Y\xb2y\xf2\xf9\xef\xc3\x9b+V\xacE\x8a\t\x12$H\x90=z\xf4\xf5\xf7\xf3\xfb\xeb\xcb\x8b\x0b\x16,X\xb0}\xfa\xe9\xcf\x83\x1b6l\xd8\xadG\x8e\x01'
 glog = b'\x00\x00\x01\x19\x022\x1a\xc6\x03\xdf3\xee\x1bh\xc7K\x04d\xe0\x0e4\x8d\xef\x81\x1c\xc1i\xf8\xc8\x08Lq\x05\x8ae/\xe1$\x0f!5\x93\x8e\xda\xf0\x12\x82E\x1d\xb5\xc2}j\'\xf9\xb9\xc9\x9a\txM\xe4r\xa6\x06\xbf\x8bbf\xdd0\xfd\xe2\x98%\xb3\x10\x91"\x886\xd0\x94\xce\x8f\x96\xdb\xbd\xf1\xd2\x13\\\x838F@\x1eB\xb6\xa3\xc3H~nk:(T\xfa\x85\xba=\xca^\x9b\x9f\n\x15y+N\xd4\xe5\xacs\xf3\xa7W\x07p\xc0\xf7\x8c\x80c\rgJ\xde\xed1\xc5\xfe\x18\xe3\xa5\x99w&\xb8\xb4|\x11D\x92\xd9# \x89.7?\xd1[\x95\xbc\xcf\xcd\x90\x87\x97\xb2\xdc\xfc\xbea\xf2V\xd3\xab\x14*]\x9e\x84<9SGmA\xa2\x1f-C\xd8\xb7{\xa4v\xc4\x17I\xec\x7f\x0co\xf6l\xa1;R)\x9dU\xaa\xfb`\x86\xb1\xbb\xcc>Z\xcbY_\xb0\x9c\xa9\xa0Q\x0b\xf5\x16\xebzu,\xd7O\xae\xd5\xe9\xe6\xe7\xad\xe8t\xd6\xf4\xea\xa8PX\xaf'
 
@@ -228,9 +229,9 @@ class Polynomial:
 
         return Polynomial(num, 0)
 
-    """
-    EDIT
-    """
+    ###
+    # EDIT
+    ###
 
     def __mod__(self, other):
 
@@ -280,11 +281,11 @@ def make_rs_blocks(version, error_correction):
     return blocks
 
 
-"""
-Utilities
-
-Formerly in utils.py
-"""
+###
+# Utilities
+# 
+# Formerly in utils.py
+###
 
 # QR encoding modes.
 MODE_NUMBER = 1 << 0
@@ -411,9 +412,9 @@ def pattern_position(version):
 
 
 def make_mask_func(pattern):
-    """
-    Return the mask function for the given mask pattern.
-    """
+    ###
+    # Return the mask function for the given mask pattern.
+    ###
     if pattern == 0:   # 000
         return lambda i, j: (i + j) % 2 == 0
     if pattern == 1:   # 001
@@ -629,11 +630,11 @@ def _lost_point_level4(modules, modules_count):
 
 
 def optimal_data_chunks(data, minimum=4):
-    """
-    An iterator returning QRData chunks optimized to the data content.
-
-    :param minimum: The minimum number of bytes in a row to split as a chunk.
-    """
+    ###
+    # An iterator returning QRData chunks optimized to the data content.
+    #
+    # :param minimum: The minimum number of bytes in a row to split as a chunk.
+    ###
     data = to_bytestring(data)
     re_repeat = (
         b'{' + str(minimum).encode('ascii') + b',}')
@@ -668,19 +669,19 @@ def _optimal_split(data, pattern):
 
 
 def to_bytestring(data):
-    """
-    Convert data to a (utf-8 encoded) byte-string if it isn't a byte-string
-    already.
-    """
+    ###
+    # Convert data to a (utf-8 encoded) byte-string if it isn't a byte-string
+    # already.
+    ###
     if not isinstance(data, bytes):
         data = str(data).encode('utf-8')
     return data
 
 
 def optimal_mode(data):
-    """
-    Calculate the optimal mode for this chunk of data.
-    """
+    ###
+    # Calculate the optimal mode for this chunk of data.
+    ###
     if data.isdigit():
         return MODE_NUMBER
     if RE_ALPHA_NUM.match(data):
@@ -866,12 +867,11 @@ def create_data(version, error_correction, data_list):
     return create_bytes(buffer, rs_blocks)
 
 
-"""
-Main
-
-Formerly in app.py
-"""
-
+###
+# Main
+# 
+# Formerly in app.py
+###
 def make(data=None, **kwargs):
     qr = QRCode(**kwargs)
     qr.add_data(data)
@@ -919,9 +919,9 @@ class QRCode:
         self.clear()
 
     def clear(self):
-        """
-        Reset the internal data.
-        """
+        ###
+        # Reset the internal data.
+        ###
         self.modules = None
         self.modules_count = 0
         self.data_cache = None
@@ -935,12 +935,12 @@ class QRCode:
         self.data_cache = None
 
     def make(self, fit=True):
-        """
-        Compile the data into a QR Code array.
-
-        :param fit: If ``True`` (or if a size has not been provided), find the
-            best fit for the data to avoid data overflow errors.
-        """
+        ###
+        # Compile the data into a QR Code array.
+        #
+        # :param fit: If ``True`` (or if a size has not been provided), find the
+        #     best fit for the data to avoid data overflow errors.
+        ###
         if fit or (self.version is None):
             self.best_fit(start=self.version)
         if self.mask_pattern is None:
@@ -994,9 +994,9 @@ class QRCode:
                     self.modules[row + r][col + c] = False
 
     def best_fit(self, start=None):
-        """
-        Find the minimum size required to fit in the data.
-        """
+        ###
+        # Find the minimum size required to fit in the data.
+        ###
         if start is None:
             start = 1
         _check_version(start)
@@ -1029,9 +1029,9 @@ class QRCode:
         return self.version
 
     def best_mask_pattern(self):
-        """
-        Find the most efficient mask pattern.
-        """
+        ###
+        # Find the most efficient mask pattern.
+        ###
         min_lost_point = 0
         pattern = 0
 

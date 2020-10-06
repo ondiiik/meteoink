@@ -1,5 +1,9 @@
-from .      import Server
-from buzzer import play
+from .           import Server
+from buzzer      import play
+from micropython import const
+
+
+SPACES = const(4)
 
 
 class WebServer(Server):

@@ -1,9 +1,5 @@
-from micropython import const
-from config      import connection, flush_con
-from .server     import bssid2bytes
-
-
-_spaces = const(4)
+from config import connection, flush_con
+from .main  import bssid2bytes
 
 
 def page(web):

@@ -1,4 +1,4 @@
-from ui       import UiFrame, Vect, Color
+from ui       import UiFrame, Vect, BLACK, WHITE
 from forecast import id2icon
 
 
@@ -13,5 +13,5 @@ class UiWeather(UiFrame):
         ui.canvas.bitmap(Vect(5, 0), bitmap)
         
         if weather.rain > 0:
-            ui.text(10, '{:.1f} mm/h'.format(weather.rain), Vect(2, self.dim.y - 14), Color.BLACK, Color.WHITE)
+            ui.text(10, '{:.1f} mm/h'.format(weather.rain), Vect(2, self.dim.y - 14), BLACK, WHITE)
 

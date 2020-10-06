@@ -1,9 +1,5 @@
-from micropython import const
 import                  heap
-from .server     import bytes2bssid
-
-
-_spaces = const(4)
+from .main       import bytes2bssid, SPACES
 
 
 def page(web):
@@ -16,7 +12,7 @@ def page(web):
         pg   += web.table_row((w.ssid,
                                bssid,
                                web.button('Use', 'use', (('ssid', w.ssid), ('bssid', bssid)))),
-                               _spaces)
+                               SPACES)
     
     pg += web.table_tail()
     heap.refresh()

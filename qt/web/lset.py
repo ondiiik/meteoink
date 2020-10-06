@@ -1,8 +1,4 @@
-from micropython import const
-from config      import location, flush_loc
-
-
-_spaces = const(4)
+from config import location, flush_loc
 
 
 def page(web):

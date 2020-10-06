@@ -1,4 +1,6 @@
 from micropython import const
+
+
 WATCHDOG_TIME    = const(30000)
 AUTOUPDATE       = False
 DHT_HUMI_CALIB   = (1.774193548, 0.0)

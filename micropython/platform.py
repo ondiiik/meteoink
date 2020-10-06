@@ -1,1 +1,2 @@
+KERNEL_VARIANT = const(1)
 IS_MICROPYTHON = True

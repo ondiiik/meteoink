@@ -1,9 +1,5 @@
-from micropython import const
 import                  heap
-from .server     import bytes2bssid
-
-
-_spaces = const(4)
+from .main       import bytes2bssid, SPACES
 
 
 def page(web):
@@ -21,7 +17,7 @@ def page(web):
         pg += web.table_row((i.name, i.lat, i.lon,
                              web.button('Edit',   'led',  idx),
                              web.button('Delete', 'ldlt', idx)),
-                             _spaces)
+                             SPACES)
     
     pg += web.table_tail()
     heap.refresh()
@@ -47,7 +43,7 @@ def page(web):
                              location[int(i.location)].name,
                              web.button('Edit',   'ed',  idx),
                              web.button('Delete', 'dlt', idx)),
-                             _spaces)
+                             SPACES)
     
     pg += web.table_tail()
     heap.refresh()
@@ -59,21 +55,21 @@ def page(web):
     
     pg += web.heading(   2,    'General setup')
     pg += web.table_head(None, 'frame="hsides"')
-    pg += web.table_row(('Language', ui.language, ''),                           _spaces)
-    pg += web.table_row(('Units',    ui.units,    ''),                           _spaces)
-    pg += web.table_row(('API key',  ui.apikey,   web.button('Edit', 'apikey')), _spaces)
+    pg += web.table_row(('Language', ui.language, ''),                           SPACES)
+    pg += web.table_row(('Units',    ui.units,    ''),                           SPACES)
+    pg += web.table_row(('API key',  ui.apikey,   web.button('Edit', 'apikey')), SPACES)
     pg += web.table_tail()
     
     pg += web.heading(   2,    'Hotspot setup')
     pg += web.table_head(None, 'frame="hsides"')
-    pg += web.table_row(('SSID',     hotspot.ssid,   web.button('Edit', 'ssid')),   _spaces)
-    pg += web.table_row(('Password', hotspot.passwd, web.button('Edit', 'passwd')), _spaces)
+    pg += web.table_row(('SSID',     hotspot.ssid,   web.button('Edit', 'ssid')),   SPACES)
+    pg += web.table_row(('Password', hotspot.passwd, web.button('Edit', 'passwd')), SPACES)
     pg += web.table_tail()
     
     pg += web.heading(   2,    'Battery  setup')
     pg += web.table_head(None, 'frame="hsides"')
-    pg += web.table_row(('Current voltage',  '{:.2f} V'.format(voltage()), ''),                            _spaces)
-    pg += web.table_row(('Critical voltage', '{:.2f} V'.format(vbat.VBAT_LOW), web.button('Edit', 'low')), _spaces)
+    pg += web.table_row(('Current voltage',  '{:.2f} V'.format(voltage()), ''),                            SPACES)
+    pg += web.table_row(('Critical voltage', '{:.2f} V'.format(vbat.VBAT_LOW), web.button('Edit', 'low')), SPACES)
     pg += web.table_tail()
     
     pg += web.heading(   2,    'Misc')

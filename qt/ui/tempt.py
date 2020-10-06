@@ -1,4 +1,4 @@
-from ui          import UiFrame, Vect, Color
+from ui          import UiFrame, Vect, BLACK, WHITE
 from micropython import const
 import                  heap
 
@@ -42,7 +42,7 @@ class UiTempTxt(UiFrame):
                 heap.refresh()
                 
                 if (f[0].temp < f[1].temp) and (f[1].temp > f[2].temp):
-                    ui.text_center(10, '{:.0f}°C'.format(f[1].temp), Vect(x1, chart_y(f[1].temp) - 12), Color.BLACK, Color.WHITE)
+                    ui.text_center(10, '{:.0f}°C'.format(f[1].temp), Vect(x1, chart_y(f[1].temp) - 12), BLACK, WHITE)
                     
                 if (f[0].temp > f[1].temp) and (f[1].temp < f[2].temp):
-                    ui.text_center(10, '{:.0f}°C'.format(f[1].temp), Vect(x1, chart_y(f[1].temp) + 4),  Color.BLACK, Color.WHITE)
+                    ui.text_center(10, '{:.0f}°C'.format(f[1].temp), Vect(x1, chart_y(f[1].temp) + 4),  BLACK, WHITE)
