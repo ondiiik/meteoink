@@ -6,7 +6,7 @@ def run(sha):
     
     # Checks if we are running right micropython firmware
     try:
-        from platform import KERNEL_VARIANT
+        from pyptf import KERNEL_VARIANT
     except:
         print('Incompatible micropython firmware found!')
         print('Please download right one here:')

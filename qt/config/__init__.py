@@ -1,4 +1,4 @@
-from platform    import IS_MICROPYTHON
+from pyptf       import IS_MICROPYTHON
 from micropython import const
 
 VARIANT_2DAYS                 = const(2)

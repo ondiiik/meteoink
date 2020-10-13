@@ -1,6 +1,6 @@
-from jumpers  import hotspot
-from platform import IS_MICROPYTHON
-from config   import sys
+from jumpers import hotspot
+from pyptf   import IS_MICROPYTHON
+from config  import sys
 
 
 if sys.WATCHDOG_TIME <= 0 or hotspot():

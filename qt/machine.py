@@ -1,4 +1,6 @@
 import sys
+import time
+import pygame
 
 
 class SPI:
@@ -78,7 +80,10 @@ def freq(max_freq):
 
 def deepsleep(t = 0):
     print('Deep sleep ....')
-    sys.exit()
+    for i in range(t // 1000):
+        _check_events()
+        time.sleep(1)
+    sys.exit(0)
 
 
 def reset():
@@ -88,6 +93,18 @@ def reset():
 
 def reset_cause():
     return 0
+
+
+def _check_events():
+    global _adc
+    
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            print('Bye bye ...')
+            sys.exit(0)
+         
+        else:
+            print('EVENT:', event)
 
 
 PWRON_RESET = 1

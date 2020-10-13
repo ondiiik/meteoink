@@ -1,23 +1,26 @@
 MONO_HLSB = 0
+MONO_VLSB = 1
+MHLSB     = MONO_HLSB
+MVLSB     = MONO_VLSB
 
 
-_amask = (0b01111111,
-          0b10111111,
-          0b11011111,
-          0b11101111,
-          0b11110111,
-          0b11111011,
-          0b11111101,
-          0b11111110)
+_amask    = (0b01111111,
+             0b10111111,
+             0b11011111,
+             0b11101111,
+             0b11110111,
+             0b11111011,
+             0b11111101,
+             0b11111110)
 
-_omask = (0b10000000,
-          0b01000000,
-          0b00100000,
-          0b00010000,
-          0b00001000,
-          0b00000100,
-          0b00000010,
-          0b00000001)
+_omask    = (0b10000000,
+             0b01000000,
+             0b00100000,
+             0b00010000,
+             0b00001000,
+             0b00000100,
+             0b00000010,
+             0b00000001)
 
 
 
@@ -27,19 +30,19 @@ class FrameBuffer:
         self.width  = w
         self.height = h
     
-    
     def fill(self, c):
-        for yy in range(self.height):
-            for xx in range(self.width):
-                self.pixel(xx, yy, c)
-    
+        p = 0 if 0 == c else 0xFF
+        for i in range(len(self.buf)):
+            self.buf[i] = p
     
     def pixel(self, x, y, c = -1):
         if (x < 0) or (x > self.width) or (y < 0) or (y > self.height):
-            return
+            return c
+        
         pix_index  = self.width * y + x
         byte_index = pix_index // 8
         bit_index  = pix_index %  8
+        
         try:
             b = self.buf[byte_index]
         except:
@@ -49,14 +52,13 @@ class FrameBuffer:
             c = 0 if (b & _omask[bit_index]) == 0 else 1
         else:
             if c == 0:
-                b |= _omask[bit_index]
-            else:
                 b &= _amask[bit_index]
+            else:
+                b |= _omask[bit_index]
             
             self.buf[byte_index] = b
             
         return c
-    
     
     def rect(self, x, y, w, h, c):
         for yy in range(y, y + h - 1):
@@ -66,21 +68,17 @@ class FrameBuffer:
             self.pixel(xx, y,     c)
             self.pixel(xx, y + h - 1, c)
     
-    
     def fill_rect(self, x, y, w, h, c):
         for yy in range(y, y + h):
             self.hline(x, yy, w, c)
-    
     
     def vline(self, x, y, h, c):
         for yy in range(y, y + h):
             self.pixel(x, yy, c)
     
-    
     def hline(self, x, y, w, c):
         for xx in range(x, x + w):
             self.pixel(xx, y, c)
-    
     
     def line(self, x1, y1, x2, y2, c):
         dx = x2 - x1
@@ -111,9 +109,7 @@ class FrameBuffer:
                 x = x1 + dx * (y - y1) / dy
                 self.pixel(int(x), int(y), c)
     
-    
     def blit(self, fb, x, y, transparent = -1):
-        pass
         for yy in range(fb.height):
             for xx in range(fb.width):
                 c = fb.pixel(xx, yy)
