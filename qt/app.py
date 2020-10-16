@@ -88,7 +88,7 @@ def run(sha):
     # Following parts are relevant in normal mode (draw forecast)
     from jumpers import meteostation, alert
     
-    if meteostation():
+    if meteostation() and not net.is_hotspot:
         # Network is running and connected ... we can checks for updates
         if sys.AUTOUPDATE:
             from autoupdate import do_update

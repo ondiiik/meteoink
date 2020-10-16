@@ -24,7 +24,7 @@ class Led():
                 self._pin.duty(256)
                 self._pin.freq(400)
             elif m == Led.DOWNLOAD:
-                self._pin.duty(8)
+                self._pin.duty(1)
                 self._pin.freq(1)
             elif m == Led.DRAWING:
                 self._pin.duty(4)

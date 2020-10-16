@@ -10,10 +10,14 @@ class Wifi:
 
 
 class Connection:
+    __slots__ = ('config', 'nets', 'is_hotspot', '_ifc')
+    
     def __init__(self):
-        from config import connection
-        self.config = connection[0]
-        self.nets   = [ Wifi('mynet1', b'aaaaaa'), Wifi('mynet2', b'bbbbbb') ]
+        from config  import connection
+        from jumpers import hotspot
+        self.is_hotspot = hotspot()
+        self.config     = connection[0]
+        self.nets       = [ Wifi('mynet1', b'aaaaaa'), Wifi('mynet2', b'bbbbbb') ]
     
     @property
     def ifconfig(self):
