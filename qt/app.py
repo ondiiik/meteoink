@@ -1,10 +1,14 @@
 def run(sha):
-    import               machine
-    from config import   sys, vbat
-    from buzzer import   play
-    from vbat   import   voltage
+    import             machine
+    from config import sys, vbat
+    from buzzer import play
+    from vbat   import voltage
     
     # Checks if we are running right micropython firmware
+    # This firmware expects some parts as built in, so the
+    # exact firmware builtneeds to be present. One of such
+    # modules, which is used for detection is pyptf
+    # (python platform).
     try:
         from pyptf import KERNEL_VARIANT
     except:
@@ -13,14 +17,14 @@ def run(sha):
         print('\t\thttps://github.com/ondiiik/meteoink/blob/master/esp32/esp32-idf3-v1.13.bin')
         machine.deepsleep()
     
-    if not 1 == KERNEL_VARIANT:
+    if not 2 == KERNEL_VARIANT:
         print('Incompatible micropython firmware version found!')
         print('Please download right one here:')
         print('\t\thttps://github.com/ondiiik/meteoink/blob/master/esp32/esp32-idf3-v1.13.bin')
         machine.deepsleep()
     
     
-    # Reads internal temerature just after wake-up to reduce
+    # Reads internal temperature just after wake-up to reduce
     # influence of chip warm-up and use some kind of ambient
     # reduction to get more close to indoor temperature. This
     # value will be used when DTH22 sensor is not found on
@@ -32,9 +36,6 @@ def run(sha):
     from esp32 import raw_temperature
     temp = ((raw_temperature() - 32) / 1.8) - 34.0
     
-    # Slow down a bit and save piece of battery
-    machine.freq(sys.FREQ_MIN)
-    
     # As we use bi-color E-Ink display, it consumes big amount
     # of memory for frame buffers. Therefore we have to call
     # tweak and call garbage collector aggressively.
@@ -43,8 +44,9 @@ def run(sha):
     
     # There is LED driver for debugging purposes. LED control
     # is running on background and can be disabled to save
-    # piece of battery capacity. However then there is no way
-    # how to signalizes in which state meteostation is.
+    # piece of battery capacity. However then there is no
+    # other way how to signalizes in which state meteostation
+    # is then UART.
     from led import Led
     led = Led()
     heap.refresh()
@@ -82,28 +84,33 @@ def run(sha):
     # we can establish WiFi connection and connect to network.
     led.mode(Led.DOWNLOAD)
     from net import Connection
-    net = Connection()
+    
+    try:
+        net = Connection()
+    except:
+        net = None
+    
     heap.refresh()
     
     # Following parts are relevant in normal mode (draw forecast)
     from jumpers import meteostation, alert
     
-    if meteostation() and not net.is_hotspot:
+    if meteostation():
         # Network is running and connected ... we can checks for updates
-        if sys.AUTOUPDATE:
+        print("DEBUG", net)
+        if sys.AUTOUPDATE and not net is None:
             from autoupdate import do_update
             do_update(sha)
-        
-        # Meteostation forecast and ui painting calculates intensively,
-        # so lets raise CPU power.
-        machine.freq(sys.FREQ_MAX)
         
         # Once we are connected on network, we can download forecast.
         # Just note that once forecast is download, WiFi is disconnected
         # to save as much battery capacity as possible.
-        from forecast import Forecast
-        forecast = Forecast(net, temp)
-        heap.refresh()
+        if not net is None:
+            from forecast import Forecast
+            forecast = Forecast(net, temp)
+            heap.refresh()
+        else:
+            forecast = None
         
         # Most time consuming part when we have all data is to draw them
         # on user interface - screen.
@@ -111,7 +118,11 @@ def run(sha):
         ui = MeteoUi(canvas, forecast, net)
         heap.refresh()
         ui.repaint_weather(led, volt)
-        del net, ui, canvas
+        
+        del ui, canvas
+        if not net is None:
+            net = True
+        
         heap.refresh()
         
         # Forecast is painted. Now we shall checks how about temperature
@@ -123,7 +134,10 @@ def run(sha):
         # When all is displayed, then go to deep sleep. Sleep time is obtained
         # according to current weather forecast and UI needs ans is in minutes.
         print('Going to deep sleep ...')
-        machine.deepsleep(forecast.status.sleep_time * 60000)
+        if net is None:
+            machine.deepsleep(60000)
+        else:
+            machine.deepsleep(forecast.status.sleep_time * 60000)
         
     # It may happen that user wants to attach with HTTP for
     # update of firmware or configuration

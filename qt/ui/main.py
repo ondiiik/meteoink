@@ -1,8 +1,7 @@
 import                  heap
-import                  machine
 from .           import Ui
-from config      import sys, display_set, display_get, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_JUST_REPAINT, DISPLAY_DONT_REFRESH
-from display     import Vect, Bitmap, BLACK, WHITE, YELLOW
+from config      import display_set, display_get, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_JUST_REPAINT, DISPLAY_DONT_REFRESH
+from display     import Vect, WHITE
 from forecast    import TEMPERATURE, WEATHER, ALL
 from micropython import const
 
@@ -23,9 +22,6 @@ class MeteoUi(Ui):
     
     
     def repaint_weather(self, led, volt):
-        # For drawing burst CPU to full power
-        machine.freq(sys.FREQ_MAX)
-        
         # Redraw display
         print('Drawing ...')
         led.mode(led.DRAWING)
@@ -33,54 +29,61 @@ class MeteoUi(Ui):
         self.canvas.fill(WHITE)
         heap.refresh()
         
-        status = self.forecast.status
-        
-        if not status.refresh == TEMPERATURE:
-            weather_dr(self, Vect(0,   0), Vect(400, 100))
-            heap.refresh()
-            l = outside_dr(self, Vect(105, 0), Vect(295, 50))
-            heap.refresh()
-        
-        outtemp_dr(self, Vect(105, 0), Vect(295, 50))
-        heap.refresh()
-        
-        if status.refresh == ALL:
-            cal_dr(self, Vect(0, 100), Vect(400, 20))
-            heap.refresh()
-        
-        if not status.refresh == TEMPERATURE:
-            inside_dr(self, Vect(105, 50), Vect(295, 50), l, self.connection)
-            heap.refresh()
-            vbat_dr(  self, Vect(284, 87), Vect(14, 10), volt)
+        if self.connection is None:
+            # No forecast when there is no connection. Just draw no-wifi
+            # symbol into middle of screen and leave
+            bitmap  = self.bitmap(1, 'nowifi')
+            self.canvas.bitmap(Vect(177, 0), bitmap)
+        else:
+            # We have forecast, so lets draw it on screen. Don't draw
+            # always everything as forecast is changing not so often,
+            # but temperature is.
+            status = self.forecast.status
+            
+            if not status.refresh == TEMPERATURE:
+                weather_dr(self, Vect(0,   0), Vect(400, 100))
+                heap.refresh()
+                l = outside_dr(self, Vect(105, 0), Vect(295, 50))
+                heap.refresh()
+            
+            outtemp_dr(self, Vect(105, 0), Vect(295, 50))
             heap.refresh()
             
-        intemp_dr(self, Vect(105, 50), Vect(295, 50))
-        heap.refresh()
-        
-        heap.refresh()
-        if status.refresh == ALL:
-            cal_dr(  self, Vect(0, 170), Vect(400, _CHART_HEIGHT + 5), False)
+            if status.refresh == ALL:
+                cal_dr(self, Vect(0, 100), Vect(400, 20))
+                heap.refresh()
+            
+            if not status.refresh == TEMPERATURE:
+                inside_dr(self, Vect(105, 50), Vect(295, 50), l, self.connection)
+                heap.refresh()
+                vbat_dr(  self, Vect(284, 87), Vect(14, 10), volt)
+                heap.refresh()
+                
+            intemp_dr(self, Vect(105, 50), Vect(295, 50))
             heap.refresh()
-            tempg_dr(self, Vect(0, 170), Vect(400, _CHART_HEIGHT))
+            
             heap.refresh()
-            icons_dr(self, Vect(0, 128), Vect(400, 40))
-            heap.refresh()
-            wind_dr( self, Vect(0, 282), Vect(400, 20))
-            heap.refresh()
-            rain_dr( self, Vect(0, 170), Vect(400, _CHART_HEIGHT))
-            heap.refresh()
-            tempt_dr(self, Vect(0, 170), Vect(400, _CHART_HEIGHT))
-            heap.refresh()
-        
-        # For flushing we can slow down as this uses busy wait and
-        # SPI communication
-        machine.freq(sys.FREQ_MIN)
+            if status.refresh == ALL:
+                cal_dr(  self, Vect(0, 170), Vect(400, _CHART_HEIGHT + 5), False)
+                heap.refresh()
+                tempg_dr(self, Vect(0, 170), Vect(400, _CHART_HEIGHT))
+                heap.refresh()
+                icons_dr(self, Vect(0, 128), Vect(400, 40))
+                heap.refresh()
+                wind_dr( self, Vect(0, 282), Vect(400, 20))
+                heap.refresh()
+                rain_dr( self, Vect(0, 170), Vect(400, _CHART_HEIGHT))
+                heap.refresh()
+                tempt_dr(self, Vect(0, 170), Vect(400, _CHART_HEIGHT))
+                heap.refresh()
         
         # Flush drawing on display (upper or all parts)
         print('Flushing ...')
         led.mode(led.FLUSHING)
         
-        if status.refresh == TEMPERATURE:
+        if self.connection is None:
+            self.canvas.flush((180, 0, 32, 27))
+        elif status.refresh == TEMPERATURE:
             self.canvas.flush((124, 0, 92, 98))
         elif status.refresh == WEATHER:
             self.canvas.flush((0, 0, 400, 98))

@@ -21,7 +21,7 @@ class Connection:
         heap.refresh()
         
         if not self._ifc.active(True):
-            raise RuntimeError("Wifi activation failed")
+            raise RuntimeError("WiFi activation failed")
         
         sc        = self._ifc.scan()
         self.nets = []
@@ -48,7 +48,7 @@ class Connection:
         heap.refresh()
         
         if not self._ifc.active(True):
-            raise RuntimeError("Wifi activation failed")
+            raise RuntimeError("WiFi activation failed")
         
         # Search first based on BSSID
         network = None
@@ -75,9 +75,7 @@ class Connection:
         
         # Checks if we have something and connect to WiFi
         if network is None:
-            print("No know WiFi found ... switching to hotspot mode")
-            self._hotspot()
-            return
+            raise RuntimeError("No know WiFi found!")
         
         self.config = network
         

@@ -1,2 +1,2 @@
-KERNEL_VARIANT = const(1)
-IS_MICROPYTHON = True
+KERNEL_VARIANT = const(2)
+IS_MICROPYTHON = const(1)
