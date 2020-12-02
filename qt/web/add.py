@@ -1,5 +1,5 @@
-import                  heap
-from .main       import bytes2bssid, SPACES
+import            heap
+from .main import bytes2bssid, SPACES
 
 
 def page(web):

@@ -97,7 +97,6 @@ def run(sha):
     
     if meteostation():
         # Network is running and connected ... we can checks for updates
-        print("DEBUG", net)
         if sys.AUTOUPDATE and not net is None:
             from autoupdate import do_update
             do_update(sha)

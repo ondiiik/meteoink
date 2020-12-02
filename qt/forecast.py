@@ -67,7 +67,7 @@ ALL         = const(3)
 
 
 class Forecast:
-    Weather     = namedtuple('Weather', ('id', 'dt', 'temp', 'feel', 'rh', 'rain', 'speed', 'dir'))
+    Weather     = namedtuple('Weather', ('id', 'dt', 'temp', 'feel', 'rh', 'rain', 'snow', 'speed', 'dir'))
     Home        = namedtuple('Home',    ('temp', 'rh'))
     Status      = namedtuple('Status',  ('refresh', 'sleep_time'))
     
@@ -108,10 +108,16 @@ class Forecast:
         
         # Parse todays forecast
         current = fcast['current']
+        
         try:
             rain = current['rain']['1h']
         except KeyError:
             rain = 0.0
+        
+        try:
+            snow = current['snow']['1h']
+        except KeyError:
+            snow = 0.0
         
         self.time_zone = fcast['timezone_offset']
         
@@ -125,6 +131,7 @@ class Forecast:
                                           current['feels_like'],
                                           current['humidity'],
                                           rain,
+                                          snow,
                                           current['wind_speed'],
                                           current['wind_deg'])
         self.time      = Time(self.time_zone)
@@ -155,12 +162,18 @@ class Forecast:
             except KeyError:
                 rain = 0.0
             
-            self.forecast.append(Forecast.Weather(weather['id'],
+            try:
+                snow = current['snow']['1h']
+            except KeyError:
+                snow = 0.0
+            
+            self.forecast.append(Forecast.Weather(701 if current['visibility'] < 500 and weather['id'] in range(800, 802) else weather['id'],
                                                   current['dt'],
                                                   current['temp'],
                                                   current['feels_like'],
                                                   current['humidity'],
                                                   rain,
+                                                  snow,
                                                   current['wind_speed'],
                                                   current['wind_deg']))
     
@@ -192,12 +205,18 @@ class Forecast:
             except KeyError:
                 rain = 0.0
             
-            self.forecast.append(Forecast.Weather(weather['id'],
+            try:
+                snow = current['snow']['3h']
+            except KeyError:
+                snow = 0.0
+            
+            self.forecast.append(Forecast.Weather(701 if current['visibility'] < 500 and weather['id'] in range(800, 802) else weather['id'],
                                                   current['dt'],
                                                   main[   'temp'],
                                                   main[   'feels_like'],
                                                   main[   'humidity'],
                                                   rain,
+                                                  snow,
                                                   wind[   'speed'],
                                                   wind[   'deg']))
     

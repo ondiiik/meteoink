@@ -148,7 +148,7 @@ dst_fmt = '../micropython/bitmap/%i/%s.bim'
 for src_name in os.listdir(src_dir):
     src = os.path.join(src_dir,src_name)
     
-    for scale in (1,5):
+    for scale in (1,4,5):
         dst = dst_fmt % (scale, src_name[:-4])
         convert(src, dst, scale)
 

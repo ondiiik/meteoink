@@ -1,6 +1,6 @@
-import                  heap
-from config      import connection, location
-from .main       import bytes2bssid
+import             heap
+from config import connection, location
+from .main  import bytes2bssid
 
 
 def page(web):

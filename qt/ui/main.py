@@ -9,7 +9,7 @@ from micropython import const
 heap.refresh()
 
 
-_CHART_HEIGHT = const(100)
+_CHART_HEIGHT = const(90)
 
 
 class MeteoUi(Ui):
@@ -50,7 +50,7 @@ class MeteoUi(Ui):
             heap.refresh()
             
             if status.refresh == ALL:
-                cal_dr(self, Vect(0, 100), Vect(400, 20))
+                cal_dr(self, Vect(0, 100), Vect(400, 26))
                 heap.refresh()
             
             if not status.refresh == TEMPERATURE:
@@ -64,17 +64,17 @@ class MeteoUi(Ui):
             
             heap.refresh()
             if status.refresh == ALL:
-                cal_dr(  self, Vect(0, 170), Vect(400, _CHART_HEIGHT + 5), False)
+                cal_dr(  self, Vect(0, 176), Vect(400, _CHART_HEIGHT + 5), False)
                 heap.refresh()
-                tempg_dr(self, Vect(0, 170), Vect(400, _CHART_HEIGHT))
+                tempg_dr(self, Vect(0, 176), Vect(400, _CHART_HEIGHT))
                 heap.refresh()
-                icons_dr(self, Vect(0, 128), Vect(400, 40))
+                icons_dr(self, Vect(0, 137), Vect(400, 40))
                 heap.refresh()
                 wind_dr( self, Vect(0, 282), Vect(400, 20))
                 heap.refresh()
-                rain_dr( self, Vect(0, 170), Vect(400, _CHART_HEIGHT))
+                rain_dr( self, Vect(0, 176), Vect(400, _CHART_HEIGHT))
                 heap.refresh()
-                tempt_dr(self, Vect(0, 170), Vect(400, _CHART_HEIGHT))
+                tempt_dr(self, Vect(0, 176), Vect(400, _CHART_HEIGHT))
                 heap.refresh()
         
         # Flush drawing on display (upper or all parts)

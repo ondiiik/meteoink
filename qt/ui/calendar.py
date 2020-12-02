@@ -57,8 +57,8 @@ class UiCalendar(UiFrame):
             if title:
                 # Draw hours text
                 if hour % 6 == 0:
-                    ui.text_center(10, str(hour), Vect(xx, self.dim.y // 2 + h_space))
+                    ui.text_center(10, str(hour), Vect(xx, self.dim.y // 2 + h_space + 6))
                 
                 # Draw day of week text
                 if (hour + 12) % 24 == 0:
-                    ui.text_center(10, day_of_week[dt[6]], Vect(xx, h_space))
+                    ui.text_center(16, day_of_week[dt[6]], Vect(xx, h_space))

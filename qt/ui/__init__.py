@@ -29,7 +29,10 @@ class Ui:
     
     def __init__(self, canvas):
         self.canvas  = canvas
-        self.numbers = { 10 : [None] * 12, 25 : [None] * 12, 50 : [None] * 12 } 
+        self.numbers = { 10 : [None] * 12,
+                         16 : [None] * 12,
+                         25 : [None] * 12,
+                         50 : [None] * 12 } 
     
     
     def bitmap(self, size, name):
