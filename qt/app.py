@@ -93,7 +93,7 @@ def run(sha):
     heap.refresh()
     
     # Following parts are relevant in normal mode (draw forecast)
-    from jumpers import meteostation, alert
+    from jumpers import meteostation, hotspot, alert
     
     if meteostation():
         # Network is running and connected ... we can checks for updates
@@ -140,7 +140,7 @@ def run(sha):
         
     # It may happen that user wants to attach with HTTP for
     # update of firmware or configuration
-    else:
+    elif hotspot():
         play(((2093, 30), (0, 120),(2093, 30)))
         led.mode(Led.DOWNLOAD)
         
@@ -159,3 +159,13 @@ def run(sha):
         server.run()
         
         machine.reset()
+    else:
+        from ui.main  import MeteoUi
+        from config   import display_set, DISPLAY_REQUIRES_FULL_REFRESH
+        
+        ui = MeteoUi(canvas, None, net)
+        ui.repaint_welcome(led)
+        
+        print('Going to deep sleep ...')
+        display_set(DISPLAY_REQUIRES_FULL_REFRESH)
+        machine.deepsleep()

@@ -4,9 +4,12 @@ from micropython import const
 VARIANT_2DAYS                 = const(2)
 VARIANT_4DAYS                 = const(4)
 
+DISPLAY_GREETINGS             = const(-1)
 DISPLAY_REQUIRES_FULL_REFRESH = const(0)
 DISPLAY_JUST_REPAINT          = const(1)
 DISPLAY_DONT_REFRESH          = const(2)
+
+DISPLAY_REFRESH_DIV           = const(1)
 
 
 
@@ -79,9 +82,8 @@ def flush_loc():
 
 def display_set(val, force = False):
     if force or (not display_get() == val):
-        f = open('config/display.py', 'w')
-        f.write('DISPLAY_STATE = {}'.format(val))
-        f.close()
+        with open('config/display.py', 'w') as f:
+            f.write('DISPLAY_STATE = {}'.format(val))
 
 def display_get():
     try:

@@ -1,2 +1,2 @@
-VBAT_LOW     = 3.0
+VBAT_LOW     = 3.2
 SHOW_VOLTAGE = False

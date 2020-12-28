@@ -21,9 +21,38 @@ class MeteoUi(Ui):
         self.connection = connection
     
     
+    def repaint_welcome(self, led):
+        # Redraw display
+        print('Drawing welcome ...')
+        led.mode(led.DRAWING)
+        
+        self.canvas.fill(WHITE)
+        heap.refresh()
+        
+        bitmap = self.bitmap(1, 'greetings1')
+        self.canvas.bitmap(Vect(0, 0), bitmap)
+        heap.refresh()
+        
+        bitmap = self.bitmap(1, 'greetings2')
+        self.canvas.bitmap(Vect(200, 0), bitmap)
+        heap.refresh()
+        
+        bitmap = self.bitmap(1, 'greetings3')
+        self.canvas.bitmap(Vect(0, 150), bitmap)
+        heap.refresh()
+        
+        bitmap = self.bitmap(1, 'greetings4')
+        self.canvas.bitmap(Vect(200, 150), bitmap)
+        heap.refresh()
+        
+        print('Flushing ...')
+        led.mode(led.FLUSHING)
+        self.canvas.flush()
+    
+    
     def repaint_weather(self, led, volt):
         # Redraw display
-        print('Drawing ...')
+        print('Drawing weather ...')
         led.mode(led.DRAWING)
         
         self.canvas.fill(WHITE)
@@ -100,7 +129,7 @@ class MeteoUi(Ui):
         # After config we will need to repaint all
         display_set(DISPLAY_REQUIRES_FULL_REFRESH)
         
-        print('Drawing ...')
+        print('Drawing config ...')
         led.mode(led.DRAWING)
         self.canvas.fill(WHITE)
         
@@ -126,7 +155,7 @@ class MeteoUi(Ui):
     
     def repaint_lowbat(self, volt):
         if not display_get() == DISPLAY_DONT_REFRESH:
-            print('Drawing ...')
+            print('Drawing lowbat ...')
             self.canvas.fill(WHITE)
             v = Vect(self.canvas.dim.x // 2 - 30, self.canvas.dim.y // 2)
             d = Vect(60, 30)

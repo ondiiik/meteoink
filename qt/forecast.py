@@ -1,7 +1,7 @@
 import                  heap
 from collections import namedtuple
 from micropython import const
-from config      import display_get, location, DISPLAY_JUST_REPAINT, VARIANT_2DAYS
+from config      import display_get, location, DISPLAY_JUST_REPAINT, VARIANT_2DAYS, DISPLAY_REFRESH_DIV
 
 # See https://openweathermap.org/weather-conditions
 id2icon = { 200 : '200',
@@ -229,7 +229,7 @@ class Forecast:
         if (dt[3] < 6):
             sleep_time = 30
         else:
-            sleep_time = 15
+            sleep_time = 30 // DISPLAY_REFRESH_DIV
         
         # Once per 30 minutes refresh wather
         t  = (dt[3] * 60 + dt[4])
