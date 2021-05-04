@@ -26,9 +26,6 @@
 # also works for black/white/yellow GDEW042C37?
 
 # Display commands
-import heap
-
-
 class EPD:
     def __init__(self, spi, cs, dc, rst, busy):
         self.spi  = spi
@@ -102,7 +99,6 @@ class EPD:
             if not self.busy.value() == 0:
                 return
             
-            heap.refresh()
             sleep_ms(250)
         
         raise RuntimeError('EPD Timeout')

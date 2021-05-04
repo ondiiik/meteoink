@@ -10,3 +10,6 @@ class DHT22():
     
     def humidity(self):
         return 46.2
+
+
+DHT11 = DHT22

@@ -1,6 +1,3 @@
-import heap
-
-
 def page(web):
     pg  = web.heading( 2, 'Add new location')
     pg += web.form_head('nloc')
@@ -8,6 +5,5 @@ def page(web):
     pg += web.form_input('Latitude',      'lat')
     pg += web.form_input('Longitude',     'lon')
     pg += web.form_tail()
-    heap.refresh()
     
     web.write(pg)

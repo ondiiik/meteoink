@@ -1,4 +1,3 @@
-import                  heap
 from .main       import bytes2bssid, SPACES
 
 
@@ -11,8 +10,6 @@ def page(web):
     pg += web.table_head(('Location', 'Latitude', 'Longitude', '', ''), 'frame="hsides"', 'style="text-align:left"')
     
     for i in location:
-        heap.refresh()
-        
         idx = (('idx', location.index(i)),)
         pg += web.table_row((i.name, i.lat, i.lon,
                              web.button('Edit',   'led',  idx),
@@ -20,8 +17,6 @@ def page(web):
                              SPACES)
     
     pg += web.table_tail()
-    heap.refresh()
-    
     pg += web.br()
     pg += web.button('Add new location', 'lnew')
     pg += web.br()
@@ -30,8 +25,6 @@ def page(web):
     pg += web.table_head(('SSID', 'BSSID', 'Location','', ''), 'frame="hsides"', 'style="text-align:left"')
     
     for i in connection:
-        heap.refresh()
-        
         if i.bssid is None:
             bssid = ''
         else:
@@ -46,12 +39,9 @@ def page(web):
                              SPACES)
     
     pg += web.table_tail()
-    heap.refresh()
-    
     pg += web.br()
     pg += web.button('Add new WiFi', 'add')
     pg += web.br()
-    heap.refresh()
     
     pg += web.heading(   2,    'General setup')
     pg += web.table_head(None, 'frame="hsides"')

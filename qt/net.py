@@ -1,17 +1,10 @@
-import gc
-
-
 class Wifi:
-    __slots__ = ('ssid', 'bssid')
-    
     def __init__(self, ssid, bssid):
         self.ssid  = ssid
         self.bssid = bssid
 
 
 class Connection:
-    __slots__ = ('config', 'nets', 'is_hotspot', '_ifc')
-    
     def __init__(self):
         from config  import connection
         from jumpers import hotspot

@@ -2,8 +2,6 @@ from ui import UiFrame, Vect, BLACK, WHITE
 
 
 class UiQr(UiFrame):
-    __slots__ = ('txt', 'lbl', 'above')
-    
     def __init__(self, ofs, dim, args):
         super().__init__(ofs, dim)
         self.txt   = args[0]

@@ -1,5 +1,4 @@
 from config import location
-import             heap
 
 
 def page(web):
@@ -11,6 +10,5 @@ def page(web):
     pg += web.form_label('Latitude',  'lat',  loc.lat)
     pg += web.form_label('Longitude', 'lon',  loc.lon)
     pg += web.form_tail()
-    heap.refresh()
     
     web.write(pg)

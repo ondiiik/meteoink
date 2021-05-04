@@ -1,4 +1,3 @@
-import                  heap
 import                  machine
 from config      import sys, display_set, display_get, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_JUST_REPAINT, DISPLAY_DONT_REFRESH
 from display     import Vect, Bitmap, BLACK, WHITE, YELLOW
@@ -6,12 +5,7 @@ from forecast    import TEMPERATURE, WEATHER, ALL
 from micropython import const
 
 
-heap.refresh()
-
-
 class UiFrame:
-    __slots__ = ('ofs', 'dim')
-    
     def __init__(self, ofs, dim):
         self.ofs = ofs
         self.dim = dim
@@ -25,8 +19,6 @@ class UiFrame:
 
 
 class Ui:
-    __slots__ = ('canvas', 'numbers')
-    
     def __init__(self, canvas):
         self.canvas  = canvas
         self.numbers = { 10 : [None] * 12,

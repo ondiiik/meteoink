@@ -1,4 +1,3 @@
-import             heap
 from config import connection, location
 from .main  import bytes2bssid
 
@@ -13,6 +12,5 @@ def page(web):
     pg += web.form_spacer()
     pg += web.form_label('Location', 'country', location[config.location].name)
     pg += web.form_tail()
-    heap.refresh()
     
     web.write(pg)

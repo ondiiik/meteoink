@@ -1,4 +1,3 @@
-import             heap
 from config import location
 
 
@@ -21,6 +20,5 @@ def page(web):
     pg += web.select_tail()
     
     pg += web.form_tail()
-    heap.refresh()
     
     web.write(pg)

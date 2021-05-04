@@ -1,6 +1,5 @@
 from ui          import UiFrame, Vect, BLACK, WHITE
 from micropython import const
-import                  heap
 
 class UiTempTxt(UiFrame):
     def __init__(self, ofs, dim):
@@ -20,7 +19,6 @@ class UiTempTxt(UiFrame):
             temp_max = max(weather.temp, weather.feel, temp_max)
             temp_min = min(weather.temp, weather.feel, temp_min)
         
-        heap.refresh()
         chart_space  = const(30)
         chart_min    = const(chart_space // 2)
         chart_max    = self.dim.y - chart_space
@@ -39,7 +37,6 @@ class UiTempTxt(UiFrame):
             if (i > 0) and (i < cmax):
                 # Draw temperature text
                 f = (forecast[i-1], forecast[i], forecast[i+1])
-                heap.refresh()
                 
                 if (f[0].temp < f[1].temp) and (f[1].temp > f[2].temp):
                     ui.text_center(16, '{:.0f}°C'.format(f[1].temp), Vect(x1, chart_y(f[1].temp) - 12), BLACK, WHITE)

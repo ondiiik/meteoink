@@ -1,11 +1,9 @@
-import               socket
-import               heap
-from   utime  import sleep_ms
+import             socket
+from utime  import sleep_ms
+from uerrno import EAGAIN, ECONNRESET
 
 
 class Server():
-    __slots__ = ('net', 'client', 'args', 'page')
-    
     def __init__(self, net):
         self.net    = net
         self.client = None
@@ -30,14 +28,11 @@ class Server():
                     self.client, addr = sck.accept()
                     break
                 except OSError as e:
-                    from uerrno import EAGAIN
                     if EAGAIN == e.args[0]:
-                        heap.refresh()
                         sleep_ms(50)
                     else:
                         break
             
-            heap.refresh()
             self.client.settimeout(8.0)
             print('Accepted client from', addr)
             
@@ -105,7 +100,6 @@ class Server():
                 self.client.send(txt.encode())
                 retry = False
             except OSError as err:
-                from errno import ECONNRESET
                 if not err == ECONNRESET:
                     raise err
     

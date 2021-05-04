@@ -1,59 +1,20 @@
-import                  heap
-from collections import namedtuple
+import                  dht
+from machine     import Pin
 from micropython import const
-from config      import display_get, location, DISPLAY_JUST_REPAINT, VARIANT_2DAYS, DISPLAY_REFRESH_DIV
+from collections import namedtuple
+from config      import pins, sys, display_get, location, DISPLAY_JUST_REPAINT, VARIANT_2DAYS, DISPLAY_REFRESH_DIV, ui
+from ltime       import Time
+        
+
 
 # See https://openweathermap.org/weather-conditions
-id2icon = { 200 : '200',
-            201 : '200',
-            202 : '200',
-            210 : '200',
-            211 : '200',
-            212 : '200',
-            221 : '200',
-            230 : '200',
-            231 : '200',
-            232 : '200',
-            300 : '300',
-            301 : '300',
-            302 : '300',
-            310 : '300',
-            311 : '300',
-            312 : '300',
-            313 : '300',
-            314 : '300',
-            321 : '300',
-            500 : '500',
-            501 : '500',
-            502 : '500',
-            503 : '500',
-            504 : '500',
+id2icon = { 200 : '200', 201 : '200', 202 : '200', 210 : '200', 211 : '200', 212 : '200', 221 : '200', 230 : '200', 231 : '200', 232 : '200',
+            300 : '300', 301 : '300', 302 : '300', 310 : '300', 311 : '300', 312 : '300', 313 : '300', 314 : '300', 321 : '300', 500 : '500',
+            501 : '500', 502 : '500', 503 : '500', 504 : '500',
             511 : '511',
-            520 : '520',
-            521 : '520',
-            522 : '520',
-            531 : '520',
-            600 : '600',
-            601 : '600',
-            602 : '600',
-            611 : '600',
-            612 : '600',
-            613 : '600',
-            615 : '600',
-            616 : '600',
-            620 : '600',
-            621 : '600',
-            622 : '600',
-            701 : '701',
-            711 : '701',
-            721 : '701',
-            731 : '701',
-            741 : '701',
-            751 : '701',
-            761 : '701',
-            762 : '701',
-            771 : '701',
-            781 : '701',
+            520 : '520', 521 : '520', 522 : '520', 531 : '520',
+            600 : '600', 601 : '600', 602 : '600', 611 : '600', 612 : '600', 613 : '600', 615 : '600', 616 : '600', 620 : '600', 621 : '600', 622 : '600',
+            701 : '701', 711 : '701', 721 : '701', 731 : '701', 741 : '701', 751 : '701', 761 : '701', 762 : '701', 771 : '701', 781 : '701',
             800 : '800',
             801 : '801',
             802 : '802',
@@ -67,44 +28,35 @@ ALL         = const(3)
 
 
 class Forecast:
-    Weather     = namedtuple('Weather', ('id', 'dt', 'temp', 'feel', 'rh', 'rain', 'snow', 'speed', 'dir'))
-    Home        = namedtuple('Home',    ('temp', 'rh'))
-    Status      = namedtuple('Status',  ('refresh', 'sleep_time'))
+    Weather = namedtuple('Weather', ('id', 'dt', 'temp', 'feel', 'rh', 'rain', 'snow', 'speed', 'dir'))
+    Home    = namedtuple('Home',    ('temp', 'rh'))
+    Status  = namedtuple('Status',  ('refresh', 'sleep_time'))
+    
     
     def __init__(self, connection, in_temp):
         print("Reading forecast data")
-        from config import ui
-        
         self._read1(connection, ui)
-        heap.refresh()
         
         self._get_status(ui)
-        heap.refresh()
         
         if self.status.refresh == ALL:
             if ui.variant == VARIANT_2DAYS:
                 self._read2_short(connection, ui)
             else:
                 self._read2_long(connection, ui, 96)
-        heap.refresh()
         
         self._get_dht(in_temp)
-        heap.refresh()
     
     
     def _read1(self, connection, ui):
-        from ltime import Time
-        
         # Download hourly weather forecast for today
         url   = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}'
-        heap.refresh()
         fcast = connection.http_get_json(url.format(location[connection.config.location].lat,
                                                     location[connection.config.location].lon,
                                                     ui.apikey,
                                                     ui.units,
                                                     ui.language,
                                                     'minutely,hourly,daily'))
-        heap.refresh()
         
         # Parse todays forecast
         current = fcast['current']
@@ -140,16 +92,13 @@ class Forecast:
     def _read2_short(self, connection, ui):
         # Download hourly weather forecast for today
         url   = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}'
-        heap.refresh()
         fcast = connection.http_get_json(url.format(connection.config.lat,
                                                     connection.config.lon,
                                                     ui.apikey,
                                                     ui.units,
                                                     'EN',
                                                     'current,minutely,daily'))
-        heap.refresh()
         connection.disconnect()
-        heap.refresh()
         
         # Build 2 days forecast
         self.forecast = []
@@ -181,16 +130,13 @@ class Forecast:
     def _read2_long(self, connection, ui, hours):
         # Download hourly weather forecast for 5 days
         url   = "http://api.openweathermap.org/data/2.5/forecast?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&cnt={}"
-        heap.refresh()
         fcast = connection.http_get_json(url.format(location[connection.config.location].lat,
                                                     location[connection.config.location].lon,
                                                     ui.apikey,
                                                     ui.units,
                                                     'EN',
                                                     (hours + 2) // 3))
-        heap.refresh()
         connection.disconnect()
-        heap.refresh()
         
         # Build 2 days forecast
         self.forecast = []
@@ -251,12 +197,12 @@ class Forecast:
     
     
     def _get_dht(self, in_temp):
-        import              dht
-        from machine import Pin
-        from config  import pins, sys
-        
         try:
-            sensor = dht.DHT22(Pin(pins.DHT))
+            if sys.DHT_VARIANT == 22:
+                sensor = dht.DHT22(Pin(pins.DHT))
+            else:
+                sensor = dht.DHT11(Pin(pins.DHT))
+            
             sensor.measure()
             self.home = Forecast.Home(sensor.temperature(), sensor.humidity() * sys.DHT_HUMI_CALIB[0] + sys.DHT_HUMI_CALIB[1])
         except OSError:

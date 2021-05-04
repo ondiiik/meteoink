@@ -1,4 +1,3 @@
-import                  heap
 from .           import Ui
 from config      import display_set, display_get, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_JUST_REPAINT, DISPLAY_DONT_REFRESH
 from display     import Vect, WHITE
@@ -6,15 +5,10 @@ from forecast    import TEMPERATURE, WEATHER, ALL
 from micropython import const
 
 
-heap.refresh()
-
-
 _CHART_HEIGHT = const(90)
 
 
 class MeteoUi(Ui):
-    __slots__ = ('forecast', 'time', 'connection')
-    
     def __init__(self, canvas, forecast, connection):
         super().__init__(canvas)
         self.forecast   = forecast
@@ -27,23 +21,18 @@ class MeteoUi(Ui):
         led.mode(led.DRAWING)
         
         self.canvas.fill(WHITE)
-        heap.refresh()
         
         bitmap = self.bitmap(1, 'greetings1')
         self.canvas.bitmap(Vect(0, 0), bitmap)
-        heap.refresh()
         
         bitmap = self.bitmap(1, 'greetings2')
         self.canvas.bitmap(Vect(200, 0), bitmap)
-        heap.refresh()
         
         bitmap = self.bitmap(1, 'greetings3')
         self.canvas.bitmap(Vect(0, 150), bitmap)
-        heap.refresh()
         
         bitmap = self.bitmap(1, 'greetings4')
         self.canvas.bitmap(Vect(200, 150), bitmap)
-        heap.refresh()
         
         print('Flushing ...')
         led.mode(led.FLUSHING)
@@ -56,7 +45,6 @@ class MeteoUi(Ui):
         led.mode(led.DRAWING)
         
         self.canvas.fill(WHITE)
-        heap.refresh()
         
         if self.connection is None:
             # No forecast when there is no connection. Just draw no-wifi
@@ -71,40 +59,26 @@ class MeteoUi(Ui):
             
             if not status.refresh == TEMPERATURE:
                 weather_dr(self, Vect(0,   0), Vect(400, 100))
-                heap.refresh()
                 l = outside_dr(self, Vect(105, 0), Vect(295, 50))
-                heap.refresh()
             
             outtemp_dr(self, Vect(105, 0), Vect(295, 50))
-            heap.refresh()
             
             if status.refresh == ALL:
                 cal_dr(self, Vect(0, 100), Vect(400, 26))
-                heap.refresh()
             
             if not status.refresh == TEMPERATURE:
                 inside_dr(self, Vect(105, 50), Vect(295, 50), l, self.connection)
-                heap.refresh()
                 vbat_dr(  self, Vect(284, 87), Vect(14, 10), volt)
-                heap.refresh()
                 
             intemp_dr(self, Vect(105, 50), Vect(295, 50))
-            heap.refresh()
             
-            heap.refresh()
             if status.refresh == ALL:
                 cal_dr(  self, Vect(0, 176), Vect(400, _CHART_HEIGHT + 5), False)
-                heap.refresh()
                 tempg_dr(self, Vect(0, 176), Vect(400, _CHART_HEIGHT))
-                heap.refresh()
                 icons_dr(self, Vect(0, 137), Vect(400, 40))
-                heap.refresh()
                 wind_dr( self, Vect(0, 282), Vect(400, 20))
-                heap.refresh()
                 rain_dr( self, Vect(0, 176), Vect(400, _CHART_HEIGHT))
-                heap.refresh()
                 tempt_dr(self, Vect(0, 176), Vect(400, _CHART_HEIGHT))
-                heap.refresh()
         
         # Flush drawing on display (upper or all parts)
         print('Flushing ...')
@@ -137,11 +111,9 @@ class MeteoUi(Ui):
               Vect(0, 0),
               Vect(0, 0),
               ('WIFI:T:WPA;S:{};P:{};;'.format(hotspot.ssid, hotspot.passwd), 'WiFi', False));
-        heap.refresh()
         
         url = 'http://{}:5555'.format(self.connection.ifconfig[0])
         qr_dr(self, Vect(278, 178), Vect(0, 0), (url, 'Config URL', True));
-        heap.refresh()
         
         url_dr(self,  Vect(0,   self.canvas.dim.y // 2), Vect(self.canvas.dim.x - 132, self.canvas.dim.y // 2), url)
         wifi_dr(self, Vect(200, 0),                      Vect(self.canvas.dim.x - 132, self.canvas.dim.y // 2), hotspot)

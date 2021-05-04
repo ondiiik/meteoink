@@ -1,24 +1,19 @@
-import heap
+from jumpers import hotspot as hs
+from network import            WLAN, STA_IF, AP_IF
+from config  import            connection, hotspot
+from utime   import            sleep
 
 
 class Wifi:
-    __slots__  = ('ssid', 'bssid')
-    
     def __init__(self, ssid, bssid):
         self.ssid  = ssid
         self.bssid = bssid
 
 
 class Connection:
-    __slots__ = ('config', 'nets', 'is_hotspot', '_ifc')
-    
     def __init__(self):
         # Scan networks in surrounding
-        from jumpers import hotspot
-        from network import WLAN, STA_IF
-        
         self._ifc = WLAN(STA_IF)
-        heap.refresh()
         
         if not self._ifc.active(True):
             raise RuntimeError("WiFi activation failed")
@@ -32,20 +27,15 @@ class Connection:
         self._ifc.active(False)
         
         # Start requested variant of connection
-        if hotspot():
+        if hs():
             self._hotspot()
         else:
             self._attach()
     
     
     def _attach(self):
-        from network import WLAN, STA_IF
-        from config  import connection
-        from utime   import sleep
-        
         # Activate WiFi interface
         self._ifc = WLAN(STA_IF)
-        heap.refresh()
         
         if not self._ifc.active(True):
             raise RuntimeError("WiFi activation failed")
@@ -83,12 +73,10 @@ class Connection:
         
         for i in range(8):
             if self._ifc.isconnected():
-                heap.refresh()
                 print("Connected: " + str(self.ifconfig))
                 self.is_hotspot = False
                 return
             
-            heap.refresh()
             sleep(1)
             
         raise RuntimeError("Wifi connection refused")
@@ -96,10 +84,6 @@ class Connection:
     
     def _hotspot(self):
         # Create hotspot to be able to attach by FTP and configure meteostation
-        from network import WLAN, AP_IF
-        from config  import hotspot
-        from utime   import sleep
-        
         self._ifc = WLAN(AP_IF)
         self._ifc.active(True)
         self._ifc.config(essid = hotspot.ssid, password = hotspot.passwd, authmode = 3)
@@ -122,7 +106,6 @@ class Connection:
     
     
     def disconnect(self):
-        from network import WLAN, STA_IF, AP_IF
         WLAN(STA_IF).active(False)
         WLAN(AP_IF).active(False)
         self._ifc = None

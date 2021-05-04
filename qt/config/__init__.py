@@ -14,8 +14,6 @@ DISPLAY_REFRESH_DIV           = const(1)
 
 
 class Location:
-    __slots__ = ('name', 'lat', 'lon')
-    
     def __init__(self, name, lat, lon):
         self.name = name
         self.lat  = lat
@@ -23,8 +21,6 @@ class Location:
 
 
 class Connection:
-    __slots__ = ('ssid', 'bssid', 'passwd', 'location')
-    
     def __init__(self, location, ssid, passwd, bssid = None):
         self.ssid     = ssid
         self.bssid    = bssid
@@ -33,16 +29,12 @@ class Connection:
 
 
 class Spot:
-    __slots__   = ('ssid', 'passwd')
-    
     def __init__(self, ssid, passwd):
         self.ssid   = ssid
         self.passwd = passwd
 
 
 class Ui:
-    __slots__     = ('apikey', 'units', 'language', 'variant')
-    
     def __init__(self, apikey, units, language, variant):
         self.apikey   = apikey
         self.units    = units

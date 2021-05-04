@@ -15,14 +15,13 @@ BUSY    = const(25)
 DHT     = const(22)
 
 # Jumpers pins
-HOTSPOT = const(16)
-ALERT   = const(23)
+HOTSPOT = const(32)
 
 # LED pin
-LED     = const(2) 
+LED     = const(21) 
 
 # Battery voltage
-VBAT    = const(32) 
+VBAT    = const(35) 
 
 # Battery voltage
-BUZZER  = const(12) 
+BUZZER  = const(33) 

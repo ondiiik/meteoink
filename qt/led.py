@@ -1,5 +1,8 @@
+from machine import Pin, PWM
+from config  import pins, led
+
+
 class Led():
-    __slots__ = ('_pin', '_enabled')
     OFF       = 0
     WARM_UP   = 1
     DOWNLOAD  = 2
@@ -8,8 +11,6 @@ class Led():
     ALERT     = 4
     
     def __init__(self):
-        from machine import Pin, PWM
-        from config  import pins, led
         self._pin     = PWM(Pin(pins.LED), freq=1, duty=0)
         self._enabled = led.LED_ENABLED
     

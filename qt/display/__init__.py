@@ -1,4 +1,3 @@
-import                  heap
 import                  framebuf
 from config      import pins
 from micropython import const
@@ -10,8 +9,6 @@ YELLOW = const(1)
 
 
 class Vect:
-    __slots__ = ('x', 'y')
-    
     def __init__(self, x, y):
         self.x = x
         self.y = y
@@ -34,8 +31,6 @@ class Vect:
 
 
 class Bitmap:
-    __slots__ = ('dim', 'buf_width', 'buf', 'fb')
-    
     def __init__(self, file_name, no_load = False):
         f        = open(file_name, 'rb')
         hdr      = f.read(2)
@@ -67,11 +62,7 @@ class Bitmap:
 
 
 class Canvas:
-    __slots__ = ('dim', 'ofs', 'fb')
-    
     class Fb:
-        __slots__ = ('buf', 'bit', 'canvas', 'epd')
-        
         def __init__(self, color, epd):
             print("\tFB%d - [ OK ]" % color)
             
@@ -79,7 +70,6 @@ class Canvas:
             self.bit    = 1 if color == YELLOW else 0
             self.canvas = framebuf.FrameBuffer(self.buf, epd.width, epd.height, framebuf.MONO_HLSB)
             self.epd    = epd
-            heap.refresh()
         
         
         def fill(self, c):
@@ -144,18 +134,15 @@ class Canvas:
         rst               = Pin(pins.RST)
         busy              = Pin(pins.BUSY)
         print("\tSPI - [ OK ]")
-        heap.refresh()
         
         # Create EPD epaper driver
         epd      = epaper.EPD(spi, cs, dc, rst, busy)
         self.dim = Vect(epd.width, epd.height)
         self.ofs = Vect(0, 0)
         print("\tEPD - [ OK ]")
-        heap.refresh()
         
         self.fb = ( Canvas.Fb(BLACK,  epd),
                     Canvas.Fb(YELLOW, epd) )
-        heap.refresh()
     
     
     def clear(self):

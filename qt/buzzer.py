@@ -1,9 +1,9 @@
-from config import pins
+from config  import pins
+from machine import Pin, PWM
+from utime   import sleep_ms
+    
 
 def play(pattern):
-    from machine import Pin, PWM
-    from utime   import sleep_ms
-    
     for tone in pattern:
         if tone[0] == 0:
             sleep_ms(tone[1])

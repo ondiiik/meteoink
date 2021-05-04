@@ -1,5 +1,4 @@
 from ui import Vect, UiFrame, BLACK, WHITE, YELLOW
-import         heap
 
 
 def drawWind(ui, pos, weather, scale = 16, arrow = False):
@@ -74,7 +73,6 @@ class UiWind(UiFrame):
         cnt      = len(forecast)
         
         for i in reversed(range(cnt)):
-            heap.refresh()
             x = ui.canvas.dim.x * i // (cnt + 1) + 5
             y = (i % 2) * -7 + 10
             drawWind(ui, Vect(x, y), forecast[i], 4, True)
