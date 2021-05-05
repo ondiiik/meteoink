@@ -3,8 +3,6 @@ from micropython import const
 from config      import temp
 
 class UiTempGr(UiFrame):
-    __slot__ = ('chart_max', 'k_temp', 'temp_min', 'block')
-    
     def __init__(self, ofs, dim):
         super().__init__(ofs, dim)
         self.temp_min =  273.0

@@ -7,8 +7,8 @@ class Wifi:
 class Connection:
     def __init__(self):
         from config  import connection
-        from jumpers import hotspot
-        self.is_hotspot = hotspot()
+        from jumpers import jumpers
+        self.is_hotspot = jumpers.hotspot
         self.config     = connection[0]
         self.nets       = [ Wifi('mynet1', b'aaaaaa'), Wifi('mynet2', b'bbbbbb') ]
     

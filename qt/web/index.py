@@ -1,10 +1,10 @@
 from .main       import bytes2bssid, SPACES
+from config      import connection, location, ui, hotspot
+from config.vbat import VBAT_LOW
+from battery     import battery
 
 
 def page(web):
-    from config import connection, location, ui, hotspot, vbat
-    from vbat   import voltage
-    
     pg  = web.heading( 2,'Locations setup')
     
     pg += web.table_head(('Location', 'Latitude', 'Longitude', '', ''), 'frame="hsides"', 'style="text-align:left"')
@@ -58,8 +58,8 @@ def page(web):
     
     pg += web.heading(   2,    'Battery  setup')
     pg += web.table_head(None, 'frame="hsides"')
-    pg += web.table_row(('Current voltage',  '{:.2f} V'.format(voltage()), ''),                            SPACES)
-    pg += web.table_row(('Critical voltage', '{:.2f} V'.format(vbat.VBAT_LOW), web.button('Edit', 'low')), SPACES)
+    pg += web.table_row(('Current voltage',  '{:.2f} V'.format(battery.voltage), ''),                    SPACES)
+    pg += web.table_row(('Critical voltage', '{:.2f} V'.format(VBAT_LOW), web.button('Edit', 'low')), SPACES)
     pg += web.table_tail()
     
     pg += web.heading(   2,    'Misc')

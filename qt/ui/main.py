@@ -8,7 +8,7 @@ from micropython import const
 _CHART_HEIGHT = const(90)
 
 
-class MeteoUi(Ui):
+class Epd42(Ui):
     def __init__(self, canvas, forecast, connection):
         super().__init__(canvas)
         self.forecast   = forecast
@@ -204,3 +204,15 @@ def url_dr(ui, p, d, u):
 def vbat_dr(ui, p, d, volt):
     from ui.vbat import UiVBat
     UiVBat(p, d).repaint(ui, volt)
+
+
+
+
+class MeteoUi:
+    def __init__(self, canvas, forecast, connection):
+        self.ui              = Epd42(canvas, forecast, connection)
+        self.repaint_welcome = self.ui.repaint_welcome
+        self.repaint_weather = self.ui.repaint_weather
+        self.repaint_config  = self.ui.repaint_config
+        self.repaint_lowbat  = self.ui.repaint_lowbat
+

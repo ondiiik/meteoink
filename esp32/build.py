@@ -8,7 +8,7 @@ import git
 cwd  = os.path.join(os.getcwd(), "../micropython")
 dwd  = os.path.abspath('micropython')
 fw   = os.path.abspath('meteoink.fw')
-mpc  = os.path.abspath('./mpy-cross')
+mpc  = os.path.abspath('./mpy-cross -v -march=xtensawin')
 repo = git.Repo(search_parent_directories = True)
 sha  = repo.head.object.hexsha.encode()
     
@@ -93,6 +93,7 @@ convert(find('ui'))
 convert(find('web'))
 convert(find('config'))
 convert(find('lang'))
+convert(find('display'))
 
 command('rm {}'.format(os.path.join(dwd, 'boot.mpy')))
 command('rm {}'.format(os.path.join(dwd, 'main.mpy')))

@@ -1,10 +1,10 @@
-import sys
 import framebuf
 import pygame
 
 
 EPD_WIDTH  = 400
 EPD_HEIGHT = 300
+
 
 class EPD:
     def __init__(self, spi, cs, dc, rst, busy):
@@ -45,7 +45,7 @@ class EPD:
     
     def display_window(self, fb_black, fb_yellow, x, y, w, h):
         progress = ('|','\\', '-','/')
-        fbb      = framebuf.FrameBuffer(fb_black, EPD_WIDTH, EPD_HEIGHT, framebuf.MONO_HLSB)
+        fbb      = framebuf.FrameBuffer(fb_black,  EPD_WIDTH, EPD_HEIGHT, framebuf.MONO_HLSB)
         fby      = framebuf.FrameBuffer(fb_yellow, EPD_WIDTH, EPD_HEIGHT, framebuf.MONO_HLSB)
         
         # Draw black frame buffer part

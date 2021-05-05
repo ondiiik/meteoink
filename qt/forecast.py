@@ -198,11 +198,7 @@ class Forecast:
     
     def _get_dht(self, in_temp):
         try:
-            if sys.DHT_VARIANT == 22:
-                sensor = dht.DHT22(Pin(pins.DHT))
-            else:
-                sensor = dht.DHT11(Pin(pins.DHT))
-            
+            sensor = dht.DHT22(Pin(pins.DHT))
             sensor.measure()
             self.home = Forecast.Home(sensor.temperature(), sensor.humidity() * sys.DHT_HUMI_CALIB[0] + sys.DHT_HUMI_CALIB[1])
         except OSError:

@@ -1,7 +1,7 @@
-from jumpers import hotspot as hs
-from network import            WLAN, STA_IF, AP_IF
-from config  import            connection, hotspot
-from utime   import            sleep
+from jumpers import jumpers
+from network import WLAN, STA_IF, AP_IF
+from config  import connection, hotspot
+from utime   import sleep
 
 
 class Wifi:
@@ -27,7 +27,7 @@ class Connection:
         self._ifc.active(False)
         
         # Start requested variant of connection
-        if hs():
+        if jumpers.hotspot:
             self._hotspot()
         else:
             self._attach()

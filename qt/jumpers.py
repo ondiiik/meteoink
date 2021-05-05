@@ -2,10 +2,13 @@ from machine import Pin
 from config  import pins
 
 
-_hotspot_pin = Pin(pins.HOTSPOT, Pin.IN, Pin.PULL_UP)
+class Jumpers:
+    def __init__(self):
+        self._hp = Pin(pins.HOTSPOT, Pin.IN, Pin.PULL_UP)
+    
+    @property
+    def hotspot(self):
+        return self._hp.value() == 0
 
 
-def __getattr__(name):
-    if name == 'hotspot':
-        return _hotspot_pin.value() == 0
-    raise AttributeError("module '{}' has no attribute '{}'".format(__name__, name))
+jumpers = Jumpers()

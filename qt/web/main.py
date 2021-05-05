@@ -7,8 +7,6 @@ SPACES = const(4)
 
 
 class WebServer(Server):
-    __slot__ = ('last')
-    
     def __init__(self, net):
         super().__init__(net)
         self.last  = ''

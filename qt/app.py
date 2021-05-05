@@ -1,15 +1,16 @@
-from machine  import deepsleep, reset
-from esp32    import raw_temperature
-from config   import sys, vbat, display_set, display_get, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_GREETINGS
-from buzzer   import play
-from vbat     import voltage
-from led      import Led
-from display  import Canvas
-from net      import Connection
-import               jumpers
-from forecast import Forecast
-from ui.main  import MeteoUi
-from web.main import WebServer
+from machine     import deepsleep, reset
+from esp32       import raw_temperature
+from config      import sys, display_set, display_get, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_GREETINGS
+from buzzer      import play
+from config.vbat import VBAT_LOW
+from battery     import battery
+from led         import Led
+from display     import Canvas
+from net         import Connection
+from jumpers     import jumpers
+from forecast    import Forecast
+from ui.main     import MeteoUi
+from web.main    import WebServer
 
 
 def run(sha):
@@ -48,9 +49,9 @@ Please download right one here:
     led = Led()
     
     # Disable LED when battery voltage is too low
-    volt = voltage()
+    volt = battery.voltage
     
-    if (volt < vbat.VBAT_LOW):
+    if (volt < VBAT_LOW):
         led.disable()
     
     # As we uses E-Ink display, the most comfortable way
@@ -61,7 +62,7 @@ Please download right one here:
     
     # When battery voltage is too low, just draw low battery
     # error on screen and go to deep sleep.
-    if (volt < vbat.VBAT_LOW):
+    if (volt < VBAT_LOW):
         led.mode(Led.ALERT)
         
         ui = MeteoUi(canvas, None, None)
@@ -77,8 +78,10 @@ Please download right one here:
     
     try:
         net = Connection()
-    except:
+    except Exception as e:
+        print('Network connection reported', e)
         net = None
+    
     
     # It can happen that we want only to move meteostation somewhere
     # and don't want to let it wake up during transport. In this case
@@ -102,7 +105,6 @@ Please download right one here:
         ui = MeteoUi(canvas, None, net)
         ui.repaint_config(led, volt)
         led.mode(Led.DOWNLOAD)
-        del ui, canvas, led, volt
         
         server = WebServer(net)
         
@@ -118,7 +120,7 @@ Please download right one here:
             from autoupdate import do_update
             do_update(sha)
         
-        # Once we are connected on network, we can download forecast.
+        # Once we are connected to network, we can download forecast.
         # Just note that once forecast is download, WiFi is disconnected
         # to save as much battery capacity as possible.
         if not net is None:
@@ -131,7 +133,6 @@ Please download right one here:
         ui = MeteoUi(canvas, forecast, net)
         ui.repaint_weather(led, volt)
         
-        del ui, canvas
         if not net is None:
             net = True
         

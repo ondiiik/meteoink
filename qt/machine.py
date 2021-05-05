@@ -49,6 +49,7 @@ class Pin:
 
 class ADC:
     ATTN_6DB = 1
+    ATTN_11DB = 2
     
     def __init__(self, pin):
         pass

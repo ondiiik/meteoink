@@ -28,33 +28,33 @@
 # Display commands
 class EPD:
     def __init__(self, spi, cs, dc, rst, busy):
-        self.spi  = spi
-        self.cs   = cs
-        self.dc   = dc
-        self.rst  = rst
-        self.busy = busy
+        self._spi  = spi
+        self._cs   = cs
+        self._dc   = dc
+        self._rst  = rst
+        self._busy = busy
         
-        self.cs.init(  self.cs.OUT,  value=1)
-        self.dc.init(  self.dc.OUT,  value=0)
-        self.rst.init( self.rst.OUT, value=0)
-        self.busy.init(self.busy.IN)
+        self._cs.init(  self._cs.OUT,  value=1)
+        self._dc.init(  self._dc.OUT,  value=0)
+        self._rst.init( self._rst.OUT, value=0)
+        self._busy.init(self._busy.IN)
         
         self.width  = 400
         self.height = 300
     
     def _command(self, command, data=None):
-        self.dc(0)
-        self.cs(0)
-        self.spi.write(bytearray([command]))
-        self.cs(1)
+        self._dc(0)
+        self._cs(0)
+        self._spi.write(bytearray([command]))
+        self._cs(1)
         if data is not None:
             self._data(data)
     
     def _data(self, data):
-        self.dc(1)
-        self.cs(0)
-        self.spi.write(data)
-        self.cs(1)
+        self._dc(1)
+        self._cs(0)
+        self._spi.write(data)
+        self._cs(1)
         
     # draw the current frame memory
     def _flush_frame(self, fb_black, fb_yellow):
@@ -72,9 +72,9 @@ class EPD:
     
     def _reset(self):
         from time import sleep_ms
-        self.rst(0)
+        self._rst(0)
         sleep_ms(200)
-        self.rst(1)
+        self._rst(1)
         sleep_ms(200)
     
     def _init(self):
@@ -96,7 +96,7 @@ class EPD:
     def _wait_until_idle(self):
         from time import sleep_ms
         for i in range(150):
-            if not self.busy.value() == 0:
+            if not self._busy.value() == 0:
                 return
             
             sleep_ms(250)

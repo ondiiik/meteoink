@@ -1,5 +1,5 @@
-from ui          import UiFrame, Vect
-from ui.wind     import drawWind
+from ui      import UiFrame, Vect
+from ui.wind import drawWind
 
 
 class UiOutside(UiFrame):

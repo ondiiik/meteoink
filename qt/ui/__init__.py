@@ -1,4 +1,3 @@
-import                  machine
 from config      import sys, display_set, display_get, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_JUST_REPAINT, DISPLAY_DONT_REFRESH
 from display     import Vect, Bitmap, BLACK, WHITE, YELLOW
 from forecast    import TEMPERATURE, WEATHER, ALL
@@ -13,18 +12,15 @@ class UiFrame:
     
     def repaint(self, ui, d = None):
         ui.canvas.ofs += self.ofs
-        r = self.draw(ui, d)
+        r              = self.draw(ui, d)
         ui.canvas.ofs -= self.ofs
         return r
 
 
 class Ui:
     def __init__(self, canvas):
-        self.canvas  = canvas
-        self.numbers = { 10 : [None] * 12,
-                         16 : [None] * 12,
-                         25 : [None] * 12,
-                         50 : [None] * 12 } 
+        self.canvas = canvas
+        self.fonts  = { 10 : {}, 16 : {}, 25 : {}, 50 : {} } 
     
     
     def bitmap(self, size, name):
@@ -56,17 +52,14 @@ class Ui:
             if ' ' == char:
                 pos.x += int(0.3 * size) + 1
             else:
-                if char in './0123456789':
-                    f = self.numbers[size]
-                    n = ord(char) - 0x2E
-                    if f[n] == None:
-                        f[n] = Bitmap('bitmap/f/{}/{}.bim'.format(size, ord(char)))
-                    bitmap = f[n]
-                else:
-                    bitmap = Bitmap('bitmap/f/{}/{}.bim'.format(size, ord(char)))
+                try:
+                    f                      = self.fonts[size][char]
+                except KeyError:
+                    f                      = Bitmap('bitmap/f/{}/{}.bim'.format(size, ord(char)))
+                    self.fonts[size][char] = f
                 
-                self.canvas.bitmap(pos, bitmap, color)
-                pos.x += bitmap.dim.x + 1
+                self.canvas.bitmap(pos, f, color)
+                pos.x += f.dim.x + 1
         
         return pos
     
@@ -77,13 +70,12 @@ class Ui:
             if ' ' == char:
                 l     += int(0.3 * size) + 1
             else:
-                if char in './0123456789':
-                    f = self.numbers[size]
-                    n = ord(char) - 0x2E
-                    if f[n] == None:
-                        f[n] = Bitmap('bitmap/f/{}/{}.bim'.format(size, ord(char)))
-                    l += f[n].dim.x + 1
-                else:
-                    l += Bitmap('bitmap/f/{}/{}.bim'.format(size, ord(char)), True).dim.x + 1
+                try:
+                    f                      = self.fonts[size][char]
+                except KeyError:
+                    f                      = Bitmap('bitmap/f/{}/{}.bim'.format(size, ord(char)))
+                    self.fonts[size][char] = f
+                
+                l += f.dim.x + 1
         
         return l
