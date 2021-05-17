@@ -43,7 +43,7 @@ class Forecast:
             if ui.variant == VARIANT_2DAYS:
                 self._read2_short(connection, ui)
             else:
-                self._read2_long(connection, ui, 96)
+                self._read2_long(connection, ui, 120)
         
         self._get_dht(in_temp)
     

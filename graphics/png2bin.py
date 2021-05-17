@@ -41,9 +41,13 @@ def rgb2color(rgba):
     if (rgba[3] < 128):
         return TRANSPARENT
     
-    c   = (rgba[0] + rgba[1] + rgba[2]) // 3
+    c   = (rgba[0] + rgba[1]) // 2
+    
+    if rgba[2] in range(c - 3, c + 3):
+        c = (rgba[0] + rgba[1] + rgba[2]) // 3
+    
     c  *= WHITE
-    c //= 255
+    c //= 127
     
     if c == TRANSPARENT:
         c += 1

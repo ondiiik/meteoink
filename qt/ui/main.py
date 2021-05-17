@@ -47,13 +47,13 @@ class Epd42(Ui):
             status = self.forecast.status
             
             if not status.refresh == TEMPERATURE:
-                weather_dr(self, Vect(0,   0), Vect(400, 100))
+                weather_dr(self, Vect(0,   0), Vect(960, 100))
                 l = outside_dr(self, Vect(105, 0), Vect(295, 50))
             
             outtemp_dr(self, Vect(105, 0), Vect(295, 50))
             
             if status.refresh == ALL:
-                cal_dr(self, Vect(0, 100), Vect(400, 26))
+                cal_dr(self, Vect(0, 540 - 300 + 100), Vect(960, 26))
             
             if not status.refresh == TEMPERATURE:
                 inside_dr(self, Vect(105, 50), Vect(295, 50), l, self.connection)
@@ -62,12 +62,12 @@ class Epd42(Ui):
             intemp_dr(self, Vect(105, 50), Vect(295, 50))
             
             if status.refresh == ALL:
-                cal_dr(  self, Vect(0, 176), Vect(400, _CHART_HEIGHT + 5), False)
-                tempg_dr(self, Vect(0, 176), Vect(400, _CHART_HEIGHT))
-                icons_dr(self, Vect(0, 137), Vect(400, 40))
-                wind_dr( self, Vect(0, 282), Vect(400, 20))
-                rain_dr( self, Vect(0, 176), Vect(400, _CHART_HEIGHT))
-                tempt_dr(self, Vect(0, 176), Vect(400, _CHART_HEIGHT))
+                cal_dr(  self, Vect(0, 540 - 300 + 176), Vect(960, _CHART_HEIGHT + 5), False)
+                tempg_dr(self, Vect(0, 540 - 300 + 176), Vect(960, _CHART_HEIGHT))
+                icons_dr(self, Vect(0, 540 - 300 + 137), Vect(960, 40))
+                wind_dr( self, Vect(0, 540 - 300 + 282), Vect(960, 20))
+                rain_dr( self, Vect(0, 540 - 300 + 176), Vect(960, _CHART_HEIGHT))
+                tempt_dr(self, Vect(0, 540 - 300 + 176), Vect(960, _CHART_HEIGHT))
         
         # Flush drawing on display (upper or all parts)
         print('Flushing ...')
