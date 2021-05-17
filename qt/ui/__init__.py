@@ -58,7 +58,9 @@ class Ui:
                     f                      = Bitmap('bitmap/f/{}/{}.bim'.format(size, ord(char)))
                     self.fonts[size][char] = f
                 
-                self.canvas.bitmap(pos, f, color)
+                if color == BLACK:
+                    self.canvas.bitmap(pos, f)
+                
                 pos.x += f.dim.x + 1
         
         return pos

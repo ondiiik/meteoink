@@ -193,6 +193,7 @@ class Forecast:
         if not display_get() == DISPLAY_JUST_REPAINT:
             refresh = ALL
         
+        refresh = ALL # DEBUG :: DEVEL
         self.status = Forecast.Status(refresh, sleep_time)
     
     

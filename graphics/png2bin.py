@@ -30,33 +30,28 @@ import sys
 import os
 
 
-class Color:
-    BLACK        = 1
-    WHITE        = 2
-    YELLOW       = 3
-    NON_YELLOW   = 4
-    TRANSPARENT  = 5
+BLACK       = 0
+WHITE       = 15
+TRANSPARENT = 1
+
+pg          = '0 23456789ABCDEF'
 
 
 def rgb2color(rgba):
     if (rgba[3] < 128):
-        return (Color.TRANSPARENT, Color.TRANSPARENT)
+        return TRANSPARENT
     
-    if (rgba[0] != rgba[2]):
-        if rgba[2] > 127:
-            return (Color.YELLOW, Color.WHITE)
-        if rgba[0] < 85:
-            return (Color.YELLOW, Color.BLACK)
-        return (Color.YELLOW, Color.YELLOW)
+    c   = (rgba[0] + rgba[1] + rgba[2]) // 3
+    c  *= WHITE
+    c //= 255
     
-    if rgba[0] > 170:
-        return (Color.WHITE, Color.WHITE)
-    if rgba[0] < 85:
-        return (Color.BLACK, Color.BLACK)
-    return (Color.WHITE, Color.BLACK)
+    if c == TRANSPARENT:
+        c += 1
+    
+    return c
 
 
-def convert(src_file_name, dst_file_name, scale = 1, mask = (Color.BLACK, Color.WHITE, Color.YELLOW, Color.NON_YELLOW)):
+def convert(src_file_name, dst_file_name, scale = 1):
     import imageio
     import struct
     import os
@@ -76,67 +71,58 @@ def convert(src_file_name, dst_file_name, scale = 1, mask = (Color.BLACK, Color.
     dst.write(struct.pack('<HH', width, height))
     
     
-    # Prepare all 3 layers
-    for mask_color in mask:
-        scale_y = 0
-        cnt     = 0
+    scale_y = 0
+    cnt     = 0
+    
+    for row in png:
+        scale_y += 1
         
-        for row in png:
-            scale_y += 1
+        if scale_y < scale:
+            continue
+        
+        print('|', end = '')
+        
+        scale_y    = 0
+        cnt       += 1
+        bit_mask   = 0
+        bits_count = 0
+        scale_x    = 0
+        
+        for rgba in row:
+            scale_x += 1
             
-            if scale_y < scale:
+            if scale_x < scale:
                 continue
             
-            print('|', end = '')
+            scale_x     = 0
+            cnt        += 1
+            bits_count += 4
+            bit_mask    = bit_mask << 4
+            color       = rgb2color(rgba)
+            pix         = color & WHITE
+            bit_mask    = bit_mask | pix
+                
+            print(pg[pix], end = '')
             
-            scale_y    = 0
-            cnt       += 1
-            bit_mask   = 0
-            bits_count = 0
-            scale_x    = 0
-            
-            for rgba in row:
-                scale_x += 1
-                
-                if scale_x < scale:
-                    continue
-                
-                scale_x     = 0
-                cnt        += 1
-                bits_count += 1
-                bit_mask    = bit_mask << 1
-                color       = rgb2color(rgba)
-                pix         = 1 if mask_color == color[cnt % 2] else 0
-                
-                if mask_color == Color.NON_YELLOW:
-                    pix = 0 if (Color.YELLOW == color[cnt % 2]) or (Color.TRANSPARENT == color[cnt % 2]) else 1
-                    
-                bit_mask = bit_mask | pix
-                    
-                print('0' if pix == 1 else ' ', end = '')
-                
-                if 8 == bits_count:
-                    if (mask_color == Color.BLACK) or (mask_color == Color.YELLOW):
-                        bit_mask = (~bit_mask & 0xFF)
-                        
-                    dst.write(struct.pack('=B', bit_mask))
-                    
-                    print('|', end = '')
-                    bits_count = 0
-                    bit_mask   = 0
-                    
-            if not 0 == bits_count:
-                bit_mask = bit_mask << (8 - bits_count)
-                
-                if (mask_color == Color.BLACK) or (mask_color == Color.YELLOW):
-                    bit_mask = (~bit_mask & 0xFF)
-                    
+            if 8 == bits_count:
+                bit_mask = ((bit_mask >> 4) | (bit_mask << 4)) & 0xFF
                 dst.write(struct.pack('=B', bit_mask))
                 
-                print('~' * (8 - bits_count) + '|', end = '')
-                cnt += (bits_count % 2)
-            print('')
+                print('|', end = '')
+                bits_count = 0
+                bit_mask   = 0
+                
+        if not 0 == bits_count:
+            bit_mask  = bit_mask << 4
+            bit_mask |= TRANSPARENT
+            
+            bit_mask = ((bit_mask >> 4) | (bit_mask << 4)) & 0xFF
+            dst.write(struct.pack('=B', bit_mask))
+            
+            print('~' + '|', end = '')
+            cnt += (bits_count % 2)
         print('')
+    print('')
         
     dst.close()
 
