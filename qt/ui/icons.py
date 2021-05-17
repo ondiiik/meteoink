@@ -14,8 +14,16 @@ class UiIcons(UiFrame):
         forecast = ui.forecast.forecast
         cnt      = len(forecast)
         h_icons  = self.dim.y // rows_cnt
+        icon     = {}
         
         for i in range(cnt):
-            xx     = ui.canvas.dim.x * i // (cnt + 1)
-            bitmap = ui.bitmap(5, id2icon[forecast[i].id])
+            xx = ui.canvas.dim.x * i // (cnt + 1)
+            id = forecast[i].id
+            
+            try:
+                bitmap = icon[id]
+            except KeyError:
+                bitmap   = ui.bitmap(5, id2icon[id])
+                icon[id] = bitmap
+            
             ui.canvas.bitmap(Vect(xx, i % rows_cnt * h_icons), bitmap)

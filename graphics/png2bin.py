@@ -73,8 +73,7 @@ def convert(src_file_name, dst_file_name, scale = 1, mask = (Color.BLACK, Color.
     
     print("Converting '%s' to '%s' - %i x %i (%i : 1) ..." % (src_file_name, dst_file_name, width, height, scale))
     
-    dst.write(struct.pack('=B', height))
-    dst.write(struct.pack('=B', width))
+    dst.write(struct.pack('<HH', width, height))
     
     
     # Prepare all 3 layers

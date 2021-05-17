@@ -20,19 +20,8 @@ class Epd42(Ui):
         print('Drawing welcome ...')
         led.mode(led.DRAWING)
         
-        self.canvas.fill(WHITE)
-        
-        bitmap = self.bitmap(1, 'greetings1')
+        bitmap = self.bitmap(1, 'greetings')
         self.canvas.bitmap(Vect(0, 0), bitmap)
-        
-        bitmap = self.bitmap(1, 'greetings2')
-        self.canvas.bitmap(Vect(200, 0), bitmap)
-        
-        bitmap = self.bitmap(1, 'greetings3')
-        self.canvas.bitmap(Vect(0, 150), bitmap)
-        
-        bitmap = self.bitmap(1, 'greetings4')
-        self.canvas.bitmap(Vect(200, 150), bitmap)
         
         print('Flushing ...')
         led.mode(led.FLUSHING)

@@ -9,7 +9,7 @@ DISPLAY_REQUIRES_FULL_REFRESH = const(0)
 DISPLAY_JUST_REPAINT          = const(1)
 DISPLAY_DONT_REFRESH          = const(2)
 
-DISPLAY_REFRESH_DIV           = const(1)
+DISPLAY_REFRESH_DIV           = const(2)
 
 
 

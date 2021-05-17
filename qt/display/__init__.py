@@ -1,6 +1,7 @@
 import                    framebuf
 from   config      import pins
 from   micropython import const
+from   struct      import unpack
 import micropython
 
 
@@ -10,33 +11,44 @@ YELLOW = const(1)
 
 
 class Vect:
+    @micropython.native
     def __init__(self, x, y):
         self.x = x
         self.y = y
     
     @property
-    def square(self):
-        return self.x * self.y
+    @micropython.viper
+    def square(self) -> int:
+        return int(self.x) * int(self.y)
     
+    @micropython.viper
     def __add__(self, v):
-        return Vect(self.x + v.x, self.y + v.y)
+        return Vect(int(self.x) + int(v.x),
+                    int(self.y) + int(v.y))
     
+    @micropython.viper
     def __sub__(self, v):
-        return Vect(self.x - v.x, self.y - v.y)
+        return Vect(int(self.x) - int(v.x),
+                    int(self.y) - int(v.y))
     
-    def __mul__(self, v):
-        return Vect(self.x * v, self.y * v)
+    @micropython.viper
+    def __mul__(self, v : int):
+        return Vect(int(self.x) * v,
+                    int(self.y) * v)
     
-    def __div__(self, v):
-        return Vect(self.x // v, self.y // v)
+    @micropython.viper
+    def __div__(self, v : int):
+        return Vect(int(self.x) // v,
+                    int(self.y) // v)
 
 
 
 class Bitmap:
+    @micropython.native
     def __init__(self, file_name, no_load = False):
         f        = open(file_name, 'rb')
-        hdr      = f.read(2)
-        self.dim = Vect(int(hdr[1]), int(hdr[0]))
+        hdr      = unpack('<HH', f.read(4))
+        self.dim = Vect(*hdr)
         
         if no_load:
             return
@@ -53,6 +65,7 @@ class Bitmap:
                           framebuf.FrameBuffer(self.buf[2], self.buf_width, self.dim.y, framebuf.MONO_HLSB),
                           framebuf.FrameBuffer(self.buf[3], self.buf_width, self.dim.y, framebuf.MONO_HLSB))
     
+    @micropython.native
     def inverted(self, idx = 0):
         l   = len(self.buf[idx])
         buf = bytearray(b'\x00' * l)
@@ -64,6 +77,7 @@ class Bitmap:
 
 
 class Fb:
+    @micropython.native
     def __init__(self, color, epd):
         print("\tFB%d - [ OK ]" % color)
         
@@ -73,15 +87,20 @@ class Fb:
         self._bit   = 1 if color == YELLOW else 0
     
     
-    @micropython.native
-    def fill(self, c):
-        self.canvas.fill((c >> self._bit) & 1)
+    @micropython.viper
+    def fill(self,
+             c : int):
+        self.canvas.fill((c >> int(self._bit)) & 1)
     
     
-    @micropython.native
-    def htline(self, x, y, w, c):
+    @micropython.viper
+    def htline(self,
+               x : int,
+               y : int,
+               w : int,
+               c : int):
         a      = 0 if c == BLACK else 1
-        c      = (c >> self._bit) & 1
+        c      = (c >> int(self._bit)) & 1
         canvas = self.canvas
         
         for xx in range (x, x + w):
@@ -89,54 +108,91 @@ class Fb:
                 canvas.pixel(xx, y, c)
     
     
-    @micropython.native
-    def hline(self, x, y, w, c):
-        self.canvas.hline(x, y, w, (c >> self._bit) & 1)
+    @micropython.viper
+    def hline(self,
+              x : int,
+              y : int,
+              w : int,
+              c : int):
+        self.canvas.hline(x, y, w, (c >> int(self._bit)) & 1)
     
     
-    @micropython.native
-    def vtline(self, x, y, h, c):
-        c      = (c >> self._bit) & 1
+    @micropython.viper
+    def vtline(self,
+               x : int,
+               y : int,
+               h : int,
+               c : int):
+        c      = (c >> int(self._bit)) & 1
         canvas = self.canvas
         
-        for yy in range (y, y + h):
+        for yy in range(y, y + h):
             if (yy + x + 1) % 2 == 0:
                 canvas.pixel(x, yy, c)
     
     
-    @micropython.native
-    def vline(self, x, y, h, c):
-        self.canvas.vline(x, y, h, (c >> self._bit) & 1)
+    @micropython.viper
+    def vline(self,
+              x : int,
+              y : int,
+              h : int,
+              c : int):
+        self.canvas.vline(x, y, h, (c >> int(self._bit)) & 1)
     
     
-    @micropython.native
-    def line(self, x1, y1, x2, y2, c):
-        self.canvas.line(x1, y1, x2, y2, (c >> self._bit) & 1)
+    @micropython.viper
+    def line(self,
+             x1 : int,
+             y1 : int,
+             x2 : int,
+             y2 : int,
+             c  : int):
+        self.canvas.line(x1, y1, x2, y2, (c >> int(self._bit)) & 1)
     
     
-    @micropython.native
-    def rect(self, x, y, w, h, c):
-        self.canvas.rect(x, y, w, h, (c >> self._bit) & 1)
+    @micropython.viper
+    def rect(self,
+             x : int,
+             y : int,
+             w : int,
+             h : int,
+             c : int):
+        self.canvas.rect(x, y, w, h, (c >> int(self._bit)) & 1)
     
     
-    @micropython.native
-    def trect(self, x, y, w, h, c):
+    @micropython.viper
+    def trect(self,
+              x : int,
+              y : int,
+              w : int,
+              h : int,
+              c : int):
         for yy in range(y, y + h):
             self.htline(x,yy, w, c)
     
     
-    @micropython.native
-    def fill_rect(self, x, y, w, h, c):
-        self.canvas.fill_rect(x, y, w, h, (c >> self._bit) & 1)
+    @micropython.viper
+    def fill_rect(self,
+                  x : int,
+                  y : int,
+                  w : int,
+                  h : int,
+                  c : int):
+        self.canvas.fill_rect(x, y, w, h, (c >> int(self._bit)) & 1)
     
     
-    @micropython.native
-    def text(self, s, x, y, c):
-        self.canvas.text(s, x, y, (c >> self._bit) & 1)
+    @micropython.viper
+    def text(self,
+             s : int,
+             x : int,
+             y : int,
+             c : int):
+        self.canvas.text(s, x, y, (c >> int(self._bit)) & 1)
 
 
 
 class Canvas:
+    @micropython.native
     def __init__(self):
         print("Building EPD:")
         # Load modules and set constants

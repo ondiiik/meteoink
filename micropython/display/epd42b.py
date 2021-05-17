@@ -22,11 +22,13 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+import micropython
 
 # also works for black/white/yellow GDEW042C37?
 
 # Display commands
 class EPD:
+    @micropython.native
     def __init__(self, spi, cs, dc, rst, busy):
         self._spi  = spi
         self._cs   = cs
@@ -42,6 +44,7 @@ class EPD:
         self.width  = 400
         self.height = 300
     
+    @micropython.native
     def _command(self, command, data=None):
         self._dc(0)
         self._cs(0)
@@ -50,6 +53,7 @@ class EPD:
         if data is not None:
             self._data(data)
     
+    @micropython.native
     def _data(self, data):
         self._dc(1)
         self._cs(0)
@@ -57,10 +61,12 @@ class EPD:
         self._cs(1)
         
     # draw the current frame memory
+    @micropython.native
     def _flush_frame(self, fb_black, fb_yellow):
         self._command(0x10, fb_black)   # Black buffer transmission
         self._command(0x13, fb_yellow)  # Yellow buffer transmission
     
+    @micropython.native
     def _set_window(self, x, y, w, h):
         from struct import pack
         xe  = (x + w - 1) | 0x0007; # Byte boundary inclusive (last byte)
@@ -70,6 +76,7 @@ class EPD:
         self._command(0x90, pack('!HHHH', x, xe, y, ye))  # Resolution setting
         self._command(0x00) # Distortion on right half
     
+    @micropython.native
     def _reset(self):
         from time import sleep_ms
         self._rst(0)
@@ -77,6 +84,7 @@ class EPD:
         self._rst(1)
         sleep_ms(200)
     
+    @micropython.native
     def _init(self):
         from struct import pack
         self._reset()
@@ -88,11 +96,13 @@ class EPD:
         self._wait_until_idle()
         
     # to wake call _init()
+    @micropython.native
     def _sleep(self):
         self._command(0x02)          # Power off display
         self._wait_until_idle()
         self._command(0x07, b'\xA5') # Deep sleep
     
+    @micropython.native
     def _wait_until_idle(self):
         from time import sleep_ms
         for i in range(150):
@@ -104,6 +114,7 @@ class EPD:
         raise RuntimeError('EPD Timeout')
     
     # draw the current frame memory
+    @micropython.native
     def display_frame(self, fb_black, fb_yellow):
         self._init()
         self._flush_frame(fb_black, fb_yellow)  # Load data into display
@@ -112,13 +123,20 @@ class EPD:
         self._sleep()                           # Suspend display
         
     # draw just part of display
-    def display_window(self, fb_black, fb_yellow, x, y, w, h):
+    @micropython.viper
+    def display_window(self,
+                       fb_black,
+                       fb_yellow,
+                       x : int,
+                       y : int,
+                       w : int,
+                       h : int):
         x  -= x % 8
         w  -= x % 8
         x1  = 0 if x < 0 else x
         y1  = 0 if y < 0 else y
-        w1  = x + (w if w < self.width  else (self.width  - x))
-        h1  = y + (h if h < self.height else (self.height - y))
+        w1  = x + (w if w < int(self.width)  else (int(self.width)  - x))
+        h1  = y + (h if h < int(self.height) else (int(self.height) - y))
         w1 -= x1 - x;
         h1 -= y1 - y;
         

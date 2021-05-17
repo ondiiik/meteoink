@@ -96,6 +96,9 @@ def reset_cause():
     return 0
 
 
+DEEPSLEEP = 0
+
+
 def _check_events():
     global _adc
     
