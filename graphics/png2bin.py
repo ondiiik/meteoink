@@ -109,7 +109,7 @@ def convert(src_file_name, dst_file_name, scale = 1):
             print(pg[pix], end = '')
             
             if 8 == bits_count:
-                bit_mask = ((bit_mask >> 4) | (bit_mask << 4)) & 0xFF
+                #bit_mask = ((bit_mask >> 4) | (bit_mask << 4)) & 0xFF
                 dst.write(struct.pack('=B', bit_mask))
                 
                 print('|', end = '')
@@ -120,7 +120,7 @@ def convert(src_file_name, dst_file_name, scale = 1):
             bit_mask  = bit_mask << 4
             bit_mask |= TRANSPARENT
             
-            bit_mask = ((bit_mask >> 4) | (bit_mask << 4)) & 0xFF
+            #bit_mask = ((bit_mask >> 4) | (bit_mask << 4)) & 0xFF
             dst.write(struct.pack('=B', bit_mask))
             
             print('~' + '|', end = '')

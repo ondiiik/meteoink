@@ -81,6 +81,10 @@ def freq(max_freq):
 
 def deepsleep(t = 0):
     print('Deep sleep ....')
+    
+    with open('reset_cause.txt', 'w') as f:
+        f.write('deepsleep')
+    
     for i in range(t // 1000):
         _check_events()
         time.sleep(1)
@@ -89,11 +93,18 @@ def deepsleep(t = 0):
 
 def reset():
     print('Reset ....')
+    
+    with open('reset_cause.txt', 'w') as f:
+        f.write('reset')
+    
     sys.exit()
 
 
 def reset_cause():
-    return 0
+    with open('reset_cause.txt', 'r') as f:
+        v = f.read()
+    
+    return 0 if 'deepsleep' == v else 1
 
 
 DEEPSLEEP = 0

@@ -37,26 +37,39 @@ class Forecast:
         print("Reading forecast data")
         self._read1(connection, ui)
         
-        self._get_status(ui)
+        if connection is None:
+            self._get_status(ui)
         
-        if self.status.refresh == ALL:
-            if ui.variant == VARIANT_2DAYS:
-                self._read2_short(connection, ui)
-            else:
-                self._read2_long(connection, ui, 120)
+        if ui.variant == VARIANT_2DAYS:
+            self._read2_short(connection, ui)
+        else:
+            self._read2_long(connection, ui, 120)
         
         self._get_dht(in_temp)
     
     
     def _read1(self, connection, ui):
-        # Download hourly weather forecast for today
-        url   = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}'
-        fcast = connection.http_get_json(url.format(location[connection.config.location].lat,
-                                                    location[connection.config.location].lon,
-                                                    ui.apikey,
-                                                    ui.units,
-                                                    ui.language,
-                                                    'minutely,hourly,daily'))
+        if connection is None:
+            print('Reread current weather data ...')
+            import owmp
+            fcast = owmp.current
+        else:
+            # Download hourly weather forecast for today
+            print('Download current weather data ...')
+            url   = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}'
+            fcast = connection.http_get_json(url.format(location[connection.config.location].lat,
+                                                        location[connection.config.location].lon,
+                                                        ui.apikey,
+                                                        ui.units,
+                                                        ui.language,
+                                                        'minutely,hourly,daily'))
+            
+            with open('owmp.py', 'w') as f:
+                f.write('current = ')
+                f.write(str(fcast))
+                f.write('\n')
+            
+            return
         
         # Parse todays forecast
         current = fcast['current']
@@ -90,15 +103,29 @@ class Forecast:
     
     
     def _read2_short(self, connection, ui):
-        # Download hourly weather forecast for today
-        url   = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}'
-        fcast = connection.http_get_json(url.format(connection.config.lat,
-                                                    connection.config.lon,
-                                                    ui.apikey,
-                                                    ui.units,
-                                                    'EN',
-                                                    'current,minutely,daily'))
-        connection.disconnect()
+        if connection is None:
+            print('Reread current weather data ...')
+            import owmp
+            fcast = owmp.forecast
+        else:
+            # Download hourly weather forecast for today
+            print('Download current forecast data ...')
+            
+            url   = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}'
+            fcast = connection.http_get_json(url.format(connection.config.lat,
+                                                        connection.config.lon,
+                                                        ui.apikey,
+                                                        ui.units,
+                                                        'EN',
+                                                        'current,minutely,daily'))
+            
+            with open('owmp.py', 'a') as f:
+                f.write('forecast = ')
+                f.write(str(fcast))
+                f.write('\n')
+                
+                return
+        
         
         # Build 2 days forecast
         self.forecast = []
@@ -128,15 +155,27 @@ class Forecast:
     
     
     def _read2_long(self, connection, ui, hours):
-        # Download hourly weather forecast for 5 days
-        url   = "http://api.openweathermap.org/data/2.5/forecast?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&cnt={}"
-        fcast = connection.http_get_json(url.format(location[connection.config.location].lat,
-                                                    location[connection.config.location].lon,
-                                                    ui.apikey,
-                                                    ui.units,
-                                                    'EN',
-                                                    (hours + 2) // 3))
-        connection.disconnect()
+        if connection is None:
+            print('Reread current weather data ...')
+            import owmp
+            fcast = owmp.forecast
+        else:
+            # Download hourly weather forecast for 5 days
+            print('Download current forecast data ...')
+            url   = "http://api.openweathermap.org/data/2.5/forecast?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&cnt={}"
+            fcast = connection.http_get_json(url.format(location[connection.config.location].lat,
+                                                        location[connection.config.location].lon,
+                                                        ui.apikey,
+                                                        ui.units,
+                                                        'EN',
+                                                        (hours + 2) // 3))
+            
+            with open('owmp.py', 'a') as f:
+                f.write('forecast = ')
+                f.write(str(fcast))
+                f.write('\n')
+                
+                return
         
         # Build 2 days forecast
         self.forecast = []
@@ -202,5 +241,5 @@ class Forecast:
             sensor = dht.DHT22(Pin(pins.DHT))
             sensor.measure()
             self.home = Forecast.Home(sensor.temperature(), sensor.humidity() * sys.DHT_HUMI_CALIB[0] + sys.DHT_HUMI_CALIB[1])
-        except OSError:
+        except (OSError, ValueError):
             self.home = Forecast.Home(in_temp, None)

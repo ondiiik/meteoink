@@ -97,7 +97,6 @@ convert(find('display'))
 
 command('rm {}'.format(os.path.join(dwd, 'boot.mpy')))
 command('rm {}'.format(os.path.join(dwd, 'main.mpy')))
-command('rm {}'.format(os.path.join(dwd, 'pyptf.mpy')))
 command('rm {}'.format(os.path.join(dwd, 'uqr.mpy')))
 command('rm {}'.format(os.path.join(dwd, 'urequests.mpy')))
 command('rm {}'.format(os.path.join(dwd, 'config/__init__.py')))

@@ -20,7 +20,6 @@ def run(sha):
     
     # Read all initializes all peripheries
     temp, led, volt, canvas, net = _perif()
-    print('perif ::', temp, led, volt, canvas, net)
     
     
     # It can happen that we want only to move meteostation somewhere
@@ -38,9 +37,6 @@ def run(sha):
     
     # And finally - meteostation display - basic functionality ;-)
     else:
-        # Network is running and connected ... we can checks for updates
-        _update(net, sha)
-        
         # Once we are connected to network, we can download forecast.
         # Just note that once forecast is download, WiFi is disconnected
         # to save as much battery capacity as possible.
@@ -61,11 +57,6 @@ def run(sha):
 
 
 def _init():
-    # Beep when we are rebooted (only when this is not wake up
-    # from deep sleep)
-    if not DEEPSLEEP == reset_cause():
-        play(((2093, 30),))
-    
     # Checks if we are running right micropython firmware
     # This firmware expects some parts as built in, so the
     # exact firmware built ID to be present. Modules, which
@@ -112,7 +103,11 @@ def _perif():
     # how to work with it is to define canvas object for
     # drawing objects and flushing them later on screen.
     led.mode(Led.WARM_UP)
-    canvas = Canvas()
+    
+    if reset_cause() == DEEPSLEEP:
+        canvas = None
+    else:
+        canvas = Canvas()
     
         
     # When battery voltage is too low, just draw low battery
@@ -131,11 +126,15 @@ def _perif():
     # we can establish WiFi connection and connect to network.
     led.mode(Led.DOWNLOAD)
     
+    net = None
+    
     try:
-        net = Connection()
+        # Activates WiFi only when we came from deep sleep mode
+        if reset_cause() == DEEPSLEEP:
+            net = Connection()
+            print('Connected to network')
     except Exception as e:
         print('Network connection reported', e)
-        net = None
     
     
     return temp, led, volt, canvas, net
@@ -169,19 +168,15 @@ def _hotspot(canvas, net, led, volt):
 
 
 
-def _update(net, sha):
-    if sys.AUTOUPDATE and not net is None:
-        from autoupdate import do_update
-        do_update(sha)
-
-
-
 def _forecast(net, temp):
-    return None if net is None else Forecast(net, temp)
+    return Forecast(net, temp)
 
 
 
 def _repaint(canvas, forecast, net, led, volt):
+    if not net is None:
+        reset()
+    
     ui = MeteoUi(canvas, forecast, net)
     ui.repaint_weather(led, volt)
     

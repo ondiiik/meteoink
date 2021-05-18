@@ -11,15 +11,26 @@ class Led():
     ALERT     = 4
     
     def __init__(self):
-        self._pin     = PWM(Pin(pins.LED), freq=1, duty=0)
+        if pins.LED < 0:
+            self._pin = None
+        else:
+            self._pin = PWM(Pin(pins.LED), freq=1, duty=0)
+        
         self._enabled = led.LED_ENABLED
+        
     
     def disable(self):
+        if self._pin is None:
+            return
+        
         self._enabled = False
         self._pin.duty(0)
         self._pin.freq(1)
         
     def mode(self, m):
+        if self._pin is None:
+            return
+        
         if self._enabled:
             if   m == Led.WARM_UP:
                 self._pin.duty(256)

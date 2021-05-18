@@ -215,11 +215,11 @@ class Canvas:
     def flush(self, sector = None):
         if sector is None:
             sector = 0, 0, self.dim.x, self.dim.y
-        epd = self.epd
         
+        epd = self.epd
         epd.on()
-        epd.clear(*sector)
-        epd.draw_image(*sector, self.fb.buf, epd.BLACK_ON_WHITE)
+        epd.clear_area(*sector)
+        epd.draw_image(sector[0], sector[1], sector[2], sector[3], self.fb.buf, epd.BLACK_ON_WHITE)
         epd.off()
     
     

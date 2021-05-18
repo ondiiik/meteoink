@@ -8,7 +8,7 @@ from micropython import const
 _CHART_HEIGHT = const(90)
 
 
-class Epd42(Ui):
+class Epd47(Ui):
     def __init__(self, canvas, forecast, connection):
         super().__init__(canvas)
         self.forecast   = forecast
@@ -35,47 +35,39 @@ class Epd42(Ui):
         
         self.canvas.fill(WHITE)
         
-        if self.connection is None:
-            # No forecast when there is no connection. Just draw no-wifi
-            # symbol into middle of screen and leave
-            bitmap  = self.bitmap(1, 'nowifi')
-            self.canvas.bitmap(Vect(177, 0), bitmap)
-        else:
-            # We have forecast, so lets draw it on screen. Don't draw
-            # always everything as forecast is changing not so often,
-            # but temperature is.
-            status = self.forecast.status
+        # We have forecast, so lets draw it on screen. Don't draw
+        # always everything as forecast is changing not so often,
+        # but temperature is.
+        status = self.forecast.status
+        
+        if not status.refresh == TEMPERATURE:
+            weather_dr(self, Vect(0,   0), Vect(960, 100))
+            l = outside_dr(self, Vect(105, 0), Vect(295, 50))
+        
+        outtemp_dr(self, Vect(105, 0), Vect(295, 50))
+        
+        if status.refresh == ALL:
+            cal_dr(self, Vect(0, 540 - 300 + 100), Vect(960, 26))
+        
+        if not status.refresh == TEMPERATURE:
+            inside_dr(self, Vect(105, 50), Vect(295, 50), l, self.connection)
+            vbat_dr(  self, Vect(284, 87), Vect(14, 10), volt)
             
-            if not status.refresh == TEMPERATURE:
-                weather_dr(self, Vect(0,   0), Vect(960, 100))
-                l = outside_dr(self, Vect(105, 0), Vect(295, 50))
-            
-            outtemp_dr(self, Vect(105, 0), Vect(295, 50))
-            
-            if status.refresh == ALL:
-                cal_dr(self, Vect(0, 540 - 300 + 100), Vect(960, 26))
-            
-            if not status.refresh == TEMPERATURE:
-                inside_dr(self, Vect(105, 50), Vect(295, 50), l, self.connection)
-                vbat_dr(  self, Vect(284, 87), Vect(14, 10), volt)
-                
-            intemp_dr(self, Vect(105, 50), Vect(295, 50))
-            
-            if status.refresh == ALL:
-                cal_dr(  self, Vect(0, 540 - 300 + 176), Vect(960, _CHART_HEIGHT + 5), False)
-                tempg_dr(self, Vect(0, 540 - 300 + 176), Vect(960, _CHART_HEIGHT))
-                icons_dr(self, Vect(0, 540 - 300 + 137), Vect(960, 40))
-                wind_dr( self, Vect(0, 540 - 300 + 282), Vect(960, 20))
-                rain_dr( self, Vect(0, 540 - 300 + 176), Vect(960, _CHART_HEIGHT))
-                tempt_dr(self, Vect(0, 540 - 300 + 176), Vect(960, _CHART_HEIGHT))
+        intemp_dr(self, Vect(105, 50), Vect(295, 50))
+        
+        if status.refresh == ALL:
+            cal_dr(  self, Vect(0, 540 - 300 + 176), Vect(960, _CHART_HEIGHT + 5), False)
+            tempg_dr(self, Vect(0, 540 - 300 + 176), Vect(960, _CHART_HEIGHT))
+            icons_dr(self, Vect(0, 540 - 300 + 137), Vect(960, 40))
+            wind_dr( self, Vect(0, 540 - 300 + 282), Vect(960, 20))
+            rain_dr( self, Vect(0, 540 - 300 + 176), Vect(960, _CHART_HEIGHT))
+            tempt_dr(self, Vect(0, 540 - 300 + 176), Vect(960, _CHART_HEIGHT))
         
         # Flush drawing on display (upper or all parts)
         print('Flushing ...')
         led.mode(led.FLUSHING)
         
-        if self.connection is None:
-            self.canvas.flush((180, 0, 32, 27))
-        elif status.refresh == TEMPERATURE:
+        if   status.refresh == TEMPERATURE:
             self.canvas.flush((124, 0, 92, 98))
         elif status.refresh == WEATHER:
             self.canvas.flush((0, 0, 400, 98))
@@ -199,7 +191,7 @@ def vbat_dr(ui, p, d, volt):
 
 class MeteoUi:
     def __init__(self, canvas, forecast, connection):
-        self.ui              = Epd42(canvas, forecast, connection)
+        self.ui              = Epd47(canvas, forecast, connection)
         self.repaint_welcome = self.ui.repaint_welcome
         self.repaint_weather = self.ui.repaint_weather
         self.repaint_config  = self.ui.repaint_config
