@@ -1,5 +1,13 @@
-from ui      import UiFrame, Vect
-from ui.wind import drawWind
+from ui          import UiFrame, Vect
+from micropython import const
+
+
+_OUTSIDE_OFS_A   = const(200)
+_OUTSIDE_OFS_80  = const(-10)
+_OUTSIDE_OFS_B   = const(_OUTSIDE_OFS_A  + 10)
+_OUTSIDE_OFS_C   = const(_OUTSIDE_OFS_A  - 210)
+_OUTSIDE_OFS_D   = const(_OUTSIDE_OFS_C  + 10)
+_OUTSIDE_OFS_50  = const(_OUTSIDE_OFS_80 + 20)
 
 
 class UiOutside(UiFrame):
@@ -7,21 +15,12 @@ class UiOutside(UiFrame):
         super().__init__(ofs, dim)
         
     def draw(self, ui, d):
-        # Draw wind
-        weather = ui.forecast.weather
-        drawWind(ui, Vect(260, 35), weather)
-        
-        # Type celsius symbol
-        ui.text(50, '°C', Vect(111, -5))
-        
         # Type humidity
-        t = '{:.0f}'.format(weather.rh)
-        ui.text(25, t, Vect(175, 18))
-        l = ui.textLength(25, t) + 6
-        ui.text(10, '%',  Vect(175 + l, 31))
+        weather = ui.forecast.weather
+        
+        ui.text_right(80, '{:.0f}'.format(weather.rh),    Vect(_OUTSIDE_OFS_A, _OUTSIDE_OFS_80))
+        ui.text(      50,  '% RH',                        Vect(_OUTSIDE_OFS_B, _OUTSIDE_OFS_50))
         
         # Type wind speed
-        ui.text(25, '{:.1f}'.format(weather.speed), Vect(175, -5))
-        ui.text(10, 'm/s', Vect(175 + l, 8))
-        
-        return l
+        ui.text_right(80, '{:.1f}'.format(weather.speed), Vect(_OUTSIDE_OFS_C, _OUTSIDE_OFS_80))
+        ui.text(      50, 'm/s',                          Vect(_OUTSIDE_OFS_D, _OUTSIDE_OFS_50))

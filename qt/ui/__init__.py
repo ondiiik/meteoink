@@ -1,5 +1,5 @@
 from config      import sys, display_set, display_get, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_JUST_REPAINT, DISPLAY_DONT_REFRESH
-from display     import Vect, Bitmap, BLACK, WHITE, YELLOW
+from display     import Vect, Bitmap, BLACK, WHITE, GRAY
 from forecast    import TEMPERATURE, WEATHER, ALL
 from micropython import const
 
@@ -20,34 +20,26 @@ class UiFrame:
 class Ui:
     def __init__(self, canvas):
         self.canvas = canvas
-        self.fonts  = { 10 : {}, 16 : {}, 25 : {}, 50 : {} } 
+        self.fonts  = { 16 : {}, 25 : {}, 50 : {} , 80 : {}, 120 : {}, 160 : {} } 
     
     
     def bitmap(self, size, name):
         return Bitmap('bitmap/{}/{}.bim'.format(size, name))
     
     
-    def text_center(self, size, text, pos, color = BLACK, corona = None, border = 2):
+    def text_center(self, size, text, pos):
         l      = self.textLength(size, text)
         pos.x -= l // 2
-        return self.text(size, text, pos, color, corona, border)
+        return self.text(size, text, pos)
     
     
-    def text_right(self, size, text, pos, color = BLACK, corona = None, border = 2):
+    def text_right(self, size, text, pos):
         l      = self.textLength(size, text)
         pos.x -= l
-        return self.text(size, text, pos, color, corona, border)
+        return self.text(size, text, pos)
     
     
-    def text(self, size, text, pos, color = BLACK, corona = None, border = 2):
-        if not corona is None:
-            for d in (Vect(1, 0)  * border,
-                      Vect(0, 1)  * border,
-                      Vect(1, 1)  * border,
-                      Vect(1, -1) * border):
-                self.text(size, text, pos + d, corona)
-                self.text(size, text, pos - d, corona)
-                
+    def text(self, size, text, pos):
         for char in text:
             if ' ' == char:
                 pos.x += int(0.3 * size) + 1
@@ -58,9 +50,7 @@ class Ui:
                     f                      = Bitmap('bitmap/f/{}/{}.bim'.format(size, ord(char)))
                     self.fonts[size][char] = f
                 
-                if color == BLACK:
-                    self.canvas.bitmap(pos, f)
-                
+                self.canvas.bitmap(pos, f)
                 pos.x += f.dim.x + 1
         
         return pos

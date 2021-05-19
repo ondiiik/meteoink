@@ -109,7 +109,7 @@ def convert(src_file_name, dst_file_name, scale = 1):
             print(pg[pix], end = '')
             
             if 8 == bits_count:
-                #bit_mask = ((bit_mask >> 4) | (bit_mask << 4)) & 0xFF
+                bit_mask = ((bit_mask >> 4) | (bit_mask << 4)) & 0xFF
                 dst.write(struct.pack('=B', bit_mask))
                 
                 print('|', end = '')
@@ -120,7 +120,7 @@ def convert(src_file_name, dst_file_name, scale = 1):
             bit_mask  = bit_mask << 4
             bit_mask |= TRANSPARENT
             
-            #bit_mask = ((bit_mask >> 4) | (bit_mask << 4)) & 0xFF
+            bit_mask = ((bit_mask >> 4) | (bit_mask << 4)) & 0xFF
             dst.write(struct.pack('=B', bit_mask))
             
             print('~' + '|', end = '')
@@ -137,7 +137,7 @@ dst_fmt = '../micropython/bitmap/%i/%s.bim'
 for src_name in os.listdir(src_dir):
     src = os.path.join(src_dir,src_name)
     
-    for scale in (1,4,5):
+    for scale in (1,2,3,4,5):
         dst = dst_fmt % (scale, src_name[:-4])
         convert(src, dst, scale)
 

@@ -24,9 +24,9 @@ class UiVBat(UiFrame):
         ui.canvas.fill_rect(Vect(1 + w - l, 2), Vect(l, h - 4))
         
         if vbat.SHOW_VOLTAGE:
-            ui.text_center(10, '{:.2}V'.format(volt), Vect(w // 2 + 2, -12))
+            ui.text_center(16, '{:.2}V'.format(volt), Vect(w // 2 + 2, -12))
         else:
-            ui.text_center(10, '{:.0%}'.format(p), Vect(w // 2 + 2, -12))
+            ui.text_center(16, '{:.0%}'.format(p), Vect(w // 2 + 2, -12))
         
         if (volt < vbat.VBAT_LOW):
             ui.canvas.line(Vect(0,0), self.dim, YELLOW, w = 6)

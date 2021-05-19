@@ -5,8 +5,15 @@ from forecast    import TEMPERATURE, WEATHER, ALL
 from micropython import const
 
 
-_CHART_HEIGHT = const(90)
-
+_CHART_HEIGHT    = const(70)
+_CHART_ICON_SIZE = const(90)
+_CHART_POS       = const(530 - _CHART_HEIGHT - _CHART_ICON_SIZE)
+_CHART_TAIL      = const(480 - _CHART_HEIGHT)
+_CHART_RAIN      = const(35  + _CHART_TAIL)
+_CHART_HEAD      = const(385 - _CHART_HEIGHT - _CHART_ICON_SIZE)
+_CHART_ICON_POS  = const(80  + _CHART_HEAD)
+_DATA_SIZE       = const(590 - _CHART_POS)
+_DATA_LOWER      = const(140)
 
 class Epd47(Ui):
     def __init__(self, canvas, forecast, connection):
@@ -41,27 +48,26 @@ class Epd47(Ui):
         status = self.forecast.status
         
         if not status.refresh == TEMPERATURE:
-            weather_dr(self, Vect(0,   0), Vect(960, 100))
-            l = outside_dr(self, Vect(105, 0), Vect(295, 50))
-        
-        outtemp_dr(self, Vect(105, 0), Vect(295, 50))
-        
-        if status.refresh == ALL:
-            cal_dr(self, Vect(0, 540 - 300 + 100), Vect(960, 26))
-        
-        if not status.refresh == TEMPERATURE:
-            inside_dr(self, Vect(105, 50), Vect(295, 50), l, self.connection)
-            vbat_dr(  self, Vect(284, 87), Vect(14, 10), volt)
+            weather_dr(self, Vect(0, 0),             Vect(960, 100))
+            outside_dr(self, Vect(145, _DATA_LOWER), Vect(295, 50))
             
-        intemp_dr(self, Vect(105, 50), Vect(295, 50))
+        outtemp_dr(self, Vect(105, 20), Vect(295, 50))
+        #
+        if status.refresh == ALL:
+            cal_dr(self, Vect(0, _CHART_HEAD), Vect(960, 26))
+            
+        if not status.refresh == TEMPERATURE:
+            inside_dr(self, Vect(640, _DATA_LOWER), Vect(295, _DATA_SIZE // 2), self.connection)
+            # # vbat_dr(  self, Vect(600, 220), Vect(14, 10), volt)
+            #
+        intemp_dr(self, Vect(640, 0), Vect(295, _DATA_SIZE))
         
         if status.refresh == ALL:
-            cal_dr(  self, Vect(0, 540 - 300 + 176), Vect(960, _CHART_HEIGHT + 5), False)
-            tempg_dr(self, Vect(0, 540 - 300 + 176), Vect(960, _CHART_HEIGHT))
-            icons_dr(self, Vect(0, 540 - 300 + 137), Vect(960, 40))
-            wind_dr( self, Vect(0, 540 - 300 + 282), Vect(960, 20))
-            rain_dr( self, Vect(0, 540 - 300 + 176), Vect(960, _CHART_HEIGHT))
-            tempt_dr(self, Vect(0, 540 - 300 + 176), Vect(960, _CHART_HEIGHT))
+            cal_dr(  self, Vect(0, _CHART_TAIL),     Vect(960, _CHART_HEIGHT), False)
+            tempg_dr(self, Vect(0, _CHART_RAIN),     Vect(960, _CHART_HEIGHT))
+            icons_dr(self, Vect(0, _CHART_ICON_POS), Vect(960, _CHART_ICON_SIZE))
+            rain_dr( self, Vect(0, _CHART_RAIN),     Vect(960, _CHART_HEIGHT))
+            tempt_dr(self, Vect(0, _CHART_RAIN),     Vect(960, _CHART_HEIGHT))
         
         # Flush drawing on display (upper or all parts)
         print('Flushing ...')
@@ -134,9 +140,9 @@ def outtemp_dr(ui, p, d):
     from ui.outtemp import UiOutTemp
     UiOutTemp(p, d).repaint(ui)
 
-def inside_dr(ui, p, d, tab, connection):
+def inside_dr(ui, p, d, connection):
     from ui.inside import UiInside
-    UiInside(p, d).repaint(ui, (tab, connection))
+    UiInside(p, d).repaint(ui, (connection,))
 
 def intemp_dr(ui, p, d):
     from ui.intemp import UiInTemp

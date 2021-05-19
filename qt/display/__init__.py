@@ -5,9 +5,9 @@ from   struct      import unpack
 import micropython
 
 
-WHITE  = const(15)
-BLACK  = const(0)
-YELLOW = const(4)
+WHITE = const(15)
+BLACK = const(0)
+GRAY  = const(13)
 
 
 class Vect:
@@ -96,11 +96,7 @@ class Fb:
                y : int,
                w : int,
                c : int):
-        canvas = self.canvas
-        
-        for xx in range (x, x + w):
-            if (xx + y) % 2 == 0:
-                canvas.pixel(xx, y, c)
+        self.canvas.hline(x, y, w, 12)
     
     
     @micropython.viper
@@ -118,11 +114,7 @@ class Fb:
                y : int,
                h : int,
                c : int):
-        canvas = self.canvas
-        
-        for yy in range(y, y + h):
-            if (yy + x + 1) % 2 == 0:
-                canvas.pixel(x, yy, c)
+        self.canvas.vline(x, y, h, 12)
     
     
     @micropython.viper
@@ -152,17 +144,6 @@ class Fb:
              h : int,
              c : int):
         self.canvas.rect(x, y, w, h, c)
-    
-    
-    @micropython.viper
-    def trect(self,
-              x : int,
-              y : int,
-              w : int,
-              h : int,
-              c : int):
-        for yy in range(y, y + h):
-            self.htline(x,yy, w, c)
     
     
     @micropython.viper
@@ -220,7 +201,8 @@ class Canvas:
         epd.on()
         epd.clear_area(*sector)
         epd.draw_image(sector[0], sector[1], sector[2], sector[3], self.fb.buf, epd.BLACK_ON_WHITE)
-        epd.off()
+        epd.draw_image(sector[0], sector[1], sector[2], sector[3], self.fb.buf, epd.BLACK_ON_WHITE)
+        epd.power_off()
     
     
     @micropython.native
@@ -270,12 +252,6 @@ class Canvas:
     def rect(self, v, d, c = BLACK):
         v += self.ofs
         self.fb.rect(v.x, v.y, d.x, d.y, c)
-    
-    
-    @micropython.native
-    def trect(self, v, d, c = BLACK):
-        v += self.ofs
-        self.fb.trect(v.x, v.y, d.x, d.y, c)
     
     
     @micropython.native

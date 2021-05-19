@@ -1,4 +1,4 @@
-from ui import UiFrame, Vect, BLACK, WHITE, YELLOW
+from ui import UiFrame, Vect, BLACK, WHITE, GRAY
 
 class UiRain(UiFrame):
     def __init__(self, ofs, dim):
@@ -32,9 +32,7 @@ class UiRain(UiFrame):
                 d = Vect(int(block) - 2, r)
                 
                 if weather.rain > 0:
-                    ui.canvas.trect(v, d, BLACK)
-                else:
-                    ui.canvas.fill_rect(v, d, YELLOW)
+                    ui.canvas.fill_rect(v, d, GRAY)
                 ui.canvas.rect( v, d, BLACK)
             
             # Type rain text
@@ -42,4 +40,4 @@ class UiRain(UiFrame):
                 f0 = forecast[i - 1]
                 f1 = forecast[i + 1]
                 if (max(f0.rain, f0.snow) < p) and (p > max(f1.rain, f1.snow)): 
-                    ui.text_center(10, '%.1f' % p, Vect(xx, self.dim.y - 2), BLACK, WHITE)
+                    ui.text_center(25, '%.1f' % p, Vect(xx, self.dim.y - 2))

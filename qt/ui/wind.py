@@ -1,4 +1,4 @@
-from ui import Vect, UiFrame, BLACK, WHITE, YELLOW
+from ui import Vect, UiFrame, BLACK, WHITE, GRAY
 
 
 def drawWind(ui, pos, weather, scale = 16, arrow = False):
@@ -32,15 +32,7 @@ def drawWind(ui, pos, weather, scale = 16, arrow = False):
         ui.canvas.line(Vect(int(d1.real), int(d1.imag)), Vect(int(d2.real), int(d2.imag)), c, w)
         ui.canvas.line(Vect(int(d1.real), int(d1.imag)), Vect(int(o.real),  int(o.imag)),  c, w)
     
-    if weather.speed > 10:
-        c = YELLOW
-    else:
-        c = WHITE
-    
-    if weather.speed > 16:
-        w = 6
-    else:
-        w = 3
+    c, w = (GRAY, 6) if weather.speed > 10 else (WHITE, 3)
         
     drawArrow(r, c,           w)
     drawArrow(r, BLACK, 1)

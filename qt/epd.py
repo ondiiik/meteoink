@@ -36,7 +36,11 @@ def off():
     print('EPD OFF')
 
 
-def clear(x, y, w, h):
+def power_off():
+    print('EPD POWER OFF')
+
+
+def clear_area(x, y, w, h):
     print('EPD Clear area {}x{}:{}+{}'.format(x, y, w, h))
 
 

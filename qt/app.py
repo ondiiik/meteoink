@@ -52,7 +52,7 @@ def run(sha):
         
         # When all is displayed, then go to deep sleep. Sleep time is obtained
         # according to current weather forecast and UI needs and is in minutes.
-        _sleep(net, forecast)
+        _sleep(forecast)
 
 
 
@@ -190,9 +190,6 @@ def _allerts():
 
 
 
-def _sleep(net, forecast):
+def _sleep(forecast):
     print('Going to deep sleep ...')
-    if net is None:
-        deepsleep(60000)
-    else:
-        deepsleep(forecast.status.sleep_time * 60000)
+    deepsleep(forecast.status.sleep_time * 60000)

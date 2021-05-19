@@ -1,6 +1,12 @@
-from ui          import UiFrame, Vect, BLACK, WHITE, YELLOW
+from ui          import UiFrame, Vect, BLACK, WHITE, GRAY
 from micropython import const
 from config      import temp
+
+
+_CHART_SPACE    = const(-20)
+_CHART_MIN      = const(_CHART_SPACE // 2)
+_CHART_OVERSHOT = const(12 - _CHART_SPACE)
+
 
 class UiTempGr(UiFrame):
     def __init__(self, ofs, dim):
@@ -20,14 +26,12 @@ class UiTempGr(UiFrame):
             temp_max      = max(weather.temp, weather.feel, temp_max)
             self.temp_min = min(weather.temp, weather.feel, self.temp_min)
         
-        chart_space    = const(30)
-        chart_min      = const(chart_space // 2)
-        self.chart_max = self.dim.y - chart_space
-        self.k_temp    = (self.chart_max - chart_min) / (temp_max - self.temp_min)
+        self.chart_max = self.dim.y - _CHART_OVERSHOT
+        self.k_temp    = (self.chart_max - _CHART_MIN) / (temp_max - self.temp_min)
         
         # Draw charts
         self.chart_draw(ui, 3, WHITE)
-        self.chart_draw(ui, 3, YELLOW, temp.OUTDOOR_HIGH, temp.OUTDOOR_LOW)
+        self.chart_draw(ui, 3, GRAY, temp.OUTDOOR_HIGH, temp.OUTDOOR_LOW)
         self.chart_draw(ui, 1, BLACK)
     
     

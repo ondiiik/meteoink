@@ -253,7 +253,7 @@ if __name__ == '__main__':
     except:
         pass
     
-    for font_size in (200, 100, 50, 25, 16, 10):
+    for font_size in (160, 120, 80, 50, 25, 16):
         # Read font
         fnt = Font('/usr/share/fonts/truetype/ubuntu/Ubuntu-B.ttf', font_size)
         
