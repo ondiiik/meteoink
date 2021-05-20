@@ -57,13 +57,15 @@ def run(sha):
             _sleep(forecast.status.sleep_time)
     
     except Exception as e:
-        from usys import print_exception
+        from usys       import print_exception
+        from config.sys import EXCEPTION_DUMP
         
         print_exception(e)
         
-        with open('sys.log', 'a') as log:
-            log.write('\n')
-            print_exception(e, log)
+        if EXCEPTION_DUMP:
+            with open('sys.log', 'a') as log:
+                log.write('\n')
+                print_exception(e, log)
         
         _sleep(5)
 
