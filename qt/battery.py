@@ -3,13 +3,11 @@ from config  import pins
 
 
 class Battery:
-    def __init__(self):
-        self.adc = ADC(Pin(pins.VBAT))
-        self.adc.atten(ADC.ATTN_11DB)
-    
     @property
     def voltage(self):
-        return self.adc.read() * 0.001757813
+        adc = ADC(Pin(pins.VBAT))
+        adc.atten(ADC.ATTN_11DB)
+        return adc.read() * 0.001706822
 
 
 battery = Battery()
