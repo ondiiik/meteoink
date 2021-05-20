@@ -13,5 +13,5 @@ class UiWeather(UiFrame):
         ui.canvas.bitmap(Vect(5, 0), bitmap)
         
         if weather.rain > 0:
-            ui.text(10, '{:.1f} mm/h'.format(weather.rain), Vect(2, self.dim.y - 14), BLACK, WHITE)
+            ui.text(25, '{:.1f} mm/h'.format(weather.rain), Vect(2, self.dim.y))
 

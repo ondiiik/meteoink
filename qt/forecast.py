@@ -104,12 +104,12 @@ class Forecast:
     
     def _read2_short(self, connection, ui):
         if connection is None:
-            print('Reread current weather data ...')
+            print('Reread short weather data ...')
             import owmp
             fcast = owmp.forecast
         else:
             # Download hourly weather forecast for today
-            print('Download current forecast data ...')
+            print('Download short forecast data ...')
             
             url   = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}'
             fcast = connection.http_get_json(url.format(connection.config.lat,
@@ -156,12 +156,12 @@ class Forecast:
     
     def _read2_long(self, connection, ui, hours):
         if connection is None:
-            print('Reread current weather data ...')
+            print('Reread long weather data ...')
             import owmp
             fcast = owmp.forecast
         else:
             # Download hourly weather forecast for 5 days
-            print('Download current forecast data ...')
+            print('Download long forecast data ...')
             url   = "http://api.openweathermap.org/data/2.5/forecast?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&cnt={}"
             fcast = connection.http_get_json(url.format(location[connection.config.location].lat,
                                                         location[connection.config.location].lon,
@@ -232,8 +232,8 @@ class Forecast:
         if not display_get() == DISPLAY_JUST_REPAINT:
             refresh = ALL
         
-        refresh = ALL # DEBUG :: DEVEL
-        self.status = Forecast.Status(refresh, sleep_time)
+        self.status = Forecast.Status(ALL, 15) # DEBUG :: DEVEL
+        #self.status = Forecast.Status(refresh, sleep_time)
     
     
     def _get_dht(self, in_temp):

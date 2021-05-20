@@ -84,7 +84,7 @@ def _perif():
     # Just note that better is to connect DHT22/DTH11 for
     # more precise temperature measurement and also for information
     # about humidity.
-    temp = ((raw_temperature() - 32) / 1.8) - 26.0
+    temp = ((raw_temperature() - 32) / 1.8) - 29.7
     
     # There is LED driver for debugging purposes. LED control
     # is running on background and can be disabled to save
@@ -191,5 +191,5 @@ def _allerts():
 
 
 def _sleep(forecast):
-    print('Going to deep sleep ...')
+    print('Going to deep sleep for {} minutes ...'.format(forecast.status.sleep_time))
     deepsleep(forecast.status.sleep_time * 60000)

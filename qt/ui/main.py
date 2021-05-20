@@ -51,15 +51,16 @@ class Epd47(Ui):
             weather_dr(self, Vect(0, 0),             Vect(960, 100))
             outside_dr(self, Vect(145, _DATA_LOWER), Vect(295, 50))
             
-        outtemp_dr(self, Vect(105, 20), Vect(295, 50))
+        winfo_dr(  self, Vect(105, -5), Vect(385, 50))
+        outtemp_dr(self, Vect(105, 60), Vect(295, 50))
         #
         if status.refresh == ALL:
             cal_dr(self, Vect(0, _CHART_HEAD), Vect(960, 26))
             
         if not status.refresh == TEMPERATURE:
-            inside_dr(self, Vect(640, _DATA_LOWER), Vect(295, _DATA_SIZE // 2), self.connection)
-            # # vbat_dr(  self, Vect(600, 220), Vect(14, 10), volt)
-            #
+            inside_dr(self, Vect(640, _DATA_LOWER), Vect(295, _DATA_SIZE // 2))
+            vbat_dr(  self, Vect(432, 16),          Vect(48, 30), volt)
+        
         intemp_dr(self, Vect(640, 0), Vect(295, _DATA_SIZE))
         
         if status.refresh == ALL:
@@ -140,9 +141,13 @@ def outtemp_dr(ui, p, d):
     from ui.outtemp import UiOutTemp
     UiOutTemp(p, d).repaint(ui)
 
-def inside_dr(ui, p, d, connection):
+def inside_dr(ui, p, d):
     from ui.inside import UiInside
-    UiInside(p, d).repaint(ui, (connection,))
+    UiInside(p, d).repaint(ui)
+
+def winfo_dr(ui, p, d):
+    from ui.winfo import UiWInfo
+    UiWInfo(p, d).repaint(ui)
 
 def intemp_dr(ui, p, d):
     from ui.intemp import UiInTemp
