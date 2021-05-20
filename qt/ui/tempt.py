@@ -39,7 +39,7 @@ class UiTempTxt(UiFrame):
                 f = (forecast[i-1], forecast[i], forecast[i+1])
                 
                 if (f[0].temp < f[1].temp) and (f[1].temp > f[2].temp):
-                    ui.text_center(16, '{:.0f}°C'.format(f[1].temp), Vect(x1, chart_y(f[1].temp) - 12), BLACK, WHITE)
+                    ui.text_center(16, '{:.0f}°C'.format(f[1].temp), Vect(x1, chart_y(f[1].temp) - 20), BLACK, WHITE)
                     
                 if (f[0].temp > f[1].temp) and (f[1].temp < f[2].temp):
                     ui.text_center(16, '{:.0f}°C'.format(f[1].temp), Vect(x1, chart_y(f[1].temp) + 4),  BLACK, WHITE)

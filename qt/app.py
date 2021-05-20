@@ -15,48 +15,60 @@ from web.main    import WebServer
 
 
 def run(sha):
-    # initializes environment
-    _init()
-    
-    # Read all initializes all peripheries
-    temp, led, volt, canvas, net = _perif()
-    print('perif ::', temp, led, volt, canvas, net)
-    
-    
-    # It can happen that we want only to move meteostation somewhere
-    # and don't want to let it wake up during transport. In this case
-    # we can put it to greetings mode, where only picture is displayed
-    # and station kept sleeping till reset button is pressed
-    if DISPLAY_GREETINGS == display_get():
-        _greetings(canvas, net, led)
-    
-    # It may happen that user wants to attach with HTTP for update of firmware
-    # or configuration. In this case we can not rely on existing WiFi connection
-    # and we rather go to hot-spot mode.
-    elif jumpers.hotspot:
-        _hotspot(canvas, net, led, volt)
-    
-    # And finally - meteostation display - basic functionality ;-)
-    else:
-        # Network is running and connected ... we can checks for updates
-        _update(net, sha)
+    try:
+        # initializes environment
+        _init()
         
-        # Once we are connected to network, we can download forecast.
-        # Just note that once forecast is download, WiFi is disconnected
-        # to save as much battery capacity as possible.
-        forecast = _forecast(net, temp)
+        # Read all initializes all peripheries
+        temp, led, volt, canvas, net = _perif()
+        print('perif ::', temp, led, volt, canvas, net)
         
-        # Most time consuming part when we have all data is to draw them
-        # on user interface - screen.
-        _repaint(canvas, forecast, net, led, volt)
         
-        # Forecast is painted. Now we shall checks for alerts if there are some
-        # activated
-        _allerts()
+        # It can happen that we want only to move meteostation somewhere
+        # and don't want to let it wake up during transport. In this case
+        # we can put it to greetings mode, where only picture is displayed
+        # and station kept sleeping till reset button is pressed
+        if DISPLAY_GREETINGS == display_get():
+            _greetings(canvas, net, led)
         
-        # When all is displayed, then go to deep sleep. Sleep time is obtained
-        # according to current weather forecast and UI needs and is in minutes.
-        _sleep(net, forecast)
+        # It may happen that user wants to attach with HTTP for update of firmware
+        # or configuration. In this case we can not rely on existing WiFi connection
+        # and we rather go to hot-spot mode.
+        elif jumpers.hotspot:
+            _hotspot(canvas, net, led, volt)
+        
+        # And finally - meteostation display - basic functionality ;-)
+        else:
+            # Network is running and connected ... we can checks for updates
+            _update(net, sha)
+            
+            # Once we are connected to network, we can download forecast.
+            # Just note that once forecast is download, WiFi is disconnected
+            # to save as much battery capacity as possible.
+            forecast = _forecast(net, temp)
+            
+            # Most time consuming part when we have all data is to draw them
+            # on user interface - screen.
+            _repaint(canvas, forecast, net, led, volt)
+            
+            # Forecast is painted. Now we shall checks for alerts if there are some
+            # activated
+            _allerts()
+            
+            # When all is displayed, then go to deep sleep. Sleep time is obtained
+            # according to current weather forecast and UI needs and is in minutes.
+            _sleep(net, forecast)
+        
+    except Exception as e:
+        from usys       import print_exception
+        from config.sys import EXCEPTION_DUMP
+        
+        print_exception(e)
+        
+        if EXCEPTION_DUMP:
+            with open('sys.log', 'a') as log:
+                log.write('\n')
+                print_exception(e, log)
 
 
 
