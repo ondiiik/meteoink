@@ -66,7 +66,7 @@ def run(sha):
             with open('sys.log', 'a') as log:
                 log.write('\n')
                 print_exception(e, log)
-        
+                
         _sleep(5)
 
 
@@ -112,9 +112,11 @@ def _perif():
     # can be read only when EPD is on
     if reset_cause() == DEEPSLEEP:
         volt = 4.2
+        ep = None
     else:
         import epd
-        epd.on()
+        ep = epd.Epd()
+        ep.on()
         volt = battery.voltage
     
     if (volt < VBAT_LOW):
@@ -128,7 +130,7 @@ def _perif():
     if reset_cause() == DEEPSLEEP:
         canvas = None
     else:
-        canvas = Canvas()
+        canvas = Canvas(ep)
     
         
     # When battery voltage is too low, just draw low battery

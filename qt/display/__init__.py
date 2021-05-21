@@ -80,7 +80,7 @@ class Fb:
         print("\tFB%d - [ OK ]" % color)
         
         self.epd    = epd
-        self.buf    = bytearray((dim.x * dim.y + 1) // 2)
+        self.buf    = epd.fb()
         self.canvas = framebuf.FrameBuffer(self.buf, dim.x, dim.y, framebuf.GS4_HMSB)
     
     
@@ -168,10 +168,9 @@ class Fb:
 
 class Canvas:
     @micropython.native
-    def __init__(self):
+    def __init__(self, epd):
         print("Building EPD:")
         # Load modules and set constants
-        import epd
         
         # Create EPD epaper driver
         self.dim = Vect(960, 540)
@@ -200,8 +199,8 @@ class Canvas:
         epd = self.epd
         epd.on()
         epd.clear_area(*sector)
-        epd.draw_image(sector[0], sector[1], sector[2], sector[3], self.fb.buf, epd.BLACK_ON_WHITE)
-        epd.draw_image(sector[0], sector[1], sector[2], sector[3], self.fb.buf, epd.BLACK_ON_WHITE)
+        epd.flush()
+        epd.flush()
         epd.power_off()
     
     
