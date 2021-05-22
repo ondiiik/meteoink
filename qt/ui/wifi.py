@@ -8,8 +8,8 @@ class UiWifi(UiFrame):
         
         
     def draw(self, ui, d):
-        ui.text(10, 'SSID:',             Vect(0, 5))
-        ui.text(10, self.hotspot.ssid,   Vect(30, 20))
-        ui.text(10, 'Password:',         Vect(0,  35))
-        ui.text(10, self.hotspot.passwd, Vect(30, 50))
+        ui.text(25, 'SSID:',             Vect(0,  5))
+        ui.text(25, self.hotspot.ssid,   Vect(30, 5 + 30))
+        ui.text(25, 'Password:',         Vect(0,  5 + 60))
+        ui.text(25, self.hotspot.passwd, Vect(30, 5 + 90))
 

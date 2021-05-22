@@ -17,13 +17,13 @@ class UiQr(UiFrame):
         
         for y in range(matrix[1]):
             for x in range(matrix[1]):
-                ui.canvas.fill_rect(Vect(x * 3, y * 3),
-                                    Vect(    3,     3),
+                ui.canvas.fill_rect(Vect(x * 6, y * 6),
+                                    Vect(    6,     6),
                                     BLACK if matrix[0].pixel(x, y) else WHITE)
         
         l = matrix[1] * 3
         if self.above:
-            ui.text_center(10, self.lbl, Vect(l // 2, -12))
+            ui.text_center(25, self.lbl, Vect(l // 2, -12))
         else:
-            ui.text_center(10, self.lbl, Vect(l // 2, l))
+            ui.text_center(25, self.lbl, Vect(l // 2, l))
 

@@ -2,6 +2,7 @@ from jumpers import jumpers
 from network import WLAN, STA_IF, AP_IF
 from config  import connection, hotspot
 from utime   import sleep
+from mode    import MODE
 
 
 class Wifi:
@@ -27,7 +28,7 @@ class Connection:
         self._ifc.active(False)
         
         # Start requested variant of connection
-        if jumpers.hotspot:
+        if jumpers.hotspot or MODE == 1:
             self._hotspot()
         else:
             self._attach()
@@ -92,6 +93,7 @@ class Connection:
             sleep(1)
         
         self.is_hotspot = True
+        print("Running hotspot: " + str(self.ifconfig))
     
     
     @property

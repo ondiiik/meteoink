@@ -31,6 +31,7 @@ def page(web):
             bssid = bytes2bssid(i.bssid)
         
         idx = (('idx', connection.index(i)),)
+        print(location, int(i.location))
         pg += web.table_row((i.ssid,
                              bssid,
                              location[int(i.location)].name,

@@ -4,6 +4,9 @@ from utime   import sleep_ms
     
 
 def play(pattern):
+    if pins.BUZZER < 0:
+        return
+    
     for tone in pattern:
         if tone[0] == 0:
             sleep_ms(tone[1])

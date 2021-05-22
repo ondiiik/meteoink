@@ -13,7 +13,7 @@ class SPI:
 _pins = [1] * 256
 
 
-_pins[16] = 0 # 1 - Meteostation, 0 - Config server
+_pins[39] = 1 # 1 - Meteostation, 0 - Config server
 _pins[23] = 1 # 1 - no alert,     0 - alert
 
 
@@ -101,11 +101,11 @@ def reset():
 
 
 def reset_cause():
-    # with open('reset_cause.txt', 'r') as f:
-        # v = f.read()
-        #
-    # return 0 if 'deepsleep' == v else 1
-    return 1
+    with open('reset_cause.txt', 'r') as f:
+        v = f.read()
+        
+    return 0 if 'deepsleep' == v else 1
+    # return 1
 
 
 DEEPSLEEP = 0

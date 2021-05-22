@@ -38,8 +38,11 @@ pg          = '0 23456789ABCDEF'
 
 
 def rgb2color(rgba):
-    if (rgba[3] < 128):
-        return TRANSPARENT
+    try:
+        if (rgba[3] < 128):
+            return TRANSPARENT
+    except IndexError:
+        pass
     
     c   = (rgba[0] + rgba[1]) // 2
     

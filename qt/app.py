@@ -10,9 +10,14 @@ from led         import Led
 from machine     import deepsleep, reset, reset_cause, DEEPSLEEP
 from net         import Connection
 from ui.main     import MeteoUi
-from utime       import sleep_ms
 from web.main    import WebServer
 
+try:
+    from mode import MODE
+except:
+    with open('mode.py', 'w') as f:
+        f.write('MODE = 0')
+    MODE = 0
 
 
 def run(sha):
@@ -34,7 +39,7 @@ def run(sha):
         # It may happen that user wants to attach with HTTP for update of firmware
         # or configuration. In this case we can not rely on existing WiFi connection
         # and we rather go to hot-spot mode.
-        elif jumpers.hotspot:
+        elif jumpers.hotspot or MODE == 1:
             _hotspot(canvas, net, led, volt)
             
         # And finally - meteostation display - basic functionality ;-)
@@ -135,14 +140,14 @@ def _perif():
         
     # When battery voltage is too low, just draw low battery
     # error on screen and go to deep sleep.
-    # if (volt < VBAT_LOW):
-        # led.mode(Led.ALERT)
-        #
-        # ui = MeteoUi(canvas, None, None)
-        # ui.repaint_lowbat(volt)
-        #
-        # print('Going to deep sleep ...')
-        # deepsleep(120000)
+    if (volt < VBAT_LOW):
+        led.mode(Led.ALERT)
+        
+        ui = MeteoUi(canvas, None, None)
+        ui.repaint_lowbat(volt)
+        
+        print('Going to deep sleep ...')
+        _sleep(15)
     
     # Once we have canvas established (large object needs
     # to be created first to prevent from memory fragmentation),
@@ -153,7 +158,7 @@ def _perif():
     
     try:
         # Activates WiFi only when we came from deep sleep mode
-        if reset_cause() == DEEPSLEEP:
+        if reset_cause() == DEEPSLEEP or MODE == 1:
             net = Connection()
             print('Connected to network')
     except Exception as e:
@@ -175,11 +180,17 @@ def _greetings(canvas, net, led):
 
 
 def _hotspot(canvas, net, led, volt):
-    play(((2093, 30), (0, 120),(2093, 30)))
-    led.mode(Led.DOWNLOAD)
+    if MODE == 0:
+        play(((2093, 30), (0, 120),(2093, 30)))
+        led.mode(Led.DOWNLOAD)
+        
+        ui = MeteoUi(canvas, None, net)
+        ui.repaint_config(led, volt)
     
-    ui = MeteoUi(canvas, None, net)
-    ui.repaint_config(led, volt)
+    
+    with open('mode.py', 'w') as f:
+        f.write('MODE = 0')
+    
     led.mode(Led.DOWNLOAD)
     
     server = WebServer(net)

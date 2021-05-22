@@ -1,5 +1,5 @@
 import                  re
-from framebuf    import FrameBuffer, MONO_HLSB
+from framebuf    import FrameBuffer, GS4_HMSB
 from micropython import const
 
 ERROR_CORRECT_L = const(1)
@@ -1177,14 +1177,14 @@ class QRCode:
         
         width = len(self.modules) + self.border * 2
         buf   = bytearray(width * (width + 7) // 8)
-        fb    = FrameBuffer(buf, width, width, MONO_HLSB)
+        fb    = FrameBuffer(buf, width, width, GS4_HMSB)
         fb.fill(0)
         
         y = self.border
         for module in self.modules:
             x = self.border
             for p in module:
-                fb.pixel(x, y, p)
+                fb.pixel(x, y, p * 15)
                 x += 1
             y += 1
         
