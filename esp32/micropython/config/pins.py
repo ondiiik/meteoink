@@ -1,7 +1,7 @@
 from micropython import const
 
 # DHT22 related pins
-DHT     = const(-1)
+DHT     = const(15)
 
 # Jumpers pins
 HOTSPOT = const(39)

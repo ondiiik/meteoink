@@ -53,10 +53,11 @@ class UiCalendar(UiFrame):
             hour    = dt[3] - dh
             
             # Draw separators
-            if 0 == hour:
+            if 0 == hour or 0 == i:
                 if title and ((dt[6] == 5) or (dt[6] == 6)):
                     ui.canvas.fill_rect(Vect(xx, 2), Vect(dblock, _CALENDAR_TITLE_SIZE), GRAY)
                 
+            if 0 == hour:
                 c = BLACK if (dt[6] == 5) or (dt[6] == 0) else GRAY
                 ui.canvas.fill_rect(Vect(xx - 1, 2), Vect(3, self.dim.y + _CALENDAR_H_SEP_SIZE), c)
                 ui.canvas.vline(Vect(xx, 0), self.dim.y + _CALENDAR_H_SEP_SIZE, BLACK)
