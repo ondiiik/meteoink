@@ -66,7 +66,7 @@ class Connection:
         
         # Checks if we have something and connect to WiFi
         if network is None:
-            raise RuntimeError("No know WiFi found!")
+            raise RuntimeError("No known WiFi found!")
         
         self.config = network
         

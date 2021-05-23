@@ -1,4 +1,4 @@
-from ui      import UiFrame, Vect
+from ui      import UiFrame, Vect, BLACK
 from battery import battery
 
 
@@ -9,7 +9,7 @@ class UiUrl(UiFrame):
         
         
     def draw(self, ui, d):
-        ui.canvas.hline(Vect(10, 0), ui.canvas.dim.x - 20)
+        ui.canvas.fill_rect(Vect(10, 0), Vect(ui.canvas.dim.x - 20, 3), BLACK)
         ui.text(25, 'Confugurator URL:', Vect(15, 50))
         ui.text(25, self.url,            Vect(45, 50 + 30))
         

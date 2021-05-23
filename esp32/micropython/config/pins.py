@@ -13,4 +13,4 @@ LED     = const(-1)
 VBAT    = const(36) 
 
 # Battery voltage
-BUZZER  = const(-1) 
+BUZZER  = const(14) 

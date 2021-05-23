@@ -100,8 +100,9 @@ class Server():
                 self.client.send(txt.encode())
                 retry = False
             except OSError as err:
-                if not err == ECONNRESET:
-                    raise err
+                # if not err == ECONNRESET:
+                    # raise err
+                pass
     
     
     @staticmethod

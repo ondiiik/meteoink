@@ -77,8 +77,6 @@ class Bitmap:
 class Fb:
     @micropython.native
     def __init__(self, color, epd, dim):
-        print("\tFB%d - [ OK ]" % color)
-        
         self.epd    = epd
         self.buf    = epd.fb()
         self.canvas = framebuf.FrameBuffer(self.buf, dim.x, dim.y, framebuf.GS4_HMSB)
@@ -169,16 +167,10 @@ class Fb:
 class Canvas:
     @micropython.native
     def __init__(self, epd):
-        print("Building EPD:")
-        # Load modules and set constants
-        
-        # Create EPD epaper driver
         self.dim = Vect(960, 540)
         self.ofs = Vect(0, 0)
         self.epd = epd
-        print("\tEPD - [ OK ]")
-        
-        self.fb = Fb(BLACK, epd, self.dim)
+        self.fb  = Fb(BLACK, epd, self.dim)
     
     
     @micropython.native
