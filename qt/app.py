@@ -1,24 +1,19 @@
-from battery     import battery
-from buzzer      import play
-from config      import display_set, display_get, alert, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_GREETINGS
-from config.vbat import VBAT_LOW
-from config.temp import INDOOR_HIGH
-from display     import Canvas
-from esp32       import raw_temperature
-from forecast    import Forecast
-from jumpers     import jumpers
-from led         import Led
-from machine     import deepsleep, reset, reset_cause, DEEPSLEEP
-from net         import Connection
-from ui.main     import MeteoUi
-from web.main    import WebServer
-
-try:
-    from mode import MODE
-except:
-    with open('mode.py', 'w') as f:
-        f.write('MODE = 0')
-    MODE = 0
+from var          import mode, alert, write
+from battery      import battery
+from buzzer       import play
+from config       import display_set, display_get, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_GREETINGS
+from config.vbat  import VBAT_LOW
+from config.temp  import INDOOR_HIGH
+from config.alert import TEMP_BALANCED_ENABLED
+from display      import Canvas
+from esp32        import raw_temperature
+from forecast     import Forecast
+from jumpers      import jumpers
+from led          import Led
+from machine      import deepsleep, reset, reset_cause, DEEPSLEEP
+from net          import Connection
+from ui.main      import MeteoUi
+from web.main     import WebServer
 
 
 def run(sha):
@@ -40,7 +35,7 @@ def run(sha):
         # It may happen that user wants to attach with HTTP for update of firmware
         # or configuration. In this case we can not rely on existing WiFi connection
         # and we rather go to hot-spot mode.
-        elif jumpers.hotspot or MODE == 1:
+        elif jumpers.hotspot or mode.MODE == 1:
             _hotspot(canvas, net, led, volt)
             
         # And finally - meteostation display - basic functionality ;-)
@@ -159,7 +154,7 @@ def _perif():
     
     try:
         # Activates WiFi only when we came from deep sleep mode
-        if reset_cause() == DEEPSLEEP or MODE == 1:
+        if reset_cause() == DEEPSLEEP or mode.MODE == 1:
             net = Connection()
             print('Connected to network')
     except Exception as e:
@@ -181,7 +176,7 @@ def _greetings(canvas, net, led):
 
 
 def _hotspot(canvas, net, led, volt):
-    if MODE == 0:
+    if mode.MODE == 0:
         play(((2093, 30), (0, 120),(2093, 30)))
         led.mode(Led.DOWNLOAD)
         
@@ -189,8 +184,7 @@ def _hotspot(canvas, net, led, volt):
         ui.repaint_config(led, volt)
     
     
-    with open('mode.py', 'w') as f:
-        f.write('MODE = 0')
+    write('mode', tuple(0))
     
     led.mode(Led.DOWNLOAD)
     
@@ -221,12 +215,22 @@ def _repaint(canvas, forecast, net, led, volt):
 
 
 def _allerts(forecast):
-    if not alert.temp_balanced:
+    if not TEMP_BALANCED_ENABLED:
         return
     
-    if forecast.home.temp > forecast.weather.temp:
+    if INDOOR_HIGH > forecast.home.temp:
+        return
+    
+    h = forecast.time.get_date_time(forecast.weather.dt)[3]
+    
+    if h == 13:
+        write('alert', (False,))
+        return
+    
+    if not alert.ALREADY_TRIGGERED and forecast.home.temp > forecast.weather.temp:
         for i in range(3):
             play(((4000, 30), (6000, 30), (4000, 30), (6000, 30), (4000, 30), (6000, 30), (4000, 30), (6000, 30), (0, 500)))
+        write('alert', (1,))
 
 
 

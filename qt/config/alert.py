@@ -1,2 +1,1 @@
-from config import Alert
-alert = Alert(True)
+TEMP_BALANCED_ENABLED = True

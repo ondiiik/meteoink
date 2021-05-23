@@ -1,8 +1,8 @@
-from jumpers import jumpers
-from network import WLAN, STA_IF, AP_IF
-from config  import connection, hotspot
-from utime   import sleep
-from mode    import MODE
+from jumpers  import jumpers
+from network  import WLAN, STA_IF, AP_IF
+from config   import connection, hotspot
+from utime    import sleep
+from var.mode import MODE
 
 
 class Wifi:

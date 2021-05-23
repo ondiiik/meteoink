@@ -1,3 +1,4 @@
+from   var         import write
 from   .           import Ui
 from   config      import display_set, display_get, hotspot, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_JUST_REPAINT, DISPLAY_DONT_REFRESH
 from   display     import Vect, WHITE
@@ -113,8 +114,7 @@ class Epd47(Ui):
         led.mode(led.FLUSHING)
         self.canvas.flush()
         
-        with open('mode.py', 'w') as f:
-            f.write('MODE = 1')
+        write('mode', tuple(1))
         
         machine.reset()
     

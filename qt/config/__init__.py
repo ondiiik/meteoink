@@ -42,11 +42,6 @@ class Ui:
         self.variant  = variant
 
 
-class Alert:
-    def __init__(self, temp_balanced):
-        self.temp_balanced = temp_balanced
-
-
 def flush_con():
     cfg_path = '/config/connection.py'
     
@@ -95,4 +90,3 @@ from .connection import connection
 from .location   import location
 from .spot       import hotspot
 from .ui         import ui
-from .alert      import alert

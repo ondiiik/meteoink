@@ -1,5 +1,5 @@
 import                  dht
-from machine     import Pin
+from machine     import Pin, deepsleep
 from micropython import const
 from collections import namedtuple
 from config      import pins, sys, display_get, location, DISPLAY_JUST_REPAINT, VARIANT_2DAYS, DISPLAY_REFRESH_DIV, ui
@@ -51,7 +51,11 @@ class Forecast:
     def _read1(self, connection, ui):
         if connection is None:
             print('Reread current weather data ...')
-            import owmp
+            try:
+                import owmp
+            except:
+                deepsleep(1)
+            
             fcast = owmp.current
         else:
             # Download hourly weather forecast for today
