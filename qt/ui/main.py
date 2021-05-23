@@ -102,7 +102,7 @@ class Epd47(Ui):
               ('WIFI:T:WPA;S:{};P:{};;'.format(hotspot.ssid, hotspot.passwd), 'WiFi', False));
         
         url = 'http://{}:5555'.format('192.168.4.1')
-        qr_dr(self, Vect(716, 296), Vect(0, 0), (url, 'Config URL', True));
+        qr_dr(self, Vect(716, 320), Vect(0, 0), (url, 'Config URL', True));
         
         url_dr(self,  Vect(0,   self.canvas.dim.y // 2), Vect(self.canvas.dim.x - 132, self.canvas.dim.y // 2), url)
         wifi_dr(self, Vect(250, 0),                      Vect(self.canvas.dim.x - 132, self.canvas.dim.y // 2), hotspot)

@@ -22,7 +22,7 @@ class WebServer(Server):
             page = __import__('web.{}'.format(self.page), None, None, ('page',), 0).page
         except ImportError:
             print('!!! Page {} not found !!!'.format(self.page))
-            return
+            page = __import__('web.index', None, None, ('page',), 0).page
         
         if not self.last == self.page:
             self.last = self.page
@@ -31,6 +31,7 @@ class WebServer(Server):
         if page(self):
             page = __import__('web.index', None, None, ('page',), 0).page
             page(self)
+
 
 
 def bssid2bytes(bssid):

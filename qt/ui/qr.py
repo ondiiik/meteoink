@@ -21,9 +21,9 @@ class UiQr(UiFrame):
                                     Vect(    6,     6),
                                     BLACK if matrix[0].pixel(x, y) else WHITE)
         
-        l = matrix[1] * 3
+        l = matrix[1] * 6
         if self.above:
-            ui.text_center(25, self.lbl, Vect(l // 2, -12))
+            ui.text_center(25, self.lbl, Vect(l // 2, -28))
         else:
-            ui.text_center(25, self.lbl, Vect(l // 2, l))
+            ui.text_center(25, self.lbl, Vect(l // 2, l + 10))
 

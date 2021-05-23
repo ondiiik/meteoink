@@ -1,7 +1,8 @@
 from battery     import battery
 from buzzer      import play
-from config      import display_set, display_get, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_GREETINGS
+from config      import display_set, display_get, alert, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_GREETINGS
 from config.vbat import VBAT_LOW
+from config.temp import INDOOR_HIGH
 from display     import Canvas
 from esp32       import raw_temperature
 from forecast    import Forecast
@@ -55,7 +56,7 @@ def run(sha):
             
             # Forecast is painted. Now we shall checks for alerts if there are some
             # activated
-            _allerts()
+            _allerts(forecast)
             
             # When all is displayed, then go to deep sleep. Sleep time is obtained
             # according to current weather forecast and UI needs and is in minutes.
@@ -219,8 +220,13 @@ def _repaint(canvas, forecast, net, led, volt):
 
 
 
-def _allerts():
-    pass
+def _allerts(forecast):
+    if not alert.temp_balanced:
+        return
+    
+    if forecast.home.temp > forecast.weather.temp:
+        for i in range(3):
+            play(((4000, 30), (6000, 30), (4000, 30), (6000, 30), (4000, 30), (6000, 30), (4000, 30), (6000, 30), (0, 500)))
 
 
 

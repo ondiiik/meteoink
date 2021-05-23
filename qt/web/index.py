@@ -1,5 +1,5 @@
 from .main       import bytes2bssid, SPACES
-from config      import connection, location, ui, hotspot
+from config      import connection, location, ui, hotspot, alert
 from config.vbat import VBAT_LOW
 from battery     import battery
 
@@ -31,7 +31,6 @@ def page(web):
             bssid = bytes2bssid(i.bssid)
         
         idx = (('idx', connection.index(i)),)
-        print(location, int(i.location))
         pg += web.table_row((i.ssid,
                              bssid,
                              location[int(i.location)].name,
@@ -43,6 +42,15 @@ def page(web):
     pg += web.br()
     pg += web.button('Add new WiFi', 'add')
     pg += web.br()
+    
+    pg += web.heading(   2,    'Alerts')
+    pg += web.table_head(None, 'frame="hsides"')
+    
+    name = 'Disable' if alert.temp_balanced else 'Enable'
+    page = 'tbae'    if alert.temp_balanced else 'tbad'
+    
+    pg += web.table_row(('Outside temperature balanced', web.button(name, page)), SPACES)
+    pg += web.table_tail()
     
     pg += web.heading(   2,    'General setup')
     pg += web.table_head(None, 'frame="hsides"')
@@ -59,11 +67,12 @@ def page(web):
     
     pg += web.heading(   2,    'Battery  setup')
     pg += web.table_head(None, 'frame="hsides"')
-    pg += web.table_row(('Current voltage',  '{:.2f} V'.format(battery.voltage), ''),                    SPACES)
+    pg += web.table_row(('Current voltage',  '{:.2f} V'.format(battery.voltage), ''),                 SPACES)
     pg += web.table_row(('Critical voltage', '{:.2f} V'.format(VBAT_LOW), web.button('Edit', 'low')), SPACES)
     pg += web.table_tail()
     
     pg += web.heading(   2,    'Misc')
     pg += web.button('Go to travel mode', 'zzz')
+    pg += web.button('Go to normal mode', 'reset')
     
     web.write(pg)

@@ -1,6 +1,6 @@
 import             socket
 from utime  import sleep_ms
-from uerrno import EAGAIN, ECONNRESET
+from uerrno import ECONNRESET, ENOTCONN
 
 
 class Server():
@@ -27,11 +27,8 @@ class Server():
                 try:
                     self.client, addr = sck.accept()
                     break
-                except OSError as e:
-                    if EAGAIN == e.args[0]:
-                        sleep_ms(50)
-                    else:
-                        break
+                except OSError as err:
+                    pass
             
             self.client.settimeout(8.0)
             print('Accepted client from', addr)
@@ -100,9 +97,8 @@ class Server():
                 self.client.send(txt.encode())
                 retry = False
             except OSError as err:
-                # if not err == ECONNRESET:
-                    # raise err
-                pass
+                if not err.errno in (ECONNRESET, ENOTCONN):
+                    raise err
     
     
     @staticmethod
