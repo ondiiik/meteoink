@@ -1,12 +1,21 @@
 # Some meteostation runtime files
 /qt/~
+/qt/config/alert.py
+/qt/config/connection.py
 /qt/config/display.py
+/qt/config/location.py
 /qt/config/resets.py
-/qt/owmp.py
-/qt/onecall.json
+/qt/config/spot.py
+/qt/config/temp.py
+/qt/config/ui.py
+/qt/config/vbat.py
 /qt/forecast.json
-/qt/var/mode.py
+/qt/hotspot.txt
+/qt/onecall.json
+/qt/owmp.py
+/qt/reset_cause.txt
 /qt/var/alert.py
+/qt/var/mode.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -28,7 +37,6 @@ lib/
 lib64/
 parts/
 sdist/
-var/
 wheels/
 pip-wheel-metadata/
 share/python-wheels/

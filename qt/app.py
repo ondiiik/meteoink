@@ -1,10 +1,8 @@
-from var          import mode, alert, write
+from var          import mode, write
+from var          import alert as alert_var
 from battery      import battery
 from buzzer       import play
-from config       import display_set, display_get, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_GREETINGS
-from config.vbat  import VBAT_LOW
-from config.temp  import INDOOR_HIGH
-from config.alert import TEMP_BALANCED_ENABLED
+from config       import display_set, display_get, alert, vbat, temp, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_GREETINGS
 from display      import Canvas
 from esp32        import raw_temperature
 from forecast     import Forecast
@@ -14,13 +12,11 @@ from machine      import deepsleep, reset, reset_cause, DEEPSLEEP
 from net          import Connection
 from ui.main      import MeteoUi
 from web.main     import WebServer
+from log          import dump_exception
 
 
 def run(sha):
     try:
-        # initializes environment
-        _init()
-        
         # Read all initializes all peripheries
         temp, led, volt, canvas, net = _perif()
         
@@ -55,38 +51,11 @@ def run(sha):
             
             # When all is displayed, then go to deep sleep. Sleep time is obtained
             # according to current weather forecast and UI needs and is in minutes.
-            _sleep(forecast.status.sleep_time)
+            _sleep()
     
     except Exception as e:
-        from usys       import print_exception
-        from config.sys import EXCEPTION_DUMP
-        
-        print_exception(e)
-        
-        if EXCEPTION_DUMP:
-            with open('sys.log', 'a') as log:
-                log.write('\n')
-                print_exception(e, log)
-                
+        dump_exception('FATAL - RECOVERY REQUIRED !!!', e)
         _sleep(5)
-
-
-
-def _init():
-    # Checks if we are running right micropython firmware
-    # This firmware expects some parts as built in, so the
-    # exact firmware built ID to be present. Modules, which
-    # is used for detection is pyptf (python platform).
-    try:
-        from pyptf import KERNEL_VARIANT
-        
-        if not 3 == KERNEL_VARIANT:
-            raise RuntimeError()
-    except:
-        raise RuntimeError('''Incompatible micropython firmware found!
-Please download right one here:
-\t\thttps://github.com/ondiiik/meteoink/blob/master/esp32
-''')
 
 
 
@@ -109,18 +78,33 @@ def _perif():
     # is then UART.
     led = Led()
     
+    # We shall checks if there is requested to toggle temperature alarm
+    if jumpers.alert:
+        alert.temp_balanced = not alert.temp_balanced
+        
+        if alert.temp_balanced:
+            play((100, 50), (200, 50), (400, 50), (800, 50), (1600, 50), (3200, 50))
+            write('alert', (False,))
+        else:
+            play((3200, 50), (1600, 50), (800, 50), (400, 50), (200, 50), (100, 50))
+        
+        alert.flush()
+        deepsleep(1)
+    
     # Disable LED when battery voltage is too low. Battery voltage
     # can be read only when EPD is on
-    if reset_cause() == DEEPSLEEP:
+    wifi_mode = reset_cause() == DEEPSLEEP and not jumpers.hotspot
+    
+    if wifi_mode:
         volt = 4.2
-        ep = None
+        ep   = None
     else:
         import epd
         ep = epd.Epd()
         ep.on()
         volt = battery.voltage
     
-    if (volt < VBAT_LOW):
+    if (volt < vbat.low_voltage):
         led.disable()
     
     # As we uses E-Ink display, the most comfortable way
@@ -128,7 +112,7 @@ def _perif():
     # drawing objects and flushing them later on screen.
     led.mode(Led.WARM_UP)
     
-    if reset_cause() == DEEPSLEEP:
+    if wifi_mode:
         canvas = None
     else:
         canvas = Canvas(ep)
@@ -136,7 +120,7 @@ def _perif():
         
     # When battery voltage is too low, just draw low battery
     # error on screen and go to deep sleep.
-    if (volt < VBAT_LOW):
+    if (volt < vbat.low_voltage):
         led.mode(Led.ALERT)
         
         ui = MeteoUi(canvas, None, None)
@@ -158,7 +142,7 @@ def _perif():
             net = Connection()
             print('Connected to network')
     except Exception as e:
-        print('Network connection reported', e)
+        dump_exception('Network connection error', e)
     
     
     return temp, led, volt, canvas, net
@@ -176,21 +160,21 @@ def _greetings(canvas, net, led):
 
 
 def _hotspot(canvas, net, led, volt):
-    if mode.MODE == 0:
-        play(((2093, 30), (0, 120),(2093, 30)))
+    if mode.MODE == 0 and net is None:
+        play((2093, 30), 120,(2093, 30))
         led.mode(Led.DOWNLOAD)
         
         ui = MeteoUi(canvas, None, net)
         ui.repaint_config(led, volt)
     
     
-    write('mode', tuple(0))
+    write('mode', (0,))
     
     led.mode(Led.DOWNLOAD)
     
     server = WebServer(net)
     
-    play(((1047, 30), (0, 120), (1319, 30), (0, 120), (1568, 30), (0, 120), (2093, 30)))
+    play((1047, 30), 120, (1319, 30), 120, (1568, 30), 120, (2093, 30))
     server.run()
     
     reset()
@@ -215,10 +199,10 @@ def _repaint(canvas, forecast, net, led, volt):
 
 
 def _allerts(forecast):
-    if not TEMP_BALANCED_ENABLED:
+    if not alert.temp_balanced:
         return
     
-    if INDOOR_HIGH > forecast.home.temp:
+    if temp.indoor_high > forecast.home.temp:
         return
     
     h = forecast.time.get_date_time(forecast.weather.dt)[3]
@@ -227,13 +211,17 @@ def _allerts(forecast):
         write('alert', (False,))
         return
     
-    if not alert.ALREADY_TRIGGERED and forecast.home.temp > forecast.weather.temp:
+    if not alert_var.ALREADY_TRIGGERED and forecast.home.temp > forecast.weather.temp:
         for i in range(3):
-            play(((4000, 30), (6000, 30), (4000, 30), (6000, 30), (4000, 30), (6000, 30), (4000, 30), (6000, 30), (0, 500)))
-        write('alert', (1,))
+            play((4000, 30), (6000, 30), (4000, 30), (6000, 30), (4000, 30), (6000, 30), (4000, 30), (6000, 30), 500)
+        write('alert', (True,))
 
 
 
-def _sleep(minutes):
+def _sleep(minutes = 0):
+    if 0 == minutes:
+        from config import ui
+        minutes = ui.refresh
+    
     print('Going to deep sleep for {} minutes ...'.format(minutes))
     deepsleep(minutes * 60000)

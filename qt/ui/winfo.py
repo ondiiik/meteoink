@@ -1,5 +1,4 @@
 from ui          import UiFrame, Vect
-from config      import location
 from micropython import const
 
 
@@ -14,6 +13,8 @@ class UiWInfo(UiFrame):
         super().__init__(ofs, dim)
         
     def draw(self, ui, args):
-        ui.text(25, ui.forecast.descr, Vect(0, 25))
-        dt = ui.forecast.time.get_date_time(ui.forecast.weather.dt)
+        fcast = ui.forecast
+        
+        ui.text(25, '{},  {}'.format(fcast.location, fcast.descr), Vect(0, 25))
+        dt = fcast.time.get_date_time(fcast.weather.dt)
         ui.text(25, '{:d}.{:d}.{:d} {:d}:{:02d}'.format(dt[2], dt[1], dt[0], dt[3], dt[4]), Vect(0, 0))

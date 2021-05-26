@@ -4,7 +4,10 @@ from micropython import const
 DHT     = const(15)
 
 # Jumpers pins
-HOTSPOT = const(39)
+HOTSPOT_BUTTON = const(39)
+
+# Alert toggle button pin
+ALLERT_BUTTON = const(34)
 
 # LED pin
 LED     = const(-1) 

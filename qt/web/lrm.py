@@ -1,4 +1,4 @@
-from config import location, flush_loc
+from config import location, Location
 
 
 def page(web):
@@ -7,7 +7,7 @@ def page(web):
     for i in range(len(location)):
         if location[i].name == name:
             location.remove(location[i])
+            Location.flush()
             break
     
-    flush_loc()
     return True

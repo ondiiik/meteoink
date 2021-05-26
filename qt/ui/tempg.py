@@ -31,7 +31,7 @@ class UiTempGr(UiFrame):
         
         # Draw charts
         self.chart_draw(ui, 3, WHITE)
-        self.chart_draw(ui, 3, GRAY, temp.OUTDOOR_HIGH, temp.OUTDOOR_LOW)
+        self.chart_draw(ui, 3, GRAY, temp.outdoor_high, temp.outdoor_low)
         self.chart_draw(ui, 1, BLACK)
     
     

@@ -4,7 +4,9 @@ from micropython import const
 from collections import namedtuple
 from config      import pins, sys, display_get, location, DISPLAY_JUST_REPAINT, VARIANT_2DAYS, DISPLAY_REFRESH_DIV, ui
 from ltime       import Time
-        
+from uerrno      import ETIMEDOUT
+from utime       import sleep_ms
+from buzzer      import play
 
 
 # See https://openweathermap.org/weather-conditions
@@ -30,15 +32,11 @@ ALL         = const(3)
 class Forecast:
     Weather = namedtuple('Weather', ('id', 'dt', 'temp', 'feel', 'rh', 'rain', 'snow', 'speed', 'dir'))
     Home    = namedtuple('Home',    ('temp', 'rh'))
-    Status  = namedtuple('Status',  ('refresh', 'sleep_time'))
     
     
     def __init__(self, connection, in_temp):
         print("Reading forecast data")
         self._read1(connection, ui)
-        
-        if connection is None:
-            self._get_status(ui)
         
         if ui.variant == VARIANT_2DAYS:
             self._read2_short(connection, ui)
@@ -53,6 +51,7 @@ class Forecast:
             print('Reread current weather data ...')
             try:
                 import owmp
+                self.location = owmp.location
             except:
                 deepsleep(1)
             
@@ -61,14 +60,18 @@ class Forecast:
             # Download hourly weather forecast for today
             print('Download current weather data ...')
             url   = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}'
-            fcast = connection.http_get_json(url.format(location[connection.config.location].lat,
-                                                        location[connection.config.location].lon,
+            loc   = location[connection.config.location]
+            fcast = connection.http_get_json(url.format(loc.lat,
+                                                        loc.lon,
                                                         ui.apikey,
                                                         ui.units,
                                                         ui.language,
                                                         'minutely,hourly,daily'))
             
             with open('owmp.py', 'w') as f:
+                f.write('location = "')
+                f.write(loc.name)
+                f.write('"\n')
                 f.write('current = ')
                 f.write(str(fcast))
                 f.write('\n')
@@ -76,6 +79,23 @@ class Forecast:
             return
         
         # Parse todays forecast
+        try:
+            if not fcast['cod'] == 0:
+                print('Server commu8nication error - can not load forecast!')
+                
+                try:
+                    print('Server reported:')
+                    print('    ', fcast['message'])
+                    print('')
+                    print('Go into configuration mode to set server correctly')
+                except:
+                    pass
+                
+                play((400, 1000), (200, 1000), (400, 1000), (200, 1000), (400, 1000), (200, 1000))
+                deepsleep()
+        except:
+            pass
+        
         current = fcast['current']
         
         try:
@@ -210,40 +230,20 @@ class Forecast:
                                                   wind[   'deg']))
     
     
-    def _get_status(self, ui):
-        # Set forecast redraw status
-        refresh = TEMPERATURE
-        
-        dt = self.time.get_date_time(self.weather.dt)
-        if (dt[3] < 6):
-            sleep_time = 30
-        else:
-            sleep_time = 30 // DISPLAY_REFRESH_DIV
-        
-        # Once per 30 minutes refresh wather
-        t  = (dt[3] * 60 + dt[4])
-        
-        ta = t % 30
-        if (0 <= ta) and (ta < sleep_time):
-            refresh = WEATHER
-        
-        # Refresh all once per 90 or 60 minutes minutes
-        ta = t % (60 if ui.variant == VARIANT_2DAYS else 90)
-        if (0 <= ta) and (ta < sleep_time):
-            refresh = ALL
-        
-        # Regardless on result - refresh all on first run
-        if not display_get() == DISPLAY_JUST_REPAINT:
-            refresh = ALL
-        
-        self.status = Forecast.Status(ALL, 15) # DEBUG :: DEVEL
-        #self.status = Forecast.Status(refresh, sleep_time)
-    
-    
     def _get_dht(self, in_temp):
-        try:
+        retry = 0
+        
+        while pins.DHT >= 0:
             sensor = dht.DHT22(Pin(pins.DHT))
-            sensor.measure()
-            self.home = Forecast.Home(sensor.temperature(), sensor.humidity() * sys.DHT_HUMI_CALIB[0] + sys.DHT_HUMI_CALIB[1])
-        except (OSError, ValueError):
-            self.home = Forecast.Home(in_temp, None)
+            
+            try:
+                sensor.measure()
+                self.home = Forecast.Home(sensor.temperature(), sensor.humidity() * sys.DHT_HUMI_CALIB[0] + sys.DHT_HUMI_CALIB[1])
+                return
+            except OSError as e:
+                if e.errno == ETIMEDOUT and retry < 8:
+                    retry += 1
+                    print('DHT timeout - retry', retry)
+                    sleep_ms(200)
+        
+        self.home = Forecast.Home(in_temp, None)

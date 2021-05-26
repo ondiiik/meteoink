@@ -1,4 +1,4 @@
-from config import connection, flush_con
+from config import connection, Connection
 from .main  import bssid2bytes
 
 
@@ -9,8 +9,7 @@ def page(web):
     for i in range(len(connection)):
         if connection[i].bssid == bssid:
             connection.remove(connection[i])
+            Connection.flush()
             break
     
-    # Write result to configuration
-    flush_con()
     return True

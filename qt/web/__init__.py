@@ -1,6 +1,10 @@
-import             socket
-from utime  import sleep_ms
-from uerrno import ECONNRESET, ENOTCONN
+import              socket
+from utime   import sleep_ms
+from uerrno  import ECONNRESET, ENOTCONN, EAGAIN
+from log     import dump_exception
+from var     import write
+from machine import deepsleep
+from buzzer  import play
 
 
 class Server():
@@ -27,7 +31,13 @@ class Server():
                 try:
                     self.client, addr = sck.accept()
                     break
-                except OSError as err:
+                except OSError as e:
+                    if e.errno == EAGAIN:
+                        sleep_ms(100)
+                    elif e.errno == 23: # Out of memory - restart server
+                        self._restart('Low memory - restart !!!')
+                    else:
+                        dump_exception('Socket accept failed ?!', e)
                     pass
             
             self.client.settimeout(8.0)
@@ -81,7 +91,8 @@ class Server():
                             self.args[key[0]] = key[1].replace('%3A', ':').replace('+', ' ').replace('%2B', '+')
                             
                         print('ARGS', self.args)
-            except:
+            except Exception as e:
+                dump_exception('WEB page failed ?!', e)
                 self.page = 'index'
             
             self._ack()
@@ -96,9 +107,13 @@ class Server():
             try:
                 self.client.send(txt.encode())
                 retry = False
-            except OSError as err:
-                if not err.errno in (ECONNRESET, ENOTCONN):
-                    raise err
+            except OSError as e:
+                dump_exception('WEB page write failed ?!', e)
+                
+                if e.errno in (ENOTCONN, ECONNRESET):
+                    self._restart('Disconnected - restarting !!!')
+                
+                raise e
     
     
     @staticmethod
@@ -232,3 +247,11 @@ class Server():
         
     def _tail(self):
         self.client.send(b'</body></html>')
+    
+    
+    @staticmethod
+    def _restart(msg):
+        print(msg)
+        play((2093, 30), 120, (1568, 30), 120, (1319, 30), 120, (1047, 30))
+        write('mode', (1,), force = True)
+        deepsleep(1)

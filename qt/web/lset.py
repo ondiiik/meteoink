@@ -1,4 +1,4 @@
-from config import location, flush_loc
+from config import location
 
 
 def page(web):
@@ -8,7 +8,7 @@ def page(web):
         if location[i].name == name:
             location[i].lat = float(web.args['lat'])
             location[i].lon = float(web.args['lon'])
+            location[i].flush()
             break
     
-    flush_loc()
     return True

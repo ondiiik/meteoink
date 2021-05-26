@@ -1,4 +1,4 @@
-from config import connection, Connection, flush_con
+from config import connection, Connection
 from .main  import bssid2bytes
 
 
@@ -14,7 +14,7 @@ def page(web):
     
     # Connection is still not there - add new
     connection.append(Connection(int(web.args['location']), web.args['ssid'], web.args['psw'], bssid))
-    flush_con()
+    Connection.flush()
     
     from .index import page
     page(web)

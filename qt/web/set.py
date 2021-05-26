@@ -10,8 +10,8 @@ def page(web):
         if connection[i].bssid == bssid:
             connection[i].passwd   = web.args['psw']
             connection[i].location = int(web.args['location'])
+            connection[i].flush()
             break
     
     # Write result to configuration
-    flush_con()
     return True

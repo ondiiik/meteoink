@@ -27,7 +27,7 @@ class WebServer(Server):
         if not self.last == self.page:
             self.last = self.page
         
-        play(((1047,30), (0,120), (1568,30)))
+        play((1047,30), 120, (1568,30))
         if page(self):
             page = __import__('web.index', None, None, ('page',), 0).page
             page(self)
