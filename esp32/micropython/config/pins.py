@@ -9,6 +9,9 @@ HOTSPOT_BUTTON = const(39)
 # Alert toggle button pin
 ALLERT_BUTTON = const(34)
 
+# Deep sleep button
+SLEEP_BUTTON = const(35)
+
 # LED pin
 LED     = const(-1) 
 

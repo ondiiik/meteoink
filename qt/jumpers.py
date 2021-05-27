@@ -8,16 +8,18 @@ class Jumpers:
         def value():
             return 1
     
-    def __init__(self):
-        if 0 > pins.HOTSPOT_BUTTON:
-            self._hp = self.PinDummy()
-        else:
-            self._hp = Pin(pins.HOTSPOT_BUTTON, Pin.IN, Pin.PULL_UP)
     
-        if 0 > pins.ALLERT_BUTTON:
-            self._al = self.PinDummy()
+    def __init__(self):
+        self._hp = self._init_pin(pins.HOTSPOT_BUTTON)
+        self._al = self._init_pin(pins.ALLERT_BUTTON)
+        self._sl = self._init_pin(pins.SLEEP_BUTTON)
+    
+    
+    def _init_pin(self, pin):
+        if 0 > pin:
+            return self.PinDummy()
         else:
-            self._al = Pin(pins.ALLERT_BUTTON, Pin.IN, Pin.PULL_UP)
+            return Pin(pin, Pin.IN, Pin.PULL_UP)
     
     
     @property
@@ -31,6 +33,11 @@ class Jumpers:
     @property
     def alert(self):
         return 0  == self._al.value()
+    
+    
+    @property
+    def sleep(self):
+        return 0 == self._sl.value()
 
 
 jumpers = Jumpers()

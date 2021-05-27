@@ -27,7 +27,8 @@ def run(sha):
         # and don't want to let it wake up during transport. In this case
         # we can put it to greetings mode, where only picture is displayed
         # and station kept sleeping till reset button is pressed
-        if DISPLAY_GREETINGS == display_get():
+        if DISPLAY_GREETINGS == display_get() or jumpers.sleep:
+            play((800, 30), 500, (400, 30))
             _greetings(canvas, net, led)
             
         # It may happen that user wants to attach with HTTP for update of firmware
