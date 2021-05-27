@@ -1,10 +1,10 @@
-from config import ui
+from config import hotspot
+from lang   import trn
 
 
 def page(web):
-    yield web.heading( 2, 'Edit hotspot password:')
+    yield web.heading( 2, trn['Set hotspot password'])
     
     yield web.form_head('passet')
-    yield web.form_input('Password',       'p1',  '', 'password')
-    yield web.form_input('Password again', 'p2',  '', 'password')
+    yield web.form_input(trn['Password'], 'p', hotspot.passwd)
     yield web.form_tail()

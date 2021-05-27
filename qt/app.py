@@ -226,8 +226,14 @@ def _sleep(fcast, minutes = 0):
         from config import ui
         minutes = ui.refresh
         h       = 12 if fcast is None else fcast.time.get_date_time(fcast.weather.dt)[3]
+        b, e    = ui.dbl
         
-        if (ui.dbl[0] > 0 and h >= ui.dbl[0]) or (h < ui.dbl[1]):
+        if b > e:
+            if h < e:
+                h += 24
+            e += 24
+        
+        if h in range(b, e):
             minutes *= 2
     
     

@@ -7,7 +7,7 @@ from lang        import trn
 def page(web):
     yield web.heading( 2,trn['Locations setup'])
     
-    yield web.table_head((trn['Location'], 'Latitude', 'Longitude', '', ''), 'frame="hsides"', 'style="text-align:left"')
+    yield web.table_head((trn['Location'], trn['Latitude'], trn['Longitude'], '', ''), 'frame="hsides"', 'style="text-align:left"')
     
     for i in location:
         idx = (('idx', location.index(i)),)
@@ -22,7 +22,7 @@ def page(web):
     yield web.br()
     
     yield web.heading(2, trn['WiFi setup'])
-    yield web.table_head(('SSID', 'BSSID', 'Location','', ''), 'frame="hsides"', 'style="text-align:left"')
+    yield web.table_head(('SSID', 'BSSID', trn['Location'],'', ''), 'frame="hsides"', 'style="text-align:left"')
     
     for i in connection:
         if i.bssid is None:
@@ -31,9 +31,10 @@ def page(web):
             bssid = bytes2bssid(i.bssid)
         
         idx = (('idx', connection.index(i)),)
+        loc = int(i.location)
         yield web.table_row((i.ssid,
                              bssid,
-                             location[int(i.location)].name,
+                             location[loc].name if loc < len(location) else '...',
                              web.button(trn['Edit'],   'ed',  idx),
                              web.button(trn['Delete'], 'dlt', idx)),
                              SPACES)
@@ -69,13 +70,13 @@ def page(web):
     yield web.heading(2, trn['Hotspot setup'])
     yield web.table_head(None, 'frame="hsides"')
     yield web.table_row(('SSID',     hotspot.ssid,   web.button(trn['Edit'], 'ssid')),   SPACES)
-    yield web.table_row(('Password', hotspot.passwd, web.button(trn['Edit'], 'passwd')), SPACES)
+    yield web.table_row((trn['Password'], hotspot.passwd, web.button(trn['Edit'], 'passwd')), SPACES)
     yield web.table_tail()
     
-    yield web.heading(2, 'Battery  setup')
+    yield web.heading(2, trn['Battery setup'])
     yield web.table_head(None, 'frame="hsides"')
-    yield web.table_row(('Current voltage',  '{:.2f} V'.format(battery.voltage), ''),                              SPACES)
-    yield web.table_row(('Critical voltage', '{:.2f} V'.format(vbat.low_voltage), web.button(trn['Edit'], 'low')), SPACES)
+    yield web.table_row((trn['Current voltage'],  '{:.2f} V'.format(battery.voltage), ''),                              SPACES)
+    yield web.table_row((trn['Critical voltage'], '{:.2f} V'.format(vbat.low_voltage), web.button(trn['Edit'], 'low')), SPACES)
     yield web.table_tail()
     
     yield web.heading(2, trn['Misc'])

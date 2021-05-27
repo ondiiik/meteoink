@@ -106,7 +106,15 @@ class Server():
                         for key in line:
                             log(key)
                             key = key.split('=', 1)
-                            self.args[key[0]] = key[1].replace('%3A', ':').replace('+', ' ').replace('%2B', '+')
+                            
+                            p = key[1].replace('+', ' ').split('%')
+                            t = bytearray(p[0].encode())
+                            
+                            for k in p[1:]:
+                                t.append(int(k[0:2], 16))
+                                t.extend(k[2:].encode())
+                            
+                            self.args[key[0]] = t.decode()
                             
                         log('ARGS', self.args)
             except Exception as e:
@@ -246,6 +254,11 @@ class Server():
     @staticmethod
     def form_spacer():
         return Server.table_row(('', ''), 1)
+    
+    
+    @staticmethod
+    def form_variable(var, val):
+        return Server.table_row(('<input type="hidden" id="{0}" name="{0}" value="{1}" />'.format(var, val),), 0)
     
     
     @staticmethod
