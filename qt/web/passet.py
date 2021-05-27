@@ -14,4 +14,4 @@ def page(web):
     except Exception as e:
         dump_exception('WEB error:', e)
     
-    return True
+    yield web.index

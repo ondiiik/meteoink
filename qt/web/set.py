@@ -1,6 +1,6 @@
 from config import connection
-from .main  import bssid2bytes
 from log    import dump_exception
+from web    import bssid2bytes
 
 
 def page(web):
@@ -19,4 +19,4 @@ def page(web):
         dump_exception('WEB error:', e)
     
     # Write result to configuration
-    return True
+    yield web.index

@@ -1,12 +1,19 @@
-import              socket
-from utime   import sleep_ms
-from uerrno  import ECONNRESET, ENOTCONN, EAGAIN
-from log     import dump_exception
-from var     import write
-from machine import deepsleep
-from buzzer  import play
-from log     import log
-from lang    import trn
+from buzzer      import play
+from gc          import collect
+from lang        import trn
+from log         import dump_exception
+from log         import log
+from machine     import deepsleep
+from micropython import const
+from uerrno      import ECONNRESET, ENOTCONN, EAGAIN, ETIMEDOUT
+from uio         import BytesIO
+from utime       import sleep_ms
+from var         import write
+import                  socket
+
+
+SPACES         = const(4)
+CONN_RETRY_CNT = const(6)
 
 
 class Server():
@@ -27,7 +34,7 @@ class Server():
         
         log('Web server listening on', addr)
         
-        # Wait for incomming connection
+        # Wait for incoming connection
         while True:
             while True:
                 try:
@@ -45,13 +52,22 @@ class Server():
             self.client.settimeout(8.0)
             log('Accepted client from', addr)
             
+            
             try:
                 # Parse HTTP request
                 request   = self.client.makefile('rwb', 0)
                 self.args = {}
                 
                 while True:
-                    line = request.readline()
+                    try:
+                        line = request.readline()
+                    except OSError as e:
+                        if e.errno == ETIMEDOUT:
+                            log('Timeout - interrupt')
+                            break
+                        
+                        raise e
+                    
                     
                     if not line or line == b'\r\n':
                         break
@@ -97,25 +113,32 @@ class Server():
                 dump_exception('WEB page failed ?!', e)
                 self.page = 'index'
             
-            self._ack()
-            self._send_page()
-            self.client = None
+            try:
+                self._ack()
+                self._send_page()
+                self.client = None
+            except OSError as e:
+                if e.errno == ENOTCONN:
+                    log('Connection dropped')
     
     
     def write(self, txt):
-        retry = True
+        if isinstance(txt, str):
+            txt = txt.encode()
         
-        while retry:
+        for retry in range(CONN_RETRY_CNT):
             try:
-                self.client.send(txt.encode())
-                retry = False
+                self.client.send(txt)
+                collect()
+                return
             except OSError as e:
-                dump_exception('WEB page write failed ?!', e)
-                
-                if e.errno in (ENOTCONN, ECONNRESET):
-                    self._restart('Disconnected - restarting !!!')
+                log('ECONNRESET -> retry')
+                if e.errno == ECONNRESET:
+                    continue
                 
                 raise e
+        
+        raise RuntimeError('Connection broken')
     
     
     @staticmethod
@@ -263,3 +286,80 @@ class Server():
         play((2093, 30), 120, (1568, 30), 120, (1319, 30), 120, (1047, 30))
         write('mode', (1,), force = True)
         deepsleep(1)
+
+
+
+class WebWriter:
+    def __init__(self, web):
+        self.s   = BytesIO()
+        self.web = web
+    
+    def write(self, txt):
+        if isinstance(txt, str):
+            txt = txt.encode()
+        
+        s = self.s
+        s.write(txt)
+        
+        if s.tell() > 1200:
+            self.web.write(s.getvalue())
+            self.s = BytesIO()
+    
+    def flush(self):
+        if self.s.tell() > 0:
+            self.web.write(self.s.getvalue())
+            self.s = BytesIO()
+
+
+
+class WebServer(Server):
+    class IndexDrawer:
+        pass
+    
+    def __init__(self, net):
+        super().__init__(net)
+        self.writer = WebWriter(self)
+        self.last   = ''
+        self.index  = WebServer.IndexDrawer()
+    
+    
+    def process(self):
+        log('*** PAGE ***', self.page)
+        
+        if (self.page == '') or (self.last == self.page):
+            self.page = 'index'
+        
+        try:
+            page = __import__('web.{}'.format(self.page), None, None, ('page',), 0).page
+        except ImportError:
+            log('!!! Page {} not found !!!'.format(self.page))
+            page = __import__('web.index', None, None, ('page',), 0).page
+        
+        if not self.last == self.page:
+            self.last = self.page
+        
+        play((1047,30), 120, (1568,30))
+        s = BytesIO()
+        
+        for p in page(self):
+            if isinstance(p, WebServer.IndexDrawer):
+                for q in __import__('web.index', None, None, ('page',), 0).page(self):
+                    self.writer.write(q)
+            else:
+                self.writer.write(p)
+        
+        self.writer.flush()
+
+
+
+def bssid2bytes(bssid):
+    b1 = bssid.split(':')
+    b2 = []
+    for i in range(6):
+        b2.append(int(b1[i], 16))
+    return bytes(b2)
+
+
+
+def bytes2bssid(bssid):
+    return ":".join("{:02x}".format(b) for b in bssid)

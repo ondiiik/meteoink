@@ -2,23 +2,21 @@ from config import location
 
 
 def page(web):
-    pg  = web.heading( 2, 'Add new location')
+    yield web.heading( 2, 'Add new location')
     
-    pg += web.form_head('new')
+    yield web.form_head('new')
     
-    pg += web.form_input('SSID',      'ssid',  web.args['ssid'])
-    pg += web.form_input('BSSID',     'bssid', web.args['bssid'])
-    pg += web.form_input('Password',  'psw')
+    yield web.form_input('SSID',      'ssid',  web.args['ssid'])
+    yield web.form_input('BSSID',     'bssid', web.args['bssid'])
+    yield web.form_input('Password',  'psw')
     
-    pg += web.form_spacer()
+    yield web.form_spacer()
     
-    pg += web.select_head('Location', 'location')
+    yield web.select_head('Location', 'location')
     
     for i in range(len(location)):
-        pg += web.select_option(i, location[i].name)
+        yield web.select_option(i, location[i].name)
     
-    pg += web.select_tail()
+    yield web.select_tail()
     
-    pg += web.form_tail()
-    
-    web.write(pg)
+    yield web.form_tail()

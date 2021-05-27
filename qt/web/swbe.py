@@ -6,4 +6,4 @@ def page(web):
         alert.error_beep = True
         alert.flush()
     
-    return True
+    yield web.index

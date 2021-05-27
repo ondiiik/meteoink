@@ -1,32 +1,30 @@
 from config import connection, location
-from .main  import bytes2bssid
 from log    import dump_exception
+from web    import bytes2bssid
 
 
 def page(web):
     try:
-        pg     = web.heading( 2, 'Edit connection')
+        yield web.heading( 2, 'Edit connection')
         config = connection[int(web.args['idx'])]
         
-        pg += web.form_head('set')
+        yield web.form_head('set')
         
-        pg += web.form_label('SSID',     'ssid',      config.ssid)
-        pg += web.form_label('BSSID',    'bssid',     bytes2bssid(config.bssid))
-        pg += web.form_input('Password', 'psw',       config.passwd, 'password')
+        yield web.form_label('SSID',     'ssid',      config.ssid)
+        yield web.form_label('BSSID',    'bssid',     bytes2bssid(config.bssid))
+        yield web.form_input('Password', 'psw',       config.passwd, 'password')
         
-        pg += web.form_spacer()
+        yield web.form_spacer()
         
-        pg += web.select_head('Location', 'location')
+        yield web.select_head('Location', 'location')
         
         for i in range(len(location)):
-            pg += web.select_option(i, location[i].name, i == config.location)
+            yield web.select_option(i, location[i].name, i == config.location)
             
-        pg += web.select_tail()
+        yield web.select_tail()
         
-        pg += web.form_tail()
-        
-        web.write(pg)
+        yield web.form_tail()
         
     except Exception as e:
         dump_exception('WEB error:', e)
-        return True
+        yield web.index

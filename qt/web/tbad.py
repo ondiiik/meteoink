@@ -6,4 +6,4 @@ def page(web):
         alert.temp_balanced = False
         alert.flush()
     
-    return True
+    yield web.index

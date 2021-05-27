@@ -11,11 +11,13 @@ from led          import Led
 from machine      import deepsleep, reset, reset_cause, DEEPSLEEP
 from net          import Connection
 from ui.main      import MeteoUi
-from web.main     import WebServer
 from log          import log, dump_exception
+from web          import WebServer
 
 
 def run(sha):
+    forecast = None
+    
     try:
         # Read all initializes all peripheries
         temp, led, volt, canvas, net = _perif()
@@ -222,7 +224,7 @@ def _sleep(fcast, minutes = 0):
     if 0 == minutes:
         from config import ui
         minutes = ui.refresh
-        h       = fcast.time.get_date_time(fcast.weather.dt)[3]
+        h       = 12 if fcast is None else fcast.time.get_date_time(fcast.weather.dt)[3]
         
         if (ui.dbl[0] > 0 and h >= ui.dbl[0]) or (h < ui.dbl[1]):
             minutes *= 2
