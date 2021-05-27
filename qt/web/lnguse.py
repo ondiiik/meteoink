@@ -1,7 +1,12 @@
 from config import ui
+from log    import dump_exception
 
 
 def page(web):
-    ui.language = web.args['l']
-    ui.flush()
+    try:
+        ui.language = web.args['l']
+        ui.flush()
+    except Exception as e:
+        dump_exception('WEB error:', e)
+    
     return True

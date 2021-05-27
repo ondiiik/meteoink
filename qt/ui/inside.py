@@ -13,7 +13,6 @@ class UiInside(UiFrame):
         super().__init__(ofs, dim)
         
     def draw(self, ui, args):
-        # Type humidity
-        t = '--' if None == ui.forecast.home.rh else '{:.0f}'.format(ui.forecast.home.rh)
+        t = '--' if ui.forecast.home.rh is None else '{:.0f}'.format(ui.forecast.home.rh)
         ui.text_right(80, t,      Vect(_INSIDE_OFS_A, _INSIDE_OFS_80))
         ui.text(      50, '% RH', Vect(_INSIDE_OFS_B, _INSIDE_OFS_50))

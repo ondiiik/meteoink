@@ -2,8 +2,8 @@ from   var         import write
 from   .           import Ui
 from   config      import display_set, display_get, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_JUST_REPAINT, DISPLAY_DONT_REFRESH
 from   display     import Vect, WHITE
-from   forecast    import TEMPERATURE, WEATHER, ALL
 from   micropython import const
+from   log         import log
 import machine
 
 
@@ -17,29 +17,29 @@ _CHART_ICON_POS  = const(80  + _CHART_HEAD)
 _DATA_SIZE       = const(590 - _CHART_POS)
 _DATA_LOWER      = const(140)
 
+
 class Epd47(Ui):
-    def __init__(self, canvas, forecast, connection):
+    def __init__(self, canvas, forecast):
         super().__init__(canvas)
         self.forecast   = forecast
-        self.connection = connection
     
     
     def repaint_welcome(self, led):
         # Redraw display
-        print('Drawing welcome ...')
+        log('Drawing welcome ...')
         led.mode(led.DRAWING)
         
         bitmap = self.bitmap(1, 'greetings')
         self.canvas.bitmap(Vect(0, 0), bitmap)
         
-        print('Flushing ...')
+        log('Flushing ...')
         led.mode(led.FLUSHING)
         self.canvas.flush()
     
     
     def repaint_weather(self, led, volt):
         # Redraw display
-        print('Drawing weather ...')
+        log('Drawing weather ...')
         led.mode(led.DRAWING)
         
         self.canvas.fill(WHITE)
@@ -67,7 +67,7 @@ class Epd47(Ui):
         tempt_dr(self, Vect(0, _CHART_RAIN),     Vect(960, _CHART_HEIGHT))
         
         # Flush drawing on display (upper or all parts)
-        print('Flushing ...')
+        log('Flushing ...')
         led.mode(led.FLUSHING)
         self.canvas.flush()
         
@@ -81,7 +81,7 @@ class Epd47(Ui):
         # After config we will need to repaint all
         display_set(DISPLAY_REQUIRES_FULL_REFRESH)
         
-        print('Drawing config ...')
+        log('Drawing config ...')
         led.mode(led.DRAWING)
         self.canvas.fill(WHITE)
         
@@ -98,7 +98,7 @@ class Epd47(Ui):
         
         vbat_dr(self,  Vect(self.canvas.dim.x // 2 - 10, self.canvas.dim.y // 2),  Vect(48, 30), volt)
         
-        print('Flushing ...')
+        log('Flushing ...')
         led.mode(led.FLUSHING)
         self.canvas.flush()
         
@@ -109,18 +109,18 @@ class Epd47(Ui):
     
     def repaint_lowbat(self, volt):
         if not display_get() == DISPLAY_DONT_REFRESH:
-            print('Drawing lowbat ...')
+            log('Drawing lowbat ...')
             self.canvas.fill(WHITE)
             v = Vect(self.canvas.dim.x // 2 - 30, self.canvas.dim.y // 2)
             d = Vect(60, 30)
             vbat_dr(self, v, d, volt)
             
-            print('Flushing ...')
+            log('Flushing ...')
             self.canvas.flush((v.x - 20, v.y - 26, d.x + 46, d.y + 40))
             
             display_set(DISPLAY_DONT_REFRESH)
         else:
-            print('Already painted ... saving battery')
+            log('Already painted ... saving battery')
 
 
 def weather_dr(ui, p, d):
@@ -195,8 +195,8 @@ def vbat_dr(ui, p, d, volt):
 
 
 class MeteoUi:
-    def __init__(self, canvas, forecast, connection):
-        self.ui              = Epd47(canvas, forecast, connection)
+    def __init__(self, canvas, forecast):
+        self.ui              = Epd47(canvas, forecast)
         self.repaint_welcome = self.ui.repaint_welcome
         self.repaint_weather = self.ui.repaint_weather
         self.repaint_config  = self.ui.repaint_config

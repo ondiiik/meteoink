@@ -12,7 +12,7 @@ from machine      import deepsleep, reset, reset_cause, DEEPSLEEP
 from net          import Connection
 from ui.main      import MeteoUi
 from web.main     import WebServer
-from log          import dump_exception
+from log          import log, dump_exception
 
 
 def run(sha):
@@ -51,11 +51,11 @@ def run(sha):
             
             # When all is displayed, then go to deep sleep. Sleep time is obtained
             # according to current weather forecast and UI needs and is in minutes.
-            _sleep()
+            _sleep(forecast)
     
     except Exception as e:
         dump_exception('FATAL - RECOVERY REQUIRED !!!', e)
-        _sleep(5)
+        _sleep(forecast, 5)
 
 
 
@@ -126,7 +126,7 @@ def _perif():
         ui = MeteoUi(canvas, None, None)
         ui.repaint_lowbat(volt)
         
-        print('Going to deep sleep ...')
+        log('Low battery !!!')
         _sleep(15)
     
     # Once we have canvas established (large object needs
@@ -140,7 +140,7 @@ def _perif():
         # Activates WiFi only when we came from deep sleep mode
         if reset_cause() == DEEPSLEEP or mode.MODE == 1:
             net = Connection()
-            print('Connected to network')
+            log('Connected to network')
     except Exception as e:
         dump_exception('Network connection error', e)
     
@@ -150,10 +150,10 @@ def _perif():
 
 
 def _greetings(canvas, net, led):
-    ui = MeteoUi(canvas, None, net)
+    ui = MeteoUi(canvas, None)
     ui.repaint_welcome(led)
     
-    print('Going to deep sleep ...')
+    log('Going to deep sleep ...')
     display_set(DISPLAY_REQUIRES_FULL_REFRESH)
     deepsleep()
 
@@ -164,7 +164,7 @@ def _hotspot(canvas, net, led, volt):
         play((2093, 30), 120,(2093, 30))
         led.mode(Led.DOWNLOAD)
         
-        ui = MeteoUi(canvas, None, net)
+        ui = MeteoUi(canvas, None)
         ui.repaint_config(led, volt)
     
     
@@ -190,7 +190,7 @@ def _repaint(canvas, forecast, net, led, volt):
     if not net is None:
         reset()
     
-    ui = MeteoUi(canvas, forecast, net)
+    ui = MeteoUi(canvas, forecast)
     ui.repaint_weather(led, volt)
     
     if not net is None:
@@ -218,10 +218,15 @@ def _allerts(forecast):
 
 
 
-def _sleep(minutes = 0):
+def _sleep(fcast, minutes = 0):
     if 0 == minutes:
         from config import ui
         minutes = ui.refresh
+        h       = fcast.time.get_date_time(fcast.weather.dt)[3]
+        
+        if (ui.dbl[0] > 0 and h >= ui.dbl[0]) or (h < ui.dbl[1]):
+            minutes *= 2
     
-    print('Going to deep sleep for {} minutes ...'.format(minutes))
+    
+    log('Going to deep sleep for {} minutes ...'.format(minutes))
     deepsleep(minutes * 60000)

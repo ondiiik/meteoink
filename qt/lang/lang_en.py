@@ -5,3 +5,11 @@ day_of_week = ('Monday',
                'Friday',
                'Saturday',
                'Sunday')
+
+
+class Dict:
+    def __getitem__(self, key):
+        return key
+
+
+trn = Dict()

@@ -1,6 +1,7 @@
 from .           import Server
 from buzzer      import play
 from micropython import const
+from log         import log
 
 
 SPACES = const(4)
@@ -13,7 +14,7 @@ class WebServer(Server):
     
     
     def process(self):
-        print('*** PAGE ***', self.page)
+        log('*** PAGE ***', self.page)
         
         if (self.page == '') or (self.last == self.page):
             self.page = 'index'
@@ -21,7 +22,7 @@ class WebServer(Server):
         try:
             page = __import__('web.{}'.format(self.page), None, None, ('page',), 0).page
         except ImportError:
-            print('!!! Page {} not found !!!'.format(self.page))
+            log('!!! Page {} not found !!!'.format(self.page))
             page = __import__('web.index', None, None, ('page',), 0).page
         
         if not self.last == self.page:

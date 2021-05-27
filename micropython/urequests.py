@@ -1,4 +1,5 @@
 import usocket
+from log import log
 
 class Response:
 
@@ -54,7 +55,7 @@ def request(method, url, data=None, json=None, headers={}, stream=None):
     try:
         ai = usocket.getaddrinfo(host, port, 0, usocket.SOCK_STREAM)
     except:
-        print('Get address info failed - SOCKET BUG - restarting')
+        log('Get address info failed - SOCKET BUG - restarting')
         from machine import reset
         reset()
     
@@ -86,7 +87,7 @@ def request(method, url, data=None, json=None, headers={}, stream=None):
             s.write(data)
 
         l = s.readline()
-        #print(l)
+        #log(l)
         l = l.split(None, 2)
         status = int(l[1])
         reason = ""
@@ -96,7 +97,7 @@ def request(method, url, data=None, json=None, headers={}, stream=None):
             l = s.readline()
             if not l or l == b"\r\n":
                 break
-            #print(l)
+            #log(l)
             if l.startswith(b"Transfer-Encoding:"):
                 if b"chunked" in l:
                     raise ValueError("Unsupported " + l)

@@ -7,6 +7,7 @@ from ltime       import Time
 from uerrno      import ETIMEDOUT
 from utime       import sleep_ms
 from buzzer      import play
+from log         import log
 
 
 # See https://openweathermap.org/weather-conditions
@@ -24,31 +25,27 @@ id2icon = { 200 : '200', 201 : '200', 202 : '200', 210 : '200', 211 : '200', 212
             804 : '804' }
 
 
-WEATHER     = const(1)
-TEMPERATURE = const(2)
-ALL         = const(3)
-
 
 class Forecast:
     Weather = namedtuple('Weather', ('id', 'dt', 'temp', 'feel', 'rh', 'rain', 'snow', 'speed', 'dir'))
     Home    = namedtuple('Home',    ('temp', 'rh'))
     
     
-    def __init__(self, connection, in_temp):
-        print("Reading forecast data")
-        self._read1(connection, ui)
+    def __init__(self, net, in_temp):
+        log("Reading forecast data")
+        self._read1(net, ui)
         
         if ui.variant == VARIANT_2DAYS:
-            self._read2_short(connection, ui)
+            self._read2_short(net, ui)
         else:
-            self._read2_long(connection, ui, 96)
+            self._read2_long(net, ui, 96)
         
-        self._get_dht(in_temp)
+        self._get_dht(net, in_temp)
     
     
-    def _read1(self, connection, ui):
-        if connection is None:
-            print('Reread current weather data ...')
+    def _read1(self, net, ui):
+        if net is None:
+            log('Reread current weather data ...')
             try:
                 import owmp
                 self.location = owmp.location
@@ -58,10 +55,10 @@ class Forecast:
             fcast = owmp.current
         else:
             # Download hourly weather forecast for today
-            print('Download current weather data ...')
+            log('Download current weather data ...')
             url   = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}'
-            loc   = location[connection.config.location]
-            fcast = connection.http_get_json(url.format(loc.lat,
+            loc   = location[net.config.location]
+            fcast = net.http_get_json(url.format(loc.lat,
                                                         loc.lon,
                                                         ui.apikey,
                                                         ui.units,
@@ -81,13 +78,13 @@ class Forecast:
         # Parse todays forecast
         try:
             if not fcast['cod'] == 0:
-                print('Server commu8nication error - can not load forecast!')
+                log('Server commu8nication error - can not load forecast!')
                 
                 try:
-                    print('Server reported:')
-                    print('    ', fcast['message'])
-                    print('')
-                    print('Go into configuration mode to set server correctly')
+                    log('Server reported:')
+                    log('    ', fcast['message'])
+                    log('')
+                    log('Go into configuration mode to set server correctly')
                 except:
                     pass
                 
@@ -128,12 +125,12 @@ class Forecast:
     
     def _read2_short(self, connection, ui):
         if connection is None:
-            print('Reread short weather data ...')
+            log('Reread short weather data ...')
             import owmp
             fcast = owmp.forecast
         else:
             # Download hourly weather forecast for today
-            print('Download short forecast data ...')
+            log('Download short forecast data ...')
             
             url   = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}'
             fcast = connection.http_get_json(url.format(location[connection.config.location].lat,
@@ -180,12 +177,12 @@ class Forecast:
     
     def _read2_long(self, connection, ui, hours):
         if connection is None:
-            print('Reread long weather data ...')
+            log('Reread long weather data ...')
             import owmp
             fcast = owmp.forecast
         else:
             # Download hourly weather forecast for 5 days
-            print('Download long forecast data ...')
+            log('Download long forecast data ...')
             url   = "http://api.openweathermap.org/data/2.5/forecast?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&cnt={}"
             fcast = connection.http_get_json(url.format(location[connection.config.location].lat,
                                                         location[connection.config.location].lon,
@@ -230,20 +227,17 @@ class Forecast:
                                                   wind[   'deg']))
     
     
-    def _get_dht(self, in_temp):
-        retry = 0
-        
-        while pins.DHT >= 0:
+    def _get_dht(self, net, in_temp):
+        # DHT22 is powered only when display is powered
+        # (network is not connected)
+        if net is None and pins.DHT >= 0:
             sensor = dht.DHT22(Pin(pins.DHT))
             
             try:
                 sensor.measure()
                 self.home = Forecast.Home(sensor.temperature(), sensor.humidity() * sys.DHT_HUMI_CALIB[0] + sys.DHT_HUMI_CALIB[1])
                 return
-            except OSError as e:
-                if e.errno == ETIMEDOUT and retry < 8:
-                    retry += 1
-                    print('DHT timeout - retry', retry)
-                    sleep_ms(200)
+            except:
+                pass
         
         self.home = Forecast.Home(in_temp, None)

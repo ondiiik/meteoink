@@ -1,5 +1,6 @@
 from config  import connection
 from jumpers import jumpers
+from log     import log
 
 
 class Wifi:
@@ -22,7 +23,7 @@ class Connection:
         return ('192.168.1.254', '255.255.255.0', '192.168.1.255')
     
     def http_get_json(self, url):
-        print("HTTP GET: " + url)
+        log("HTTP GET: " + url)
         import urequests
         return urequests.get(url).json()
     

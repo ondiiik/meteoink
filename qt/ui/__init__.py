@@ -1,6 +1,5 @@
 from config      import sys, display_set, display_get, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_JUST_REPAINT, DISPLAY_DONT_REFRESH
 from display     import Vect, Bitmap, BLACK, WHITE, GRAY
-from forecast    import TEMPERATURE, WEATHER, ALL
 from micropython import const
 
 

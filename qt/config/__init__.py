@@ -79,18 +79,19 @@ hotspot = Spot('{}', '{}')
 
 
 class Ui:
-    def __init__(self, apikey, units, language, variant, refresh):
+    def __init__(self, apikey, units, language, variant, refresh, dbl_refr_range):
         self.apikey   = apikey
         self.units    = units
         self.language = language
         self.variant  = variant
         self.refresh  = refresh
+        self.dbl      = dbl_refr_range
     
     def flush(self):
         v = 'VARIANT_4DAYS' if self.variant == VARIANT_4DAYS else 'VARIANT_2DAYS'
         s = '''from config import Ui, {3}
-ui = Ui("{0}", "{1}", "{2}", {3}, {4})
-'''.format(self.apikey, self.units, self.language, v, self.refresh)
+ui = Ui("{0}", "{1}", "{2}", {3}, {4}, {5})
+'''.format(self.apikey, self.units, self.language, v, self.refresh, self.dbl)
         with open('config/ui.py', 'w') as f:
             f.write(s)
 
@@ -193,7 +194,7 @@ except:
 try:
     from .ui import ui
 except:
-    reload = _rebuild('ui', Ui, "", "metric", "EN", VARIANT_4DAYS, 10) or reload
+    reload = _rebuild('ui', Ui, "", "metric", "EN", VARIANT_4DAYS, 20, (0, 7)) or reload
 
 try:
     from .alert import alert

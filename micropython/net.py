@@ -3,6 +3,7 @@ from network  import WLAN, STA_IF, AP_IF
 from config   import connection, hotspot
 from utime    import sleep
 from var.mode import MODE
+from log      import log
 
 
 class Wifi:
@@ -74,7 +75,7 @@ class Connection:
         
         for i in range(8):
             if self._ifc.isconnected():
-                print("Connected: " + str(self.ifconfig))
+                log("Connected: " + str(self.ifconfig))
                 self.is_hotspot = False
                 return
             
@@ -93,7 +94,7 @@ class Connection:
             sleep(1)
         
         self.is_hotspot = True
-        print("Running hotspot: " + str(self.ifconfig))
+        log("Running hotspot: " + str(self.ifconfig))
     
     
     @property
@@ -102,7 +103,7 @@ class Connection:
     
     
     def http_get_json(self, url):
-        print("HTTP GET: " + url)
+        log("HTTP GET: " + url)
         import urequests
         return urequests.get(url).json()
     

@@ -1,5 +1,6 @@
 import pygame
 import framebuf
+from log import log
 
 
 LANDSCAPE     = 0
@@ -25,23 +26,23 @@ class Epd:
     
     
     def on(self):
-        print('EPD ON')
+        log('EPD ON')
     
     
     def off(self):
-        print('EPD OFF')
+        log('EPD OFF')
     
     
     def power_off(self):
-        print('EPD POWER OFF')
+        log('EPD POWER OFF')
     
     
     def clear_area(self, x, y, w, h):
-        print('EPD Clear area {}x{}:{}+{}'.format(x, y, w, h))
+        log('EPD Clear area {}x{}:{}+{}'.format(x, y, w, h))
     
     
     def flush(self):
-        print('EPD Draw area {}x{}:{}+{}'.format(0, 0, Epd.WIDTH, Epd.HEIGHT))
+        log('EPD Draw area {}x{}:{}+{}'.format(0, 0, Epd.WIDTH, Epd.HEIGHT))
         
         fb = framebuf.FrameBuffer(self._fb, Epd.WIDTH, Epd.HEIGHT, framebuf.GS4_HMSB)
         

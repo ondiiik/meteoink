@@ -5,6 +5,8 @@ from log     import dump_exception
 from var     import write
 from machine import deepsleep
 from buzzer  import play
+from log     import log
+from lang    import trn
 
 
 class Server():
@@ -23,7 +25,7 @@ class Server():
         sck.setblocking(False)
         sck.listen(1)
         
-        print('Web server listening on', addr)
+        log('Web server listening on', addr)
         
         # Wait for incomming connection
         while True:
@@ -41,7 +43,7 @@ class Server():
                     pass
             
             self.client.settimeout(8.0)
-            print('Accepted client from', addr)
+            log('Accepted client from', addr)
             
             try:
                 # Parse HTTP request
@@ -55,7 +57,7 @@ class Server():
                         break
                     
                     line = line.decode()
-                    print('LINE', line.rstrip())
+                    log('LINE', line.rstrip())
                     
                     # Check for GET file and args
                     if line.startswith('GET '):
@@ -65,15 +67,15 @@ class Server():
                         if len(line) < 3:
                             continue
                         
-                        print('REQ', line[1])
+                        log('REQ', line[1])
                         if not line[1].startswith('/'):
                             continue
                         
                         line = line[1][1:].split('?', 1)
-                        print('SPLIT', line)
+                        log('SPLIT', line)
                         
                         self.page = line[0]
-                        print('PAGE', self.page)
+                        log('PAGE', self.page)
                         
                         if len(line) < 2:
                             continue
@@ -86,11 +88,11 @@ class Server():
                             continue
                         
                         for key in line:
-                            print(key)
+                            log(key)
                             key = key.split('=', 1)
                             self.args[key[0]] = key[1].replace('%3A', ':').replace('+', ' ').replace('%2B', '+')
                             
-                        print('ARGS', self.args)
+                        log('ARGS', self.args)
             except Exception as e:
                 dump_exception('WEB page failed ?!', e)
                 self.page = 'index'
@@ -203,6 +205,12 @@ class Server():
     
     
     @staticmethod
+    def button_enable(flag, url):
+        return Server.button(trn['Disable' if flag else 'Enable'],
+                             url + ('d' if flag else 'e'))
+    
+    
+    @staticmethod
     def form_head(page):
         return '<form action="/{}">{}'.format(page, Server.table_head(('', '')))
     
@@ -242,7 +250,7 @@ class Server():
         
         
     def _head(self):
-        self.write('<!DOCTYPE html><html><head><title>{0}</title></head><body><h1>{0}</h1>'.format('Meteostation'))
+        self.write('<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>{0}</title></head><body><h1>{0}</h1>'.format(trn['Meteostation']))
         
         
     def _tail(self):
@@ -251,7 +259,7 @@ class Server():
     
     @staticmethod
     def _restart(msg):
-        print(msg)
+        log(msg)
         play((2093, 30), 120, (1568, 30), 120, (1319, 30), 120, (1047, 30))
         write('mode', (1,), force = True)
         deepsleep(1)
