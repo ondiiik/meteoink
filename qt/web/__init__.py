@@ -232,7 +232,7 @@ class Server():
     
     @staticmethod
     def button(caption, url, args_list = None):
-        return '<button type="button" onclick="location.href=\'{}{}\'">{}</button>'.format(url, Server.mk_args(args_list), caption)
+        return '<button class="button" onclick="location.href=\'{}{}\'">{}</button>'.format(url, Server.mk_args(args_list), caption)
     
     
     @staticmethod
@@ -247,8 +247,8 @@ class Server():
     
     
     @staticmethod
-    def form_tail(label_submit = 'Submit', label_cancel = 'Cancel'):
-        return '{}<br><br><input type="submit" value="{}"><button><a href="/">{}</a></button></form>'.format(Server.table_tail(), label_submit, label_cancel)
+    def form_tail(label_submit = trn['Submit'], label_cancel = trn['Cancel']):
+        return '{}<br><br><input type="submit" class="button" value="{}"><button class="button"><a href="/">{}</a></button></form>'.format(Server.table_tail(), label_submit, label_cancel)
     
     
     @staticmethod
@@ -286,7 +286,14 @@ class Server():
         
         
     def _head(self):
-        self.write('<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>{0}</title></head><body><h1>{0}</h1>'.format(trn['Meteostation']))
+        self.write('<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8; width=device-width; initial-scale=1"><title>{0}</title></head><body><h1>{0}</h1>'.format(trn['Meteostation']))
+        self.write('<style>html{font-family: Helvetica; display:inline-block; margin: 0px auto; font-size: 16px;}')
+        self.write('h1{color: #0F3376;}')
+        self.write('p{font-size: 1.5rem;}')
+        self.write('.button{display: inline-block; background-color: #0074d9; border: none; border-radius: 4px; color: white; padding: 6px 20px; text-decoration: none; font-size: 14px; margin: 2px; cursor: pointer;}')
+        self.write('.butt_on{background-color: #42f486;}')
+        self.write('.butt_off{background-color: #4286f4;}')
+        self.write('</style>')
         
         
     def _tail(self):
