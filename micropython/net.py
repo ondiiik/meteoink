@@ -2,6 +2,12 @@ from jumpers import jumpers
 from network import WLAN, STA_IF, AP_IF
 from config  import connection, hotspot
 from utime   import sleep
+import              urequests
+from uerrno  import ECONNRESET
+from log     import log
+
+
+CONN_RETRY_CNT = const(6)
 
 
 class Wifi:
@@ -73,7 +79,7 @@ class Connection:
         
         for i in range(8):
             if self._ifc.isconnected():
-                print("Connected: " + str(self.ifconfig))
+                log("Connected: " + str(self.ifconfig))
                 self.is_hotspot = False
                 return
             
@@ -92,6 +98,7 @@ class Connection:
             sleep(1)
         
         self.is_hotspot = True
+        log("Running hotspot: " + str(self.ifconfig))
     
     
     @property
@@ -100,9 +107,19 @@ class Connection:
     
     
     def http_get_json(self, url):
-        print("HTTP GET: " + url)
-        import urequests
-        return urequests.get(url).json()
+        log("HTTP GET: " + url)
+        
+        for retry in range(CONN_RETRY_CNT):
+            try:
+                return urequests.get(url).json()
+                collect()
+                return
+            except OSError as e:
+                log('ECONNRESET -> retry')
+                if e.errno == ECONNRESET:
+                    continue
+                
+                raise e
     
     
     def disconnect(self):

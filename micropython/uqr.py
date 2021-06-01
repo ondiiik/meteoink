@@ -1,1 +1,1 @@
-/home/ondiiik/Development/meteo/meteo_py/qt/uqr.py
+../simulator/uqr.py

@@ -1,1 +1,1 @@
-../qt/battery.py
+../simulator/battery.py

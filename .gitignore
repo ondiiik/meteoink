@@ -1,7 +1,20 @@
 # Some meteostation runtime files
-/qt/~
-/qt/config/display.py
-/qt/config/resets.py
+/simulator/~
+/simulator/config/alert.py
+/simulator/config/connection.py
+/simulator/config/display.py
+/simulator/config/location.py
+/simulator/config/resets.py
+/simulator/config/spot.py
+/simulator/config/temp.py
+/simulator/config/ui.py
+/simulator/config/vbat.py
+/simulator/forecast.json
+/simulator/hotspot.txt
+/simulator/onecall.json
+/simulator/reset_cause.txt
+/simulator/var/alert.py
+/simulator/var/display.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -23,7 +36,6 @@ lib/
 lib64/
 parts/
 sdist/
-var/
 wheels/
 pip-wheel-metadata/
 share/python-wheels/
