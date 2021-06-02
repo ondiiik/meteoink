@@ -152,9 +152,8 @@ def _greetings(canvas, net, led):
     ui = MeteoUi(canvas, None, net)
     ui.repaint_welcome(led)
     
+    write('display', (DISPLAY_REQUIRES_FULL_REFRESH,))
     log('Going to deep sleep ...')
-    display.DISPLAY_STATE = DISPLAY_REQUIRES_FULL_REFRESH
-    write('display')
     deepsleep()
 
 

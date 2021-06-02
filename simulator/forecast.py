@@ -31,7 +31,7 @@ ALL         = const(3)
 
 
 class Forecast:
-    Weather = namedtuple('Weather', ('id', 'dt', 'temp', 'feel', 'rh', 'rain', 'snow', 'speed', 'dir'))
+    Weather = namedtuple('Weather', ('icon', 'dt', 'temp', 'feel', 'rh', 'rain', 'snow', 'speed', 'dir'))
     Home    = namedtuple('Home',    ('temp', 'rh'))
     Status  = namedtuple('Status',  ('refresh', 'sleep_time'))
     
@@ -99,7 +99,7 @@ class Forecast:
         dsc            = weather['description']
         self.descr     = dsc[0].upper() + dsc[1:]
         
-        self.weather   = Forecast.Weather(weather['id'],
+        self.weather   = Forecast.Weather('{}{}'.format(id2icon[weather['id']], weather['icon'][-1]),
                                           current['dt'],
                                           current['temp'],
                                           current['feels_like'],
@@ -138,7 +138,8 @@ class Forecast:
             except KeyError:
                 snow = 0.0
             
-            self.forecast.append(Forecast.Weather(701 if current['visibility'] < 500 and weather['id'] in range(800, 802) else weather['id'],
+            id = 701 if current['visibility'] < 500 and weather['id'] in range(800, 802) else weather['id']
+            self.forecast.append(Forecast.Weather('{}{}'.format(id2icon[id], weather['icon'][-1]),
                                                   current['dt'],
                                                   current['temp'],
                                                   current['feels_like'],
@@ -178,7 +179,9 @@ class Forecast:
             except KeyError:
                 snow = 0.0
             
-            self.forecast.append(Forecast.Weather(701 if current['visibility'] < 500 and weather['id'] in range(800, 802) else weather['id'],
+            id = 701 if current['visibility'] < 500 and weather['id'] in range(800, 802) else weather['id']
+            
+            self.forecast.append(Forecast.Weather('{}{}'.format(id2icon[id], weather['icon'][-1]),
                                                   current['dt'],
                                                   main[   'temp'],
                                                   main[   'feels_like'],

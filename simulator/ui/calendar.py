@@ -19,8 +19,10 @@ class UiCalendar(UiFrame):
         h_space = const(4)
         
         if cfg.variant == VARIANT_2DAYS:
+            hpi    = 1
             dblock = int(block * 24)
         else:
+            hpi    = 3
             dblock = int(block * 8)
         
         # Draw upper horizontal lines
@@ -44,11 +46,13 @@ class UiCalendar(UiFrame):
             hour    = dt[3] - dh
             
             # Draw separators
-            if 0 == hour:
-                if title:
-                    if (dt[6] == 5) or (dt[6] == 6):
-                        ui.canvas.trect(Vect(xx, 1), Vect(dblock, 4), BLACK)
+            if title and ((dt[6] == 5) or (dt[6] == 6)):
+                if 0 == i:
+                    ui.canvas.trect(Vect(int(xx - dt[3] // hpi * hpi * block / hpi), 1), Vect(dblock, 4), BLACK)
+                if 0 == hour:
+                    ui.canvas.trect(Vect(xx, 1), Vect(dblock, 4), BLACK)
                 
+            if 0 == hour:
                 if (dt[6] == 5) or (dt[6] == 0):
                     ui.canvas.vline(Vect(xx + 1, 0), self.dim.y - 10 + h_space, BLACK)
                 

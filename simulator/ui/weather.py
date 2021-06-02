@@ -9,7 +9,7 @@ class UiWeather(UiFrame):
         
     def draw(self, ui, d):
         weather = ui.forecast.weather
-        bitmap  = ui.bitmap(1, id2icon[weather.id])
+        bitmap  = ui.bitmap(1, weather.icon)
         ui.canvas.bitmap(Vect(5, 0), bitmap)
         
         if weather.rain > 0:
