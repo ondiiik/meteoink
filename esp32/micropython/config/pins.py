@@ -7,7 +7,10 @@ DHT     = const(15)
 HOTSPOT_BUTTON = const(39)
 
 # Alert toggle button pin
-ALLERT_BUTTON = const(34)
+REFRESH_BUTTON = const(34)
+
+# Alert toggle button pin
+ALLERT_BUTTON = const(-1)
 
 # Deep sleep button
 SLEEP_BUTTON = const(35)

@@ -81,6 +81,9 @@ def _perif():
     # is then UART.
     led = Led()
     
+    if jumpers.refresh:
+        play((1600, 50), (3200, 50), (1600, 50), (3200, 50))
+    
     # We shall checks if there is requested to toggle temperature alarm
     if jumpers.alert:
         alert.temp_balanced = not alert.temp_balanced
@@ -96,7 +99,7 @@ def _perif():
     
     # Disable LED when battery voltage is too low. Battery voltage
     # can be read only when EPD is on
-    wifi_mode = reset_cause() == DEEPSLEEP and not jumpers.hotspot
+    wifi_mode = (reset_cause() == DEEPSLEEP or jumpers.refresh) and not jumpers.hotspot
     
     if wifi_mode:
         volt = 4.2
@@ -141,7 +144,7 @@ def _perif():
     
     try:
         # Activates WiFi only when we came from deep sleep mode
-        if reset_cause() == DEEPSLEEP or mode.MODE == 1:
+        if reset_cause() == DEEPSLEEP or jumpers.refresh or jumpers.refresh or mode.MODE == 1:
             net = Connection()
             log('Connected to network')
     except net.NoWifiError:

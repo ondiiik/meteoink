@@ -1,4 +1,5 @@
 from ui import UiFrame, Vect, BLACK, WHITE
+import micropython
 
 
 class UiQr(UiFrame):

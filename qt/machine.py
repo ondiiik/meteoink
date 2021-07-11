@@ -101,11 +101,12 @@ def reset():
 
 
 def reset_cause():
-    with open('reset_cause.txt', 'r') as f:
-        v = f.read()
-        
-    return 0 if 'deepsleep' == v else 1
-    # return 1
+    try:
+        with open('reset_cause.txt', 'r') as f:
+            v = f.read()
+            return 0 if 'deepsleep' == v else 1
+    except:
+        return 1
 
 
 DEEPSLEEP = 0

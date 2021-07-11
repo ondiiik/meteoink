@@ -1,5 +1,6 @@
-from ui      import UiFrame, Vect, BLACK
-from battery import battery
+from   ui      import UiFrame, Vect, BLACK
+from   battery import battery
+import micropython
 
 
 class UiUrl(UiFrame):

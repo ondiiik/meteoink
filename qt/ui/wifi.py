@@ -1,4 +1,5 @@
-from ui import UiFrame, Vect
+from   ui import UiFrame, Vect
+import micropython
 
 
 class UiWifi(UiFrame):
