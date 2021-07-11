@@ -61,7 +61,9 @@ class Epd47(Ui):
         intemp_dr(self, Vect(640, 0), Vect(295, _DATA_SIZE))
         
         cal_dr(  self, Vect(0, _CHART_TAIL),     Vect(960, _CHART_HEIGHT), False)
+        
         tempg_dr(self, Vect(0, _CHART_RAIN),     Vect(960, _CHART_HEIGHT))
+        
         icons_dr(self, Vect(0, _CHART_ICON_POS), Vect(960, _CHART_ICON_SIZE))
         rain_dr( self, Vect(0, _CHART_RAIN),     Vect(960, _CHART_HEIGHT))
         tempt_dr(self, Vect(0, _CHART_RAIN),     Vect(960, _CHART_HEIGHT))

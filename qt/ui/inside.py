@@ -1,5 +1,6 @@
-from ui          import UiFrame, Vect
-from micropython import const
+from   ui          import UiFrame, Vect
+from   micropython import const
+import micropython 
 
 
 _INSIDE_OFS_A  = const(70)
@@ -12,6 +13,7 @@ class UiInside(UiFrame):
     def __init__(self, ofs, dim):
         super().__init__(ofs, dim)
         
+    @micropython.native
     def draw(self, ui, args):
         t = '--' if ui.forecast.home.rh is None else '{:.0f}'.format(ui.forecast.home.rh)
         ui.text_right(80, t,      Vect(_INSIDE_OFS_A, _INSIDE_OFS_80))

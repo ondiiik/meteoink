@@ -1,5 +1,6 @@
-from ui          import UiFrame, Vect
-from micropython import const
+from   ui          import UiFrame, Vect
+from   micropython import const
+import micropython 
 
 
 _OUTSIDE_OFS_A   = const(200)
@@ -14,6 +15,7 @@ class UiOutside(UiFrame):
     def __init__(self, ofs, dim):
         super().__init__(ofs, dim)
         
+    @micropython.native
     def draw(self, ui, d):
         # Type humidity
         weather = ui.forecast.weather

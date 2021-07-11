@@ -192,7 +192,7 @@ class Canvas:
         epd.on()
         epd.clear_area(*sector)
         epd.flush()
-        epd.flush()
+        # epd.flush()
         epd.power_off()
     
     

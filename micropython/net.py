@@ -4,12 +4,23 @@ from config   import connection, hotspot
 from utime    import sleep
 from var.mode import MODE
 from log      import log
+from uerrno   import ECONNABORTED, ENOBUFS
 
 
 class Wifi:
     def __init__(self, ssid, bssid):
         self.ssid  = ssid
         self.bssid = bssid
+
+
+class NoWifiError(RuntimeError):
+    def __init__(self):
+        super().__init__("No known WiFi found!")
+
+
+class JsonError(ValueError):
+    def __init__(self, e):
+        super().__init__(e)
 
 
 class Connection:
@@ -67,7 +78,7 @@ class Connection:
         
         # Checks if we have something and connect to WiFi
         if network is None:
-            raise RuntimeError("No known WiFi found!")
+            raise NoWifiError()
         
         self.config = network
         
@@ -105,7 +116,17 @@ class Connection:
     def http_get_json(self, url):
         log("HTTP GET: " + url)
         import urequests
-        return urequests.get(url).json()
+        
+        for i in range(10):
+            try:
+                return urequests.get(url).json()
+            except OSError as e:
+                if e.errno in (ECONNABORTED, ENOBUFS):
+                    sleep_ms(100)
+            except ValueError as e:
+                raise JsonError(e)
+        
+        raise RuntimeError('Connection failed')
     
     
     def disconnect(self):

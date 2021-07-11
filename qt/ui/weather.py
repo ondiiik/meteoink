@@ -1,5 +1,6 @@
-from ui       import UiFrame, Vect, BLACK, WHITE
-from forecast import id2icon
+from   ui       import UiFrame, Vect, BLACK, WHITE
+from   forecast import id2icon
+import micropython 
 
 
 class UiWeather(UiFrame):
@@ -7,6 +8,7 @@ class UiWeather(UiFrame):
         super().__init__(ofs, dim)
         
         
+    @micropython.native
     def draw(self, ui, d):
         weather = ui.forecast.weather
         bitmap  = ui.bitmap(1, id2icon[weather.id])

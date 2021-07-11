@@ -9,6 +9,7 @@ class UiQr(UiFrame):
         self.above = args[2]
         
         
+    @micropython.native
     def draw(self, ui, d):
         from uqr import QRCode
         qr = QRCode()

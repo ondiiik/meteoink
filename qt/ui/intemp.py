@@ -1,5 +1,6 @@
-from ui          import UiFrame, Vect, BLACK
-from micropython import const
+from   ui          import UiFrame, Vect, BLACK
+from   micropython import const
+import micropython 
 
 
 _INTEMP_OFS_0   = const(-150)
@@ -14,6 +15,7 @@ class UiInTemp(UiFrame):
         super().__init__(ofs, dim)
         
         
+    @micropython.native
     def draw(self, ui, d):
         t = ui.forecast.home.temp
         t = '{:.1f}'.format(t) if not None == t else '--'

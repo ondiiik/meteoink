@@ -4,6 +4,7 @@ from machine     import deepsleep
 
 
 
+VARIANT_DAILY                 = const(0)
 VARIANT_2DAYS                 = const(2)
 VARIANT_4DAYS                 = const(4)
 
@@ -88,7 +89,7 @@ class Ui:
         self.dbl      = dbl_refr_range
     
     def flush(self):
-        v = 'VARIANT_4DAYS' if self.variant == VARIANT_4DAYS else 'VARIANT_2DAYS'
+        v = 'VARIANT_4DAYS' if self.variant == VARIANT_4DAYS else 'VARIANT_2DAYS' if self.variant == VARIANT_2DAYS else 'VARIANT_DAILY'
         s = '''from config import Ui, {3}
 ui = Ui("{0}", "{1}", "{2}", {3}, {4}, {5})
 '''.format(self.apikey, self.units, self.language, v, self.refresh, self.dbl)

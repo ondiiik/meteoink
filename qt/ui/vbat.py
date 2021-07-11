@@ -1,5 +1,6 @@
-from ui     import UiFrame, Vect, BLACK, WHITE, GRAY
-from config import vbat
+from   ui     import UiFrame, Vect, BLACK, WHITE, GRAY
+from   config import vbat
+import micropython 
         
 
 
@@ -8,6 +9,7 @@ class UiVBat(UiFrame):
         super().__init__(ofs, dim)
         
         
+    @micropython.native
     def draw(self, ui, volt):
         w = self.dim.x
         h = self.dim.y

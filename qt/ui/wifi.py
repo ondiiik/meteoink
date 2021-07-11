@@ -7,6 +7,7 @@ class UiWifi(UiFrame):
         self.hotspot = hotspot
         
         
+    @micropython.native
     def draw(self, ui, d):
         ui.text(25, 'SSID:',             Vect(0,  5))
         ui.text(25, self.hotspot.ssid,   Vect(30, 5 + 30))

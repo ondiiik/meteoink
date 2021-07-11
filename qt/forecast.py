@@ -1,13 +1,11 @@
-import                  dht
-from machine     import Pin, deepsleep
-from micropython import const
-from collections import namedtuple
-from config      import pins, sys, display_get, location, DISPLAY_JUST_REPAINT, VARIANT_2DAYS, DISPLAY_REFRESH_DIV, ui
-from ltime       import Time
-from uerrno      import ETIMEDOUT
-from utime       import sleep_ms
-from buzzer      import play
-from log         import log
+import dht
+from   machine     import Pin, deepsleep
+from   collections import namedtuple
+from   config      import pins, sys, location, VARIANT_2DAYS, VARIANT_DAILY, ui
+from   ltime       import Time
+from   buzzer      import play
+from   log         import log
+import micropython
 
 
 # See https://openweathermap.org/weather-conditions
@@ -35,12 +33,22 @@ class Forecast:
         log("Reading forecast data")
         self._read1(net, ui)
         
-        if ui.variant == VARIANT_2DAYS:
+        if   ui.variant == VARIANT_DAILY:
+            self._read2_daily(net, ui)
+            self.daily = True
+        elif ui.variant == VARIANT_2DAYS:
             self._read2_short(net, ui)
+            self.daily = False
         else:
             self._read2_long(net, ui, 96)
+            self.daily = False
         
         self._get_dht(net, in_temp)
+    
+    
+    @property
+    def cnt(self):
+        return 4 if self.daily else len(self.forecast)
     
     
     def _read1(self, net, ui):
@@ -59,11 +67,11 @@ class Forecast:
             url   = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}'
             loc   = location[net.config.location]
             fcast = net.http_get_json(url.format(loc.lat,
-                                                        loc.lon,
-                                                        ui.apikey,
-                                                        ui.units,
-                                                        ui.language,
-                                                        'minutely,hourly,daily'))
+                                                 loc.lon,
+                                                 ui.apikey,
+                                                 ui.units,
+                                                 ui.language,
+                                                 'minutely,hourly,daily'))
             
             with open('owmp.py', 'w') as f:
                 f.write('location = "')
@@ -121,6 +129,58 @@ class Forecast:
                                           current['wind_speed'],
                                           current['wind_deg'])
         self.time      = Time(self.time_zone)
+    
+    
+    def _read2_daily(self, connection, ui):
+        if connection is None:
+            log('Reread dayly weather data ...')
+            import owmp
+            fcast = owmp.forecast
+        else:
+            # Download hourly weather forecast for today
+            log('Download dayly forecast data ...')
+            
+            url   = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}'
+            fcast = connection.http_get_json(url.format(location[connection.config.location].lat,
+                                                        location[connection.config.location].lon,
+                                                        ui.apikey,
+                                                        ui.units,
+                                                        'EN',
+                                                        'current,minutely,hourly'))
+            
+            with open('owmp.py', 'a') as f:
+                f.write('forecast = ')
+                f.write(str(fcast))
+                f.write('\n')
+                
+                return
+        
+        
+        # Build 2 days forecast
+        self.forecast = []
+        
+        for current in fcast['daily']:
+            weather = current['weather'][0]
+            
+            try:
+                rain = current['rain']
+            except KeyError:
+                rain = 0.0
+            
+            try:
+                snow = weather['snow']
+            except KeyError:
+                snow = 0.0
+            
+            self.forecast.append(Forecast.Weather(weather['id'],
+                                                  current['dt'],
+                                                  current['temp'],
+                                                  current['feels_like'],
+                                                  current['humidity'],
+                                                  rain,
+                                                  snow,
+                                                  current['wind_speed'],
+                                                  current['wind_deg']))
     
     
     def _read2_short(self, connection, ui):

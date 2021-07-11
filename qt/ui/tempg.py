@@ -1,6 +1,7 @@
-from ui          import UiFrame, Vect, BLACK, WHITE, GRAY
-from micropython import const
-from config      import temp
+from   ui          import UiFrame, Vect, BLACK, WHITE, GRAY
+from   micropython import const
+from   config      import temp
+import micropython 
 
 
 _CHART_SPACE    = const(-20)
@@ -14,9 +15,15 @@ class UiTempGr(UiFrame):
         self.temp_min =  273.0
     
     
+    @micropython.native
     def draw(self, ui, d):
         # Pre-calculates some range values
         forecast   = ui.forecast.forecast
+        
+        if ui.forecast.daily:
+            # No graph for daily variant
+            return
+        
         cnt        = len(forecast)
         self.block = ui.canvas.dim.x / cnt
         temp_max   = -273.0
@@ -35,6 +42,7 @@ class UiTempGr(UiFrame):
         self.chart_draw(ui, 1, BLACK)
     
     
+    @micropython.native
     def chart_draw(self, ui, w, c, th = None, tl = None):
         forecast = ui.forecast.forecast
         cnt      = len(forecast)
@@ -58,5 +66,6 @@ class UiTempGr(UiFrame):
                     ui.canvas.line(v1, v2, c, w * 2)
     
     
+    @micropython.native
     def chart_y(self, temp):
         return int(self.chart_max - (temp - self.temp_min) * self.k_temp)

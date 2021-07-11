@@ -8,6 +8,7 @@ class UiUrl(UiFrame):
         self.url = url
         
         
+    @micropython.native
     def draw(self, ui, d):
         ui.canvas.fill_rect(Vect(10, 0), Vect(ui.canvas.dim.x - 20, 3), BLACK)
         ui.text(25, 'Confugurator URL:', Vect(15, 50))

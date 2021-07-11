@@ -1,6 +1,7 @@
 from ui import Vect, UiFrame, BLACK, WHITE, GRAY
 
 
+@micropython.native
 def drawWind(ui, pos, weather, scale = 16, arrow = False):
     def rescale(v):
         return v * scale // 16
@@ -56,6 +57,7 @@ def drawWind(ui, pos, weather, scale = 16, arrow = False):
         drawWindSpeed(w,     BLACK)
 
 
+@micropython.native
 class UiWind(UiFrame):
     def __init__(self, ofs, dim):
         super().__init__(ofs, dim)

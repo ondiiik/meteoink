@@ -126,7 +126,7 @@ def _perif():
     if (volt < vbat.low_voltage):
         led.mode(Led.ALERT)
         
-        ui = MeteoUi(canvas, None, None)
+        ui = MeteoUi(canvas, None)
         ui.repaint_lowbat(volt)
         
         log('Low battery !!!')
@@ -144,6 +144,12 @@ def _perif():
         if reset_cause() == DEEPSLEEP or mode.MODE == 1:
             net = Connection()
             log('Connected to network')
+    except net.NoWifiError:
+        log('No WiFi ...')
+        _sleep(None, 20)
+    except net.JsonError:
+        log('Incomming data corrupted ...')
+        _sleep(None, 10)
     except Exception as e:
         dump_exception('Network connection error', e)
     

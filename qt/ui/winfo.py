@@ -1,6 +1,6 @@
-from ui          import UiFrame, Vect
-from micropython import const
-
+from   ui          import UiFrame, Vect
+from   micropython import const
+import micropython 
 
 _INSIDE_OFS_A  = const(70)
 _INSIDE_OFS_80 = const(-10)
@@ -8,6 +8,7 @@ _INSIDE_OFS_B  = const(_INSIDE_OFS_A  + 10)
 _INSIDE_OFS_50 = const(_INSIDE_OFS_80 + 20)
 
 
+@micropython.native
 class UiWInfo(UiFrame):
     def __init__(self, ofs, dim):
         super().__init__(ofs, dim)

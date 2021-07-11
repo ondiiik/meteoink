@@ -1,6 +1,7 @@
-from ui          import UiFrame, Vect
-from config      import temp
-from micropython import const
+from   ui          import UiFrame, Vect
+from   config      import temp
+from   micropython import const
+import micropython 
 
 
 _OUTTEMP_OFS_A   = const(200)
@@ -14,6 +15,7 @@ class UiOutTemp(UiFrame):
         super().__init__(ofs, dim)
         
         
+    @micropython.native
     def draw(self, ui, d):
         t = ui.forecast.weather.temp
         ui.text_right(120, '{:.1f}'.format(t), Vect(_OUTTEMP_OFS_A, _OUTTEMP_OFS_120))

@@ -1,7 +1,8 @@
-from ui          import UiFrame, Vect, BLACK, GRAY
-from micropython import const
-from config      import ui as cfg
-from config      import VARIANT_2DAYS
+from   ui          import UiFrame, Vect, BLACK, GRAY
+from   micropython import const
+from   config      import ui as cfg
+from   config      import VARIANT_2DAYS
+import micropython 
 
 
 _CALENDAR_H_SPACE    = const(4)
@@ -17,15 +18,20 @@ class UiCalendar(UiFrame):
         super().__init__(ofs, dim)
         
         
+    @micropython.native
     def draw(self, ui, title):
         if title:
             from lang import day_of_week
         
         forecast = ui.forecast.forecast
-        cnt      = len(forecast)
+        daily    = ui.forecast.daily
+        cnt      = ui.forecast.cnt
         block    = ui.canvas.dim.x / cnt
         
-        if cfg.variant == VARIANT_2DAYS:
+        if daily:
+            hpi    = 1
+            dblock = int(block)
+        elif cfg.variant == VARIANT_2DAYS:
             hpi    = 1
             dblock = int(block * 24)
         else:
@@ -48,6 +54,8 @@ class UiCalendar(UiFrame):
                 break
         
         # Draw all items related to forecast
+        ofs = block // 2 if daily else 0
+        
         for i in range(cnt):
             xx      = int(block * i)
             weather = forecast[i]
@@ -61,16 +69,16 @@ class UiCalendar(UiFrame):
                 if 0 == hour:
                     ui.canvas.fill_rect(Vect(xx, 2), Vect(dblock, _CALENDAR_TITLE_SIZE), GRAY)
             
-            if 0 == hour:
+            if not daily and 0 == hour:
                 c = BLACK if (dt[6] == 5) or (dt[6] == 0) else GRAY
                 ui.canvas.fill_rect(Vect(xx - 1, 2), Vect(3, self.dim.y + _CALENDAR_H_SEP_SIZE), c)
                 ui.canvas.vline(Vect(xx, 0), self.dim.y + _CALENDAR_H_SEP_SIZE, BLACK)
             
             if title:
                 # Draw hours text
-                if hour % 6 == 0:
+                if not daily and hour % 6 == 0:
                     ui.text_center(_CALENDAR_HOUR_FONT, str(hour), Vect(xx, self.dim.y // 2 + _CALENDAR_DAY_FONT))
                 
                 # Draw day of week text
-                if (hour + 12) % 24 == 0:
-                    ui.text_center(_CALENDAR_DAY_FONT, day_of_week[dt[6]], Vect(xx, _CALENDAR_H_SPACE))
+                if (hour + 12) % 24 == 0 or daily:
+                    ui.text_center(_CALENDAR_DAY_FONT, day_of_week[dt[6]], Vect(int(xx + ofs), _CALENDAR_H_SPACE))
