@@ -1,3 +1,4 @@
+from bitmap      import fonts, bmp
 from config      import sys, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_JUST_REPAINT, DISPLAY_DONT_REFRESH
 from display     import Vect, Bitmap, BLACK, WHITE, YELLOW
 from forecast    import TEMPERATURE, WEATHER, ALL
@@ -20,11 +21,10 @@ class UiFrame:
 class Ui:
     def __init__(self, canvas):
         self.canvas = canvas
-        self.fonts  = { 10 : {}, 16 : {}, 25 : {}, 50 : {} } 
     
     
     def bitmap(self, size, name):
-        return Bitmap('bitmap/{}/{}.bim'.format(size, name))
+        return Bitmap(bmp.bmp[name][size])
     
     
     def text_center(self, size, text, pos, color = BLACK, corona = None, border = 2):
@@ -52,12 +52,7 @@ class Ui:
             if ' ' == char:
                 pos.x += int(0.3 * size) + 1
             else:
-                try:
-                    f                      = self.fonts[size][char]
-                except KeyError:
-                    f                      = Bitmap('bitmap/f/{}/{}.bim'.format(size, ord(char)))
-                    self.fonts[size][char] = f
-                
+                f = Bitmap(fonts.fonts[size][ord(char)])
                 self.canvas.bitmap(pos, f, color)
                 pos.x += f.dim.x + 1
         
@@ -70,12 +65,7 @@ class Ui:
             if ' ' == char:
                 l     += int(0.3 * size) + 1
             else:
-                try:
-                    f                      = self.fonts[size][char]
-                except KeyError:
-                    f                      = Bitmap('bitmap/f/{}/{}.bim'.format(size, ord(char)))
-                    self.fonts[size][char] = f
-                
+                f  = Bitmap(fonts.fonts[size][ord(char)])
                 l += f.dim.x + 1
         
         return l

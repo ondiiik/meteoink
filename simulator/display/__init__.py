@@ -45,33 +45,28 @@ class Vect:
 
 class Bitmap:
     @micropython.native
-    def __init__(self, file_name, no_load = False):
-        f        = open(file_name, 'rb')
-        hdr      = unpack('<HH', f.read(4))
-        self.dim = Vect(*hdr)
+    def __init__(self, bmp, no_load = False):
+        self.dim = Vect(bmp[0], bmp[1])
         
         if no_load:
             return
         
         self.buf_width = ((self.dim.x + 7) // 8) * 8
         cnt            = (self.buf_width * self.dim.y) // 8
-        self.buf       = (bytearray(f.read(cnt)),
-                          bytearray(f.read(cnt)),
-                          bytearray(f.read(cnt)),
-                          bytearray(f.read(cnt)))
-        f.close()
-        self.fb        = (framebuf.FrameBuffer(self.buf[0], self.buf_width, self.dim.y, framebuf.MONO_HLSB),
-                          framebuf.FrameBuffer(self.buf[1], self.buf_width, self.dim.y, framebuf.MONO_HLSB),
-                          framebuf.FrameBuffer(self.buf[2], self.buf_width, self.dim.y, framebuf.MONO_HLSB),
-                          framebuf.FrameBuffer(self.buf[3], self.buf_width, self.dim.y, framebuf.MONO_HLSB))
+        self.buf       = bmp[2]
+        self.fb        = (framebuf.FrameBuffer(bytearray(self.buf[        :     cnt]), self.buf_width, self.dim.y, framebuf.MONO_HLSB),
+                          framebuf.FrameBuffer(bytearray(self.buf[cnt     : 2 * cnt]), self.buf_width, self.dim.y, framebuf.MONO_HLSB),
+                          framebuf.FrameBuffer(bytearray(self.buf[2 * cnt : 3 * cnt]), self.buf_width, self.dim.y, framebuf.MONO_HLSB),
+                          framebuf.FrameBuffer(bytearray(self.buf[3 * cnt :        ]), self.buf_width, self.dim.y, framebuf.MONO_HLSB))
     
     @micropython.native
     def inverted(self, idx = 0):
-        l   = len(self.buf[idx])
+        l   = len(self.buf) // 4
         buf = bytearray(b'\x00' * l)
+        src = self.buf[idx * l: (idx + 1) * l]
         
         for i in range(l):
-            buf[i] = (~self.buf[idx][i]) & 0xFF
+            buf[i] = (~src[i]) & 0xFF
         
         return framebuf.FrameBuffer(buf, self.buf_width, self.dim.y, framebuf.MONO_HLSB)
 
