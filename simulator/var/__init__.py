@@ -8,9 +8,15 @@ def _check_alert(args, assign):
 
 
 def _write_alert(args):
-    log('Rebuild variables', 'alert')
-    with open('var/{}.py'.format('alert'), 'w') as f:
-        f.write('ALREADY_TRIGGERED = {}'.format(args[0]))
+    try:
+        from var.alert import _cnt as cnt
+    except:
+        cnt = 0
+    
+    cnt += 1
+    log('Rebuild variables', f'alert ({cnt} times)')
+    with open(f'var/alert.py', 'w') as f:
+        f.write(f'ALREADY_TRIGGERED = {args[0]}\n_cnt = {cnt}\n')
 
 
 def _check_display(args, assign):
@@ -19,9 +25,15 @@ def _check_display(args, assign):
 
 
 def _write_display(args):
-    log('Rebuild variables', 'display')
-    with open('var/{}.py'.format('display'), 'w') as f:
-        f.write('DISPLAY_STATE = {}'.format(args[0]))
+    try:
+        from var.display import _cnt as cnt
+    except:
+        cnt = 0
+    
+    cnt += 1
+    log('Rebuild variables', f'display ({cnt} times)')
+    with open('var/display.py', 'w') as f:
+        f.write(f'DISPLAY_STATE = {args[0]}\n_cnt = {cnt}\n')
 
 
 _modules = { 'alert'   : (_check_alert,   _write_alert),

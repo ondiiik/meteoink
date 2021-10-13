@@ -30,13 +30,19 @@ class Location:
         except:
             location = []
         
+        try:
+            from config.connection import _cnt
+        except:
+            _cnt = 0
+        
+        _cnt += 1
         with open('config/location.py', 'w') as f:
             f.write('from config import Location\nlocation = [\n')
-        
+            
             for c in location:
-                f.write('Location("{}", {}, {}),\n'.format(c.name, c.lat, c.lon))
-            f.write(']')
-            f.close()
+                f.write(f'Location("{c.name}", {c.lat}, {c.lon}),\n')
+            
+            f.write(f']\n\n_cnt = {_cnt}')
 
 
 
@@ -54,13 +60,19 @@ class Connection:
         except:
             connection = []
         
+        try:
+            from config.connection import _cnt
+        except:
+            _cnt = 0
+        
+        _cnt += 1
         with open('config/connection.py', 'w') as f:
             f.write('from config import Connection\nconnection = [\n')
             
             for c in connection:
-                f.write('Connection({}, "{}", "{}", {}),\n'.format(c.location, c.ssid, c.passwd, c.bssid))
-            f.write(']')
-            f.close()
+                f.write(f'Connection({c.location}, "{c.ssid}", "{c.passwd}", {c.bssid}),\n')
+            
+            f.write(f']\n\n_cnt = {_cnt}')
 
 
 
@@ -70,11 +82,18 @@ class Spot:
         self.passwd = passwd
     
     def flush(self):
-        s = '''from config import Spot
-hotspot = Spot('{}', '{}')
-'''.format(self.ssid, self.passwd)
+        try:
+            from config.spot import _cnt
+        except:
+            _cnt = 0
+        
+        _cnt += 1
         with open('config/spot.py', 'w') as f:
-            f.write(s)
+            f.write(f'''from config import Spot
+hotspot = Spot('{self.ssid}', '{self.passwd}')
+
+_cnt = {_cnt}
+''')
 
 
 
@@ -88,12 +107,19 @@ class Ui:
         self.dbl      = dbl_refr_range
     
     def flush(self):
-        v = 'VARIANT_4DAYS' if self.variant == VARIANT_4DAYS else 'VARIANT_2DAYS'
-        s = '''from config import Ui, {3}
-ui = Ui("{0}", "{1}", "{2}", {3}, {4}, {5})
-'''.format(self.apikey, self.units, self.language, v, self.refresh, self.dbl)
+        try:
+            from config.ui import _cnt
+        except:
+            _cnt = 0
+        
+        _cnt += 1
         with open('config/ui.py', 'w') as f:
-            f.write(s)
+            v = 'VARIANT_4DAYS' if self.variant == VARIANT_4DAYS else 'VARIANT_2DAYS'
+            f.write(f'''from config import Ui, {v}
+ui = Ui("{self.apikey}", "{self.units}", "{self.language}", {v}, {self.refresh}, {self.dbl})
+
+_cnt = {_cnt}
+''')
 
 
 
@@ -103,11 +129,18 @@ class Alert:
         self.error_beep    = error_beep
     
     def flush(self):
-        s = '''from config import Alert
-alert = Alert({}, {})
-'''.format(self.temp_balanced, self.error_beep)
+        try:
+            from config.alert import _cnt
+        except:
+            _cnt = 0
+        
+        _cnt += 1
         with open('config/alert.py', 'w') as f:
-            f.write(s)
+            f.write(f'''from config import Alert
+alert = Alert({self.temp_balanced}, {self.error_beep})
+
+_cnt = {_cnt}
+''')
 
 
 
@@ -117,11 +150,18 @@ class VBat:
         self.show_voltage = show_voltage
     
     def flush(self):
-        s = '''from config import VBat
-vbat = VBat({}, {})
-'''.format(self.low_voltage, self.show_voltage)
+        try:
+            from config.vbat import _cnt
+        except:
+            _cnt = 0
+        
+        _cnt += 1
         with open('config/vbat.py', 'w') as f:
-            f.write(s)
+            f.write(f'''from config import VBat
+vbat = VBat({self.low_voltage}, {self.show_voltage})
+
+_cnt = {_cnt}
+''')
 
 
 
@@ -132,11 +172,18 @@ class Temp:
         self.outdoor_low  = outdoor_low
     
     def flush(self):
-        s = '''from config import Temp
-temp = Temp({}, {}, {})
-'''.format(self.indoor_high, self.outdoor_high, self.outdoor_low)
+        try:
+            from config.vbat import _cnt
+        except:
+            _cnt = 0
+        
+        _cnt += 1
         with open('config/temp.py', 'w') as f:
-            f.write(s)
+            f.write(f'''from config import Temp
+temp = Temp({self.indoor_high}, {self.outdoor_high}, {self.outdoor_low})
+
+_cnt = {_cnt}
+''')
 
 
 
