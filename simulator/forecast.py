@@ -1,5 +1,5 @@
 import                  dht
-from machine     import Pin, deepsleep
+from machine     import Pin, deepsleep, RTC
 from micropython import const
 from collections import namedtuple
 from config      import pins, sys, location, DISPLAY_JUST_REPAINT, VARIANT_2DAYS, DISPLAY_REFRESH_DIV, ui
@@ -51,6 +51,11 @@ class Forecast:
         self._get_dht(in_temp)
     
     
+    @staticmethod
+    def _mk_id(id, rain):
+        return id if id != 500 or rain < 2 else 520
+    
+    
     def _read1(self, connection, ui):
         # Download hourly weather forecast for today
         url   = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}'
@@ -99,7 +104,11 @@ class Forecast:
         dsc            = weather['description']
         self.descr     = dsc[0].upper() + dsc[1:]
         
-        self.weather   = Forecast.Weather('{}{}'.format(id2icon[weather['id']], weather['icon'][-1]),
+        # Fix rain icon according to amount of rain
+        def _mk_id(id, rain):
+            return id if id != 500 or rain < 0.5 else 520
+        
+        self.weather   = Forecast.Weather('{}{}'.format(id2icon[self._mk_id(weather['id'], rain)], weather['icon'][-1]),
                                           current['dt'],
                                           current['temp'],
                                           current['feels_like'],
@@ -109,6 +118,11 @@ class Forecast:
                                           current['wind_speed'],
                                           current['wind_deg'])
         self.time      = Time(self.time_zone)
+        
+        # Set RTC clock according to forecast time
+        rtc = RTC()
+        dt  = self.time.get_date_time(self.weather.dt)
+        rtc.init((dt[0], dt[1], dt[2], 0, dt[3], dt[4], dt[5], 0))
     
     
     def _read2_short(self, connection, ui):
@@ -139,7 +153,7 @@ class Forecast:
                 snow = 0.0
             
             id = 701 if current['visibility'] < 500 and weather['id'] in range(800, 802) else weather['id']
-            self.forecast.append(Forecast.Weather('{}{}'.format(id2icon[id], weather['icon'][-1]),
+            self.forecast.append(Forecast.Weather('{}{}'.format(id2icon[self._mk_id(id, rain)], weather['icon'][-1]),
                                                   current['dt'],
                                                   current['temp'],
                                                   current['feels_like'],
@@ -181,7 +195,7 @@ class Forecast:
             
             id = 701 if current['visibility'] < 500 and weather['id'] in range(800, 802) else weather['id']
             
-            self.forecast.append(Forecast.Weather('{}{}'.format(id2icon[id], weather['icon'][-1]),
+            self.forecast.append(Forecast.Weather('{}{}'.format(id2icon[self._mk_id(id, rain)], weather['icon'][-1]),
                                                   current['dt'],
                                                   main[   'temp'],
                                                   main[   'feels_like'],

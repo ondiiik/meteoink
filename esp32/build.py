@@ -74,10 +74,25 @@ def packfw(l):
     f.close()
 
 
-f = open(os.path.join(cwd, 'main.py'), 'w')
-f.write('from app import run\n')
-f.write('run({})\n'.format(sha))
-f.close()
+with open(os.path.join(cwd, 'main.py'), 'w') as f:
+    f.write(f'''from log import dump_exception
+
+try:
+    print('Initializing watchdog ...')
+    from machine import WDT
+    wdt = WDT(timeout=120000)
+    
+    print('Starting the application ...')
+    from app import run
+    run({sha})
+    
+except KeyboardInterrupt as e:
+    dump_exception('Interrupted by keyboard ...', e)
+except BaseException as e:
+    dump_exception('!!! APPLICATION ERROR - REBOOTING !!!', e)
+    import machine
+    machine.reset()
+''')
 
 command('rm -Rf {}'.format(dwd))
 command('mkdir  {}'.format(dwd))

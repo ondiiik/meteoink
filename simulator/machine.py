@@ -1,5 +1,6 @@
 import sys
 import time
+import datetime
 import pygame
 
 
@@ -73,6 +74,17 @@ class PWM:
     def deinit(self):
         pass
 
+
+class RTC():
+    def __init__(self):
+        pass
+    
+    def datetime(self):
+        dt = datetime.datetime.now().timetuple()
+        return dt.tm_year, dt.tm_mon, dt.tm_mday, dt.tm_wday, dt.tm_hour, dt.tm_min, dt.tm_sec, dt.tm_yday 
+    
+    def init(self, v):
+        pass
 
 def freq(max_freq):
     pass

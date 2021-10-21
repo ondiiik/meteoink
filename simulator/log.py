@@ -2,6 +2,7 @@ from usys       import print_exception
 from config.sys import EXCEPTION_DUMP, VERBOSE_LOG
 from buzzer     import play
 from config     import alert
+from machine    import RTC
 
 
 try:
@@ -20,7 +21,8 @@ def dump_exception(msg, e):
         pos = _log.tell()
         
         if pos < EXCEPTION_DUMP :
-            _log.write('\n')
+            dt  = RTC().datetime()
+            _log.write(f'\n{dt[2]}.{dt[1]}.{dt[0]} {dt[4]}:{dt[5]:02} :: ')
             _log.write(msg)
             _log.write('\n')
             print_exception(e, _log)
@@ -37,13 +39,10 @@ if VERBOSE_LOG:
         pos = _log.tell()
         
         if pos < EXCEPTION_DUMP:
-            ps = False
+            dt  = RTC().datetime()
+            _log.write(f'{dt[2]}.{dt[1]}.{dt[0]} {dt[4]}:{dt[5]:02} ::')
+            
             for s in args:
-                if ps:
-                    _log.write(' ')
-                else:
-                    ps = True
-                
                 _log.write(str(s))
             
             _log.write('\n')
