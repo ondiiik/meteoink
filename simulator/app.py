@@ -17,7 +17,7 @@ from web      import WebServer
 
 
 
-def run(sha):
+def run(sha, wdt):
     try:
         # Beep when we are rebooted (only when this is not wake up
         # from deep sleep)
@@ -42,7 +42,7 @@ def run(sha):
         # or configuration. In this case we can not rely on existing WiFi connection
         # and we rather go to hot-spot mode.
         elif jumpers.hotspot:
-            _hotspot(canvas, net, led, volt)
+            _hotspot(canvas, net, led, volt, wdt)
         
         # And finally - meteostation display - basic functionality ;-)
         else:
@@ -158,7 +158,7 @@ def _greetings(canvas, net, led):
 
 
 
-def _hotspot(canvas, net, led, volt):
+def _hotspot(canvas, net, led, volt, wdt):
     play((2093, 30), 120,(2093, 30))
     led.mode(Led.DOWNLOAD)
     
@@ -166,7 +166,7 @@ def _hotspot(canvas, net, led, volt):
     ui.repaint_config(led, volt)
     led.mode(Led.DOWNLOAD)
     
-    server = WebServer(net)
+    server = WebServer(net, wdt)
     
     play((1047, 30), 120, (1319, 30), 120, (1568, 30), 120, (2093, 30))
     server.run()

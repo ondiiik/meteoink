@@ -84,7 +84,7 @@ try:
     
     print('Starting the application ...')
     from app import run
-    run({sha})
+    run({sha}, wdt)
     
 except KeyboardInterrupt as e:
     dump_exception('Interrupted by keyboard ...', e)

@@ -17,28 +17,38 @@ CONN_RETRY_CNT = const(6)
 
 
 class Server():
-    def __init__(self, net):
+    def __init__(self, net, wdt):
+        self.wdt    = wdt
         self.net    = net
         self.client = None
         self.args   = {}
-        self.page  = ''
+        self.page   = ''
+        self.wdt.feed()
     
     
     def run(self):
         # Open TCP socket for listening
+        self.wdt.feed()
         addr = socket.getaddrinfo('0.0.0.0', 5555)[0][-1]
         sck  = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.wdt.feed()
         sck.bind(addr)
+        self.wdt.feed()
         sck.setblocking(False)
+        self.wdt.feed()
         sck.listen(1)
+        self.wdt.feed()
         
         log('Web server listening on', addr)
         
         # Wait for incoming connection
         while True:
+            self.wdt.feed()
+            
             while True:
                 try:
                     self.client, addr = sck.accept()
+                    self.wdt.feed()
                     break
                 except OSError as e:
                     if e.errno == EAGAIN:
@@ -55,12 +65,16 @@ class Server():
             
             try:
                 # Parse HTTP request
+                self.wdt.feed()
                 request   = self.client.makefile('rwb', 0)
                 self.args = {}
                 
                 while True:
+                    self.wdt.feed()
+                    
                     try:
                         line = request.readline()
+                        self.wdt.feed()
                     except OSError as e:
                         if e.errno == ETIMEDOUT:
                             log('Timeout - interrupt')
@@ -74,6 +88,7 @@ class Server():
                     
                     line = line.decode()
                     log('LINE', line.rstrip())
+                    self.wdt.feed()
                     
                     # Check for GET file and args
                     if line.startswith('GET '):
@@ -136,8 +151,11 @@ class Server():
         
         for retry in range(CONN_RETRY_CNT):
             try:
+                self.wdt.feed()
                 self.client.send(txt)
+                self.wdt.feed()
                 collect()
+                self.wdt.feed()
                 return
             except OSError as e:
                 log('ECONNRESET -> retry')
@@ -282,7 +300,9 @@ class Server():
         
         
     def _ack(self):
+        self.wdt.feed()
         self.client.send(b'HTTP/1.0 200 OK\nContent-type: text/html\n\n')
+        self.wdt.feed()
         
         
     def _head(self):
@@ -297,11 +317,14 @@ class Server():
         
         
     def _tail(self):
+        self.wdt.feed()
         self.client.send(b'</body></html>')
+        self.wdt.feed()
     
     
     @staticmethod
     def _restart(msg):
+        self.wdt.feed()
         log(msg)
         play((2093, 30), 120, (1568, 30), 120, (1319, 30), 120, (1047, 30))
         write('mode', (1,), force = True)
@@ -319,15 +342,21 @@ class WebWriter:
             txt = txt.encode()
         
         s = self.s
+        self.wdt.feed()
         s.write(txt)
+        self.wdt.feed()
         
         if s.tell() > 1200:
+            self.wdt.feed()
             self.web.write(s.getvalue())
+            self.wdt.feed()
             self.s = BytesIO()
     
     def flush(self):
         if self.s.tell() > 0:
+            self.wdt.feed()
             self.web.write(self.s.getvalue())
+            self.wdt.feed()
             self.s = BytesIO()
 
 
@@ -364,11 +393,17 @@ class WebServer(Server):
         for p in page(self):
             if isinstance(p, WebServer.IndexDrawer):
                 for q in __import__('web.index', None, None, ('page',), 0).page(self):
+                    self.wdt.feed()
                     self.writer.write(q)
+                    self.wdt.feed()
             else:
+                self.wdt.feed()
                 self.writer.write(p)
+                self.wdt.feed()
         
+        self.wdt.feed()
         self.writer.flush()
+        self.wdt.feed()
 
 
 

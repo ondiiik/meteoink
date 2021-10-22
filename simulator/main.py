@@ -7,7 +7,7 @@ try:
     
     print('Starting the application ...')
     from app import run
-    run(b'8ef390335a9b1fd58ee106c988f2617f6606ebe6')
+    run(b'e933f67ec8729734657896441997d3b3c2a31321', wdt)
     
 except KeyboardInterrupt as e:
     dump_exception('Interrupted by keyboard ...', e)
