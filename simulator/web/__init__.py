@@ -341,22 +341,24 @@ class WebWriter:
         if isinstance(txt, str):
             txt = txt.encode()
         
-        s = self.s
-        self.wdt.feed()
+        s   = self.s
+        wdt = self.web.wdt
+        wdt.feed()
         s.write(txt)
-        self.wdt.feed()
+        wdt.feed()
         
         if s.tell() > 1200:
-            self.wdt.feed()
+            wdt.feed()
             self.web.write(s.getvalue())
-            self.wdt.feed()
+            wdt.feed()
             self.s = BytesIO()
     
     def flush(self):
         if self.s.tell() > 0:
-            self.wdt.feed()
+            wdt = self.web.wdt
+            wdt.feed()
             self.web.write(self.s.getvalue())
-            self.wdt.feed()
+            wdt.feed()
             self.s = BytesIO()
 
 
@@ -365,8 +367,8 @@ class WebServer(Server):
     class IndexDrawer:
         pass
     
-    def __init__(self, net):
-        super().__init__(net)
+    def __init__(self, net, wdt):
+        super().__init__(net, wdt)
         self.writer = WebWriter(self)
         self.last   = ''
         self.index  = WebServer.IndexDrawer()

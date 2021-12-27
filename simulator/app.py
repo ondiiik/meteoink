@@ -17,16 +17,15 @@ from web      import WebServer
 
 
 
-def run(sha, wdt):
+def run(sha):
     try:
+        # Init all peripheries
+        temp, led, volt, canvas, net, wdt = _perif()
+        
         # Beep when we are rebooted (only when this is not wake up
         # from deep sleep)
         if not DEEPSLEEP == reset_cause():
             play((2093, 30))
-        
-        
-        # Read all initializes all peripheries
-        temp, led, volt, canvas, net = _perif()
         
         
         # It can happen that we want only to move meteostation somewhere
@@ -34,6 +33,7 @@ def run(sha, wdt):
         # we can put it to greetings mode, where only picture is displayed
         # and station kept sleeping till reset button is pressed
         if DISPLAY_GREETINGS == display.DISPLAY_STATE or jumpers.sleep:
+            # Read all initializes all peripheries
             play((800, 30), 500, (400, 30))
             _greetings(canvas, net, led)
         
@@ -73,6 +73,11 @@ def run(sha, wdt):
 
 
 def _perif():
+    # First of all we have to initialize watchdog if requested
+    log('Initializing watchdog ...')
+    from machine import WDT
+    wdt = WDT(timeout=120000)
+    
     # Reads internal temperature just after wake-up to reduce
     # influence of chip warm-up and use some kind of ambient
     # reduction to get more close to indoor temperature. This
@@ -144,7 +149,7 @@ def _perif():
         dump_exception('Network connection error', e)
     
     
-    return temp, led, volt, canvas, net
+    return temp, led, volt, canvas, net, wdt
 
 
 

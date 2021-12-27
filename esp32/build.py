@@ -78,13 +78,9 @@ with open(os.path.join(cwd, 'main.py'), 'w') as f:
     f.write(f'''from log import dump_exception
 
 try:
-    print('Initializing watchdog ...')
-    from machine import WDT
-    wdt = WDT(timeout=120000)
-    
     print('Starting the application ...')
     from app import run
-    run({sha}, wdt)
+    run({sha})
     
 except KeyboardInterrupt as e:
     dump_exception('Interrupted by keyboard ...', e)

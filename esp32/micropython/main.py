@@ -1,13 +1,9 @@
 from log import dump_exception
 
 try:
-    print('Initializing watchdog ...')
-    from machine import WDT
-    wdt = WDT(timeout=120000)
-    
     print('Starting the application ...')
     from app import run
-    run(b'e933f67ec8729734657896441997d3b3c2a31321', wdt)
+    run(b'fdd04ce7a42b3005e4d722574315b654399707a7')
     
 except KeyboardInterrupt as e:
     dump_exception('Interrupted by keyboard ...', e)
