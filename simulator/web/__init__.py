@@ -19,9 +19,10 @@ CONN_RETRY_CNT = const(6)
 
 class WebServer:
     net = None
+    wdt = None
 
     def __init__(self, net, wdt):
-        self.wdt = wdt
+        type(self).wdt = wdt
         type(self).net = net
         self.client = None
         self.args = {}
@@ -29,17 +30,14 @@ class WebServer:
         self.wdt.feed()
 
     def run(self):
-        # Starting web server
         self.wdt.feed()
         print('[WEB] ', 'Starting WEB server')
         www_dir = '/web/www'
-        server = MicroWebSrv(webPath=f'{www_dir}/',
-                             port=5555)
+        server = MicroWebSrv(webPath=f'{www_dir}/', port=5555)
         server.MaxWebSocketRecvLen = 256
         server.WebSocketThreaded = False
         self.wdt.feed()
         server.Start()
-        # Server is running here - we shall never reach this place
 
 
 def button(caption, url, args_list={}):
@@ -184,9 +182,11 @@ def webpage_handler(name, method='POST'):
     def builder(fn):
         @decorate
         def wrapper(client, response):
+            WebServer.wdt.feed()
             args = client.ReadRequestPostedFormData() if method == 'POST' else client.GetRequestQueryParams()
             with Page(response) as page:
                 fn(page, args)
+            WebServer.wdt.feed()
 
         return wrapper
 
@@ -222,37 +222,37 @@ def send_page(client, response, page):
                              content=content)
 
 
-from .index import www, index
-from .add import www
-from .apikey import www
-from .apiset import www
-from .dlt import www
-from .ed import www
-from .lang import www
-from .ldlt import www
-from .led import www
-from .lnew import www
-from .lnguse import www
-from .low import www
-from .lowset import www
-from .lrm import www
-from .lset import www
-from .new import www
-from .nloc import www
-from .passet import www
-from .passwd import www
-from .refr import www
-from .refrset import www
-from .res import www
-from .rm import www
-from .set import www, set
-from .ssid import www
-from .ssidset import www
-from .swbd import www
-from .swbe import www
-from .tbad import www
-from .tbae import www
-from .temp import www
-from .tset import www
-from .use import www
-from .zzz import www
+from .page.index import www, index
+from .page.alertbugd import www
+from .page.alertbuge import www
+from .page.alerttempd import www
+from .page.alerttempe import www
+from .page.apiedt import www
+from .page.apiset import www
+from .page.battedt import www
+from .page.battset import www
+from .page.langedt import www
+from .page.languse import www
+from .page.locdlt import www
+from .page.locedt import www
+from .page.locmake import www
+from .page.locnew import www
+from .page.locrm import www
+from .page.locset import www
+from .page.passedt import www
+from .page.passset import www
+from .page.refredt import www
+from .page.refrset import www
+from .page.reset import www
+from .page.ssidedt import www
+from .page.ssidset import www
+from .page.tempedt import www
+from .page.tempset import www
+from .page.wifidlt import www
+from .page.wifiedt import www
+from .page.wifimake import www
+from .page.wifinew import www
+from .page.wifirm import www
+from .page.wifiset import www, wifiset
+from .page.wifiuse import www
+from .page.zzz import www

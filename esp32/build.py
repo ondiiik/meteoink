@@ -109,6 +109,7 @@ convert(find('ui'))
 convert(find('var'))
 convert(find('web'))
 convert(find('web/microweb'))
+convert(find('web/page'))
 
 command('rm {}'.format(Path(dwd, 'boot.mpy')))
 command('rm {}'.format(Path(dwd, 'main.mpy')))
