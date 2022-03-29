@@ -1,12 +1,10 @@
 from config import vbat
-from log    import dump_exception
+import web
 
 
-def page(web):
-    try:
-        vbat.low_voltage = max(2.8, min(4.0, float(web.args['v'])))
-        vbat.flush()
-    except Exception as e:
-        dump_exception('WEB error:', e)
-    
-    yield web.index
+@web.webpage_handler(__name__)
+def www(page, args):
+    vbat.low_voltage = max(2.8, min(4.0, float(args['v'])))
+    vbat.flush()
+
+    web.index(page)

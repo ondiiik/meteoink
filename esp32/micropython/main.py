@@ -3,7 +3,7 @@ from log import dump_exception
 try:
     print('Starting the application ...')
     from app import run
-    run(b'fdd04ce7a42b3005e4d722574315b654399707a7')
+    run(b'5f368ee606febaeeb63e53c7a4375429f0c6268d')
     
 except KeyboardInterrupt as e:
     dump_exception('Interrupted by keyboard ...', e)

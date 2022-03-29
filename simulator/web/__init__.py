@@ -1,412 +1,200 @@
-from buzzer      import play
-from gc          import collect
-from lang        import trn
-from log         import dump_exception
-from log         import log
-from machine     import deepsleep
+from buzzer import play
+from gc import collect
+from lang import trn
+from log import dump_exception
+from log import log
+from machine import deepsleep
 from micropython import const
-from uerrno      import ECONNRESET, ENOTCONN, EAGAIN, ETIMEDOUT
-from uio         import BytesIO
-from utime       import sleep_ms
-from var         import write
-import                  socket
+from uerrno import ECONNRESET, ENOTCONN, EAGAIN, ETIMEDOUT
+from uio import BytesIO
+from .microweb.microWebSrv import MicroWebSrv
+from utime import sleep_ms
+from var import write
+import socket
 
 
-SPACES         = const(4)
+SPACES = const(4)
 CONN_RETRY_CNT = const(6)
 
 
-class Server():
+class WebServer:
+    net = None
+
     def __init__(self, net, wdt):
-        self.wdt    = wdt
-        self.net    = net
+        self.wdt = wdt
+        type(self).net = net
         self.client = None
-        self.args   = {}
-        self.page   = ''
+        self.args = {}
+        self.page = ''
         self.wdt.feed()
-    
-    
+
     def run(self):
-        # Open TCP socket for listening
+        # Starting web server
         self.wdt.feed()
-        addr = socket.getaddrinfo('0.0.0.0', 5555)[0][-1]
-        sck  = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        print('[WEB] ', 'Starting WEB server')
+        www_dir = '/web/www'
+        server = MicroWebSrv(webPath=f'{www_dir}/',
+                             port=5555)
+        server.MaxWebSocketRecvLen = 256
+        server.WebSocketThreaded = False
         self.wdt.feed()
-        sck.bind(addr)
-        self.wdt.feed()
-        sck.setblocking(False)
-        self.wdt.feed()
-        sck.listen(1)
-        self.wdt.feed()
-        
-        log('Web server listening on', addr)
-        
-        # Wait for incoming connection
-        while True:
-            self.wdt.feed()
-            
-            while True:
-                try:
-                    self.client, addr = sck.accept()
-                    self.wdt.feed()
-                    break
-                except OSError as e:
-                    if e.errno == EAGAIN:
-                        sleep_ms(100)
-                    elif e.errno == 23: # Out of memory - restart server
-                        self._restart('Low memory - restart !!!')
-                    else:
-                        dump_exception('Socket accept failed ?!', e)
-                    pass
-            
-            self.client.settimeout(8.0)
-            log('Accepted client from', addr)
-            
-            
-            try:
-                # Parse HTTP request
-                self.wdt.feed()
-                request   = self.client.makefile('rwb', 0)
-                self.args = {}
-                
-                while True:
-                    self.wdt.feed()
-                    
-                    try:
-                        line = request.readline()
-                        self.wdt.feed()
-                    except OSError as e:
-                        if e.errno == ETIMEDOUT:
-                            log('Timeout - interrupt')
-                            break
-                        
-                        raise e
-                    
-                    
-                    if not line or line == b'\r\n':
-                        break
-                    
-                    line = line.decode()
-                    log('LINE', line.rstrip())
-                    self.wdt.feed()
-                    
-                    # Check for GET file and args
-                    if line.startswith('GET '):
-                        line = line.split()
-                        
-                        # Parse GET request like '/page?arg1=n1&arg2=n2&...'
-                        if len(line) < 3:
-                            continue
-                        
-                        log('REQ', line[1])
-                        if not line[1].startswith('/'):
-                            continue
-                        
-                        line = line[1][1:].split('?', 1)
-                        log('SPLIT', line)
-                        
-                        self.page = line[0]
-                        log('PAGE', self.page)
-                        
-                        if len(line) < 2:
-                            continue
-                        
-                        line = line[1].split('&')
-                        
-                        if len(line[0]) < 1:
-                            continue
-                        if line[0] == '':
-                            continue
-                        
-                        for key in line:
-                            log(key)
-                            key = key.split('=', 1)
-                            
-                            p = key[1].replace('+', ' ').split('%')
-                            t = bytearray(p[0].encode())
-                            
-                            for k in p[1:]:
-                                t.append(int(k[0:2], 16))
-                                t.extend(k[2:].encode())
-                            
-                            self.args[key[0]] = t.decode()
-                            
-                        log('ARGS', self.args)
-            except Exception as e:
-                dump_exception('WEB page failed ?!', e)
-                self.page = 'index'
-            
-            try:
-                self._ack()
-                self._send_page()
-                self.client = None
-            except OSError as e:
-                if e.errno == ENOTCONN:
-                    log('Connection dropped')
-    
-    
-    def write(self, txt):
-        if isinstance(txt, str):
-            txt = txt.encode()
-        
-        for retry in range(CONN_RETRY_CNT):
-            try:
-                self.wdt.feed()
-                self.client.send(txt)
-                self.wdt.feed()
-                collect()
-                self.wdt.feed()
-                return
-            except OSError as e:
-                log('ECONNRESET -> retry')
-                if e.errno == ECONNRESET:
-                    continue
-                
-                raise e
-        
-        raise RuntimeError('Connection broken')
-    
-    
-    @staticmethod
-    def heading(level, txt):
-        return '<h{0}>{1}</h{0}>'.format(level, txt)
-    
-    
-    @staticmethod
-    def br(cnt = 1):
-        return '<br>' * cnt
-    
-    
-    @staticmethod
-    def select_head(label, name):
-        return '<label for="{1}">{0}</label><select name="{1}" id="{1}">'.format(label, name)
-    
-    
-    @staticmethod
-    def select_option(value, name, selected = False):
-        return '<option value="{}"{}>{}</option>'.format(value, ' selected' if selected else '', name)
-    
-    
-    @staticmethod
-    def select_tail():
-        return '</select>'
-    
-    
-    @staticmethod
-    def table_head(cells, table_attr = '', heading_attr = ''):
-        ret = '<table {}><thead>'.format(table_attr)
-        
-        if not cells is None:
-            ret += '<tr>'
-            
-            for cell in cells:
-                ret += '<th {}>{}</th>'.format(heading_attr, cell)
-            
-            ret += '</tr>'
-        
-        ret += '</thead><tbody>'
-        
-        return ret
-    
-    
-    @staticmethod
-    def table_tail():
-        return '</tbody></table>'
-    
-    
-    @staticmethod
-    def table_row(cells, space = 0):
-        ret   = '<tr>'
+        server.Start()
+        # Server is running here - we shall never reach this place
+
+
+def button(caption, url, args_list={}):
+    ret = f'<form method="post" action="{url}" class="inline">'
+
+    for name, value in args_list.items():
+        ret += f'<input type="hidden" name="{name}" value="{value}">'
+
+    ret += f'<button class="button">{caption}</button></form>'
+    return ret
+
+
+class _Select:
+    def __init__(self, page, label, name):
+        self.page = page
+        self.label = label
+        self.name = name
+
+    def __enter__(self):
+        self.page += '<label for="{1}">{0}</label><select name="{1}" id="{1}">'.format(self.label, self.name)
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.page += '</select>'
+
+    def option(self, value, name, selected=False):
+        self.page += f'<option value="{value}"{" selected" if selected else ""}>{name}</option>'
+
+
+class _Table:
+    def __init__(self, page, cells, table_attr='', heading_attr=''):
+        self.page = page
+        self.cells = cells
+        self.table_attr = table_attr
+        self.heading_attr = heading_attr
+
+    def __enter__(self):
+        self.page += f'<table {self.table_attr}><thead>'
+
+        if not self.cells is None:
+            self.page += '<tr>'
+
+            for cell in self.cells:
+                self.page += f'<th {self.heading_attr}>{cell}</th>'
+
+            self.page += '</tr>'
+
+        self.page += '</thead><tbody>'
+        return self
+
+    def __exit__(self, type, value, traceback):
+        self.page += '</tbody></table>'
+
+    def row(self, cells, space=0):
+        self.page += '<tr>'
         space = '&nbsp;' * space
-        
+
         for cell in cells:
-            ret += '<td>{}{}</td>'.format(cell, space)
-        
-        ret += '</tr>'
-        
-        return ret
-        
-        
-        
-    @staticmethod
-    def mk_args(args_list):
-        if args_list is None:
-            ret = ''
-        else:
-            ret = None
-            for arg in args_list:
-                if ret is None:
-                    ret = '?'
-                else:
-                    ret += '&'
-                
-                if arg[1] is None:
-                    ret += '{}'.format(arg[0])
-                else:
-                    ret += '{}={}'.format(arg[0], arg[1])
-        
-        return ret
-    
-    
-    @staticmethod
-    def button(caption, url, args_list = None):
-        return '<button class="button" onclick="location.href=\'{}{}\'">{}</button>'.format(url, Server.mk_args(args_list), caption)
-    
-    
-    @staticmethod
-    def button_enable(flag, url):
-        return Server.button(trn['Disable' if flag else 'Enable'],
-                             url + ('d' if flag else 'e'))
-    
-    
-    @staticmethod
-    def form_head(page):
-        return '<form action="/{}">{}'.format(page, Server.table_head(('', '')))
-    
-    
-    @staticmethod
-    def form_tail(label_submit = trn['Submit'], label_cancel = trn['Cancel']):
-        return '{}<br><br><input type="submit" class="button" value="{}"><button class="button"><a href="/">{}</a></button></form>'.format(Server.table_tail(), label_submit, label_cancel)
-    
-    
-    @staticmethod
-    def form_spacer():
-        return Server.table_row(('', ''), 1)
-    
-    
-    @staticmethod
-    def form_variable(var, val):
-        return Server.table_row(('<input type="hidden" id="{0}" name="{0}" value="{1}" />'.format(var, val),), 0)
-    
-    
-    @staticmethod
-    def form_input(txt, var, dfl = '', tp = 'text', space = 4):
-        return Server.table_row(('<label>{}</label>'.format(txt),
-                                 '<input type="{3}" id="{0}" name="{0}" value="{2}">'.format(var, txt, dfl, tp)),
-                                 space)
-    
-    
-    @staticmethod
-    def form_label(txt, var, dfl = '', tp = 'text', space = 4):
-        return Server.table_row(('<label>{}</label>'.format(txt),
-                                 '<input type="{3}" value="{2}" disabled="1"><input type="hidden" name="{0}" value="{2}" />'.format(var, txt, dfl, tp)),
-                                 space)
-    
-    
-    def _send_page(self):
-        self._head()
-        self.process()
-        self._tail()
-        
-        
-    def _ack(self):
-        self.wdt.feed()
-        self.client.send(b'HTTP/1.0 200 OK\nContent-type: text/html\n\n')
-        self.wdt.feed()
-        
-        
-    def _head(self):
-        self.write('<!DOCTYPE html><html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8; width=device-width; initial-scale=1"><title>{0}</title></head><body><h1>{0}</h1>'.format(trn['Meteostation']))
-        self.write('<style>html{font-family: Helvetica; display:inline-block; margin: 0px auto; font-size: 16px;}')
-        self.write('h1{color: #0F3376;}')
-        self.write('p{font-size: 1.5rem;}')
-        self.write('.button{display: inline-block; background-color: #0074d9; border: none; border-radius: 4px; color: white; padding: 6px 20px; text-decoration: none; font-size: 14px; margin: 2px; cursor: pointer;}')
-        self.write('.butt_on{background-color: #42f486;}')
-        self.write('.butt_off{background-color: #4286f4;}')
-        self.write('</style>')
-        
-        
-    def _tail(self):
-        self.wdt.feed()
-        self.client.send(b'</body></html>')
-        self.wdt.feed()
-    
-    
-    @staticmethod
-    def _restart(msg):
-        self.wdt.feed()
-        log(msg)
-        play((2093, 30), 120, (1568, 30), 120, (1319, 30), 120, (1047, 30))
-        write('mode', (1,), force = True)
-        deepsleep(1)
+            self.page += '<td>{}{}</td>'.format(cell, space)
+
+        self.page += '</tr>'
 
 
+class _Form(_Table):
+    def __init__(self, page, url, label_submit=trn('Submit'), label_cancel=trn('Cancel')):
+        super().__init__(page, ("", ""))
+        self.url = url
+        self.label_submit = label_submit
+        self.label_cancel = label_cancel
 
-class WebWriter:
-    def __init__(self, web):
-        self.s   = BytesIO()
-        self.web = web
-    
-    def write(self, txt):
-        if isinstance(txt, str):
-            txt = txt.encode()
-        
-        s   = self.s
-        wdt = self.web.wdt
-        wdt.feed()
-        s.write(txt)
-        wdt.feed()
-        
-        if s.tell() > 1200:
-            wdt.feed()
-            self.web.write(s.getvalue())
-            wdt.feed()
-            self.s = BytesIO()
-    
-    def flush(self):
-        if self.s.tell() > 0:
-            wdt = self.web.wdt
-            wdt.feed()
-            self.web.write(self.s.getvalue())
-            wdt.feed()
-            self.s = BytesIO()
+    def __enter__(self):
+        self.page += f'<form  method="post" action="/{self.url}">'
+        super().__enter__()
+        return self
+
+    def __exit__(self, type, value, traceback):
+        super().__exit__(type, value, traceback)
+        self.page += f'<br><br><input type="submit" class="button" value="{self.label_submit}"><button class="button"><a href="/">{self.label_cancel}</a></button></form>'
+
+    def label(self, txt, var, dfl='', tp='text', space=4):
+        self.row((f'<label>{txt}</label>',
+                  '<input type="{3}" value="{2}" disabled="1"><input type="hidden" name="{0}" value="{2}" />'.format(var, txt, dfl, tp)),
+                 space)
+
+    def input(self, txt, var, dfl='', tp='text', space=4):
+        self.row((f'<label>{txt}</label>',
+                  '<input type="{3}" id="{0}" name="{0}" value="{2}">'.format(var, txt, dfl, tp)),
+                 space)
+
+    def variable(self, var, val):
+        self.row(('<input type="hidden" id="{0}" name="{0}" value="{1}" />'.format(var, val),), 0)
+
+    def spacer(self):
+        self.row(('', ''), 1)
 
 
+class Page:
+    def __init__(self, response):
+        self.doc = ''
+        self.response = response
 
-class WebServer(Server):
-    class IndexDrawer:
-        pass
-    
-    def __init__(self, net, wdt):
-        super().__init__(net, wdt)
-        self.writer = WebWriter(self)
-        self.last   = ''
-        self.index  = WebServer.IndexDrawer()
-    
-    
-    def process(self):
-        log('*** PAGE ***', self.page)
-        
-        if (self.page == '') or (self.last == self.page):
-            self.page = 'index'
-        
-        try:
-            page = __import__('web.{}'.format(self.page), None, None, ('page',), 0).page
-        except ImportError:
-            log('!!! Page {} not found !!!'.format(self.page))
-            page = __import__('web.index', None, None, ('page',), 0).page
-        
-        if not self.last == self.page:
-            self.last = self.page
-        
-        play((1047,30), 120, (1568,30))
-        s = BytesIO()
-        
-        for p in page(self):
-            if isinstance(p, WebServer.IndexDrawer):
-                for q in __import__('web.index', None, None, ('page',), 0).page(self):
-                    self.wdt.feed()
-                    self.writer.write(q)
-                    self.wdt.feed()
-            else:
-                self.wdt.feed()
-                self.writer.write(p)
-                self.wdt.feed()
-        
-        self.wdt.feed()
-        self.writer.flush()
-        self.wdt.feed()
+    def __enter__(self):
+        self.doc += '<!DOCTYPE html><html><head><link rel="stylesheet" href="microweb.css"></head><body>'
+        return self
 
+    def __exit__(self, type, value, traceback):
+        self.doc += '</body></html>'
+        self.response.WriteResponseOk(headers=None,
+                                      contentType="text/html",
+                                      contentCharset="UTF-8",
+                                      content=self.doc)
+
+    def __str__(self):
+        return self.doc
+
+    def __iadd__(self, other):
+        self.doc += other
+        return self
+
+    def table(self, cells, table_attr='', heading_attr=''):
+        return _Table(self, cells, table_attr, heading_attr)
+
+    def form(self, url, label_submit=trn('Submit'), label_cancel=trn('Cancel')):
+        return _Form(self, url, label_submit, label_cancel)
+
+    def select(self, label, name):
+        return _Select(self, label, name)
+
+    def heading(self, level, txt):
+        self.doc += '<h{0}>{1}</h{0}>'.format(level, txt)
+
+    def br(self, cnt=1):
+        self.doc += '<br>' * cnt
+
+    def button(self, caption, url, args_list={}):
+        self.doc += button(caption, url, args_list)
+
+
+def webpage_handler(name, method='POST'):
+    decorate = MicroWebSrv.route(name2page(name), method)
+
+    def builder(fn):
+        @decorate
+        def wrapper(client, response):
+            args = client.ReadRequestPostedFormData() if method == 'POST' else client.GetRequestQueryParams()
+            with Page(response) as page:
+                fn(page, args)
+
+        return wrapper
+
+    return builder
+
+
+def button_enable(flag, url):
+    return button(trn('Disable' if flag else 'Enable'), url + ('d' if flag else 'e'))
 
 
 def bssid2bytes(bssid):
@@ -417,6 +205,54 @@ def bssid2bytes(bssid):
     return bytes(b2)
 
 
-
 def bytes2bssid(bssid):
     return ":".join("{:02x}".format(b) for b in bssid)
+
+
+def name2page(name):
+    name = name.split('.')[-1]
+    return '/' if name == 'index' else f'/{name}'
+
+
+def send_page(client, response, page):
+    content = ''.join(page(client, response))
+    response.WriteResponseOk(headers=None,
+                             contentType="text/html",
+                             contentCharset="UTF-8",
+                             content=content)
+
+
+from .index import www, index
+from .add import www
+from .apikey import www
+from .apiset import www
+from .dlt import www
+from .ed import www
+from .lang import www
+from .ldlt import www
+from .led import www
+from .lnew import www
+from .lnguse import www
+from .low import www
+from .lowset import www
+from .lrm import www
+from .lset import www
+from .new import www
+from .nloc import www
+from .passet import www
+from .passwd import www
+from .refr import www
+from .refrset import www
+from .res import www
+from .rm import www
+from .set import www, set
+from .ssid import www
+from .ssidset import www
+from .swbd import www
+from .swbe import www
+from .tbad import www
+from .tbae import www
+from .temp import www
+from .tset import www
+from .use import www
+from .zzz import www

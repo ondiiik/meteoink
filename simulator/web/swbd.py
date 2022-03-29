@@ -1,9 +1,11 @@
 from config import alert
+import web
 
 
-def page(web):
+@web.webpage_handler(__name__)
+def www(page, args):
     if alert.error_beep:
         alert.error_beep = False
         alert.flush()
-    
-    yield web.index
+
+    web.index(page)

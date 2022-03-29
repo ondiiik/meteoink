@@ -30,5 +30,10 @@
 			<type>1</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/micropython/urequests.py</locationURI>
 		</link>
+		<link>
+			<name>tools/build.py</name>
+			<type>1</type>
+			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/esp32/build.py</locationURI>
+		</link>
 	</linkedResources>
 </projectDescription>

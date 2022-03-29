@@ -1,19 +1,15 @@
 from config import connection, Connection
-from log    import dump_exception
-from web    import bssid2bytes
+import web
 
 
-def page(web):
-    try:
-        bssid = bssid2bytes(web.args['bssid'])
-        
-        for i in range(len(connection)):
-            if connection[i].bssid == bssid:
-                connection.remove(connection[i])
-                Connection.flush()
-                break
-    
-    except Exception as e:
-        dump_exception('WEB error:', e)
-    
-    yield web.index
+@web.webpage_handler(__name__)
+def www(page, args):
+    bssid = web.bssid2bytes(args['bssid'])
+
+    for i in range(len(connection)):
+        if connection[i].bssid == bssid:
+            connection.remove(connection[i])
+            Connection.flush()
+            break
+
+    web.index(page)

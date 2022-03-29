@@ -1,12 +1,13 @@
 from config import ui
-from lang   import trn
+from lang import trn
+import web
 
 
-def page(web):
-    yield web.heading( 2, trn['Display refresh time'])
-    
-    yield web.form_head('refrset')
-    yield web.form_input(trn['Refresh time'], 't',  ui.refresh)
-    yield web.form_input(trn['Doubled from'], 'b',  ui.dbl[0])
-    yield web.form_input(trn['Doubled to'],   'e',  ui.dbl[1])
-    yield web.form_tail()
+@web.webpage_handler(__name__)
+def www(page, args):
+    page.heading(2, trn('Display refresh time'))
+
+    with page.form('refrset') as form:
+        form.input(trn('Refresh time'), 't',  ui.refresh)
+        form.input(trn('Doubled from'), 'b',  ui.dbl[0])
+        form.input(trn('Doubled to'),   'e',  ui.dbl[1])

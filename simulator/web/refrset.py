@@ -1,13 +1,11 @@
 from config import ui
-from log    import dump_exception
+import web
 
 
-def page(web):
-    try:
-        l                  = int(web.args['t']), (int(web.args['b']), int(web.args['e']))
-        ui.refresh, ui.dbl = l
-        ui.flush()
-    except Exception as e:
-        dump_exception('WEB error:', e)
-    
-    yield web.index
+@web.webpage_handler(__name__)
+def www(page, args):
+    l = int(args['t']), (int(args['b']), int(args['e']))
+    ui.refresh, ui.dbl = l
+    ui.flush()
+
+    web.index(page)

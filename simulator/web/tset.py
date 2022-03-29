@@ -1,13 +1,11 @@
 from config import temp
-from log import dump_exception
+import web
 
 
-def page(web):
-    try:
-        l = float(web.args['ihi']), float(web.args['ohi']), float(web.args['olo'])
-        temp.indoor_high, temp.outdoor_high, temp.outdoor_low = l
-        temp.flush()
-    except Exception as e:
-        dump_exception('WEB error:', e)
-    
-    yield web.index
+@web.webpage_handler(__name__)
+def www(page, args):
+    l = float(args['ihi']), float(args['ohi']), float(args['olo'])
+    temp.indoor_high, temp.outdoor_high, temp.outdoor_low = l
+    temp.flush()
+
+    web.index(page)

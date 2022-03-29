@@ -1,18 +1,13 @@
 from config import location
-from log    import dump_exception
-from lang   import trn
+from lang import trn
+import web
 
 
-def page(web):
-    try:
-        loc = location[int(web.args['idx'])]
-        yield web.heading( 2, trn['Edit location'])
-        yield web.form_head('lset')
-        yield web.form_variable('idx',  web.args['idx'])
-        yield web.form_input(trn['Location name'], 'name', loc.name)
-        yield web.form_input(trn['Latitude'],      'lat',  loc.lat)
-        yield web.form_input(trn['Longitude'],     'lon',  loc.lon)
-        yield web.form_tail()
-    except Exception as e:
-        dump_exception('WEB error:', e)
-        yield web.index
+@web.webpage_handler(__name__)
+def www(page, args):
+    loc = location[int(args['idx'])]
+    page.heading(2, trn('Edit location'))
+    with page.form('lset') as form:
+        form.variable('idx',  args['idx'])
+        form.input(trn('Location name'),    'name', loc.name)
+        form.input(trn('GPS coordinates'),  'gps',  f'{loc.lat}N, {loc.lon}E')

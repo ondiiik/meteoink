@@ -49,7 +49,8 @@ class EPD:
         fby      = framebuf.FrameBuffer(fb_yellow, EPD_WIDTH, EPD_HEIGHT, framebuf.MONO_HLSB)
         
         # Draw black frame buffer part
-        for i in reversed(range(15)):
+        # for i in reversed(range(15)):
+        for i in (0,):
             pygame.display.set_caption('EPD {} x {} - REDRAWING BLACK ({})'.format(self.width, self.height, progress[i % len(progress)]))
             color = ((i * 8, i * 8, i * 8), (255 - i * 8, 255 - i * 8, 255 - i * 8), (0, 0, 0))
             a     = i % 2
@@ -63,7 +64,8 @@ class EPD:
             self._clock.tick(4 if i > 7 else 2)
             
         # Draw yellow frame buffer part
-        for i in reversed(range(1, 16)):
+        # for i in reversed(range(1, 16)):
+        for i in (0, ):
             pygame.display.set_caption('EPD {} x {} - REDRAWING YELLOW ({})'.format(self.width, self.height, progress[i % len(progress)]))
             a     = i % 2
             color = ((i * 8, i * 8, i * 8), (255 - i * 8, 255 - i * 8, 0))

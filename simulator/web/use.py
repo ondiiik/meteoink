@@ -1,23 +1,19 @@
 from config import location
-from lang   import trn
+from lang import trn
+import web
 
 
-def page(web):
-    yield web.heading(2, trn['Add new location'])
-    
-    yield web.form_head('new')
-    
-    yield web.form_input('SSID',          'ssid',  web.args['ssid'])
-    yield web.form_input('BSSID',         'bssid', web.args['bssid'])
-    yield web.form_input(trn['Password'], 'psw')
-    
-    yield web.form_spacer()
-    
-    yield web.select_head(trn['Location'], 'location')
-    
-    for i in range(len(location)):
-        yield web.select_option(i, location[i].name)
-    
-    yield web.select_tail()
-    
-    yield web.form_tail()
+@web.webpage_handler(__name__)
+def www(page, args):
+    page.heading(2, trn('Add new location'))
+
+    with page.form('new') as form:
+        form.input('SSID',          'ssid',  args['ssid'])
+        form.input('BSSID',         'bssid', args['bssid'])
+        form.input(trn('Password'), 'psw',   config.passwd, 'password')
+
+        form.spacer()
+
+        with page.select(trn('Location'), 'location') as select:
+            for i in range(len(location)):
+                select.option(i, location[i].name)

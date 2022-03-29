@@ -1,12 +1,11 @@
 from config import location, Location
-from log    import dump_exception
+import web
 
 
-def page(web):
-    try:
-        location.append(Location(web.args['name'], web.args['lat'], web.args['lon']))
-        Location.flush()
-    except Exception as e:
-        dump_exception('WEB error:', e)
-    
-    yield web.index
+@web.webpage_handler(__name__)
+def www(page, args):
+    gps = [float(ll[:-1] if ll[-1] in ('N', 'E') else ll) for ll in args['gps'].split(',')]
+    location.append(Location(args['name'], gps[0], gps[1]))
+    Location.flush()
+
+    web.index(page)

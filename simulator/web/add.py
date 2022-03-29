@@ -1,16 +1,14 @@
-from web  import bytes2bssid, SPACES
 from lang import trn
+import web
 
 
-def page(web):
-    yield web.heading( 2, trn['Choose WiFi to connect'])
-    yield web.table_head(('SSID', 'BSSID', ''), 'frame="hsides"', 'style="text-align:left"')
-    
-    for w in web.net.nets:
-        bssid = bytes2bssid(w.bssid)
-        yield web.table_row((w.ssid,
-                             bssid,
-                             web.button(trn['Use'], 'use', (('ssid', w.ssid), ('bssid', bssid)))),
-                             SPACES)
-    
-    yield web.table_tail()
+@web.webpage_handler(__name__)
+def www(page, args):
+    page.heading(2, trn('Choose WiFi to connect'))
+
+    with page.table(('SSID', 'BSSID', ''), 'frame="hsides"', 'style="text-align:left"') as table:
+        for w in web.WebServer.net.nets:
+            bssid = web.bytes2bssid(w.bssid)
+            table.row((w.ssid, bssid,
+                       web.button(trn('Use'), 'use', {'ssid': w.ssid, 'bssid': bssid})),
+                      web.SPACES)

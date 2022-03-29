@@ -1,9 +1,11 @@
 from lang import trn
+import web
 
-def page(web):
-    yield web.heading( 2, trn['Add new location'])
-    yield web.form_head('nloc')
-    yield web.form_input(trn['Location name'], 'name')
-    yield web.form_input(trn['Latitude'],      'lat')
-    yield web.form_input(trn['Longitude'],     'lon')
-    yield web.form_tail()
+
+@web.webpage_handler(__name__)
+def www(page, args):
+    page.heading(2, trn('Add new location'))
+
+    with page.form('nloc') as form:
+        form.input(trn('Location name'),   'name')
+        form.input(trn('GPS coordinates'), 'gps')

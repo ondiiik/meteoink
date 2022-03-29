@@ -7,9 +7,5 @@ day_of_week = ('Monday',
                'Sunday')
 
 
-class Dict:
-    def __getitem__(self, key):
-        return key
-
-
-trn = Dict()
+def trn(eng):
+    return eng

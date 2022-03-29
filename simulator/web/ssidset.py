@@ -1,12 +1,10 @@
 from config import hotspot
-from log    import dump_exception
+import web
 
 
-def page(web):
-    try:
-        hotspot.ssid = web.args['id']
-        hotspot.flush()
-    except Exception as e:
-        dump_exception('WEB error:', e)
-    
-    yield web.index
+@web.webpage_handler(__name__)
+def www(page, args):
+    hotspot.ssid = args['id']
+    hotspot.flush()
+
+    web.index(page)

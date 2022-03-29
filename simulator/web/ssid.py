@@ -1,10 +1,11 @@
 from config import hotspot
-from lang   import trn
+from lang import trn
+import web
 
 
-def page(web):
-    yield web.heading(2, trn['Hotspot SSID'])
-    
-    yield web.form_head('ssidset')
-    yield web.form_input('SSID', 'id', hotspot.ssid)
-    yield web.form_tail()
+@web.webpage_handler(__name__)
+def www(page, args):
+    page.heading(2, trn('Hotspot SSID'))
+
+    with page.form('ssidset') as form:
+        form.input('SSID', 'id', hotspot.ssid)

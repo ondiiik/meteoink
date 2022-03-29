@@ -1,18 +1,13 @@
 from config import location
-from log    import dump_exception
-from lang   import trn
+from lang import trn
+import web
 
 
-def page(web):
-    try:
-        yield web.heading(2, trn['DELETE LOCATION'] + ' ??!')
-        loc = location[int(web.args['idx'])]
-    
-        yield web.form_head('lrm')
-        yield web.form_label(trn['Name'],      'name', loc.name)
-        yield web.form_label(trn['Latitude'],  'lat',  loc.lat)
-        yield web.form_label(trn['Longitude'], 'lon',  loc.lon)
-        yield web.form_tail()
-    except Exception as e:
-        dump_exception('WEB error:', e)
-        yield web.index
+@web.webpage_handler(__name__)
+def www(page, args):
+    page.heading(2, trn('DELETE LOCATION') + ' ??!')
+    loc = location[int(args['idx'])]
+
+    with page.form('lrm') as form:
+        form.label(trn('Name'),             'name', loc.name)
+        form.label(trn('GPS coordinates'),  'gps',  f'{loc.lat}N, {loc.lon}E')

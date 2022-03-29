@@ -1,10 +1,11 @@
 from config import ui
-from lang   import trn
+from lang import trn
+import web
 
 
-def page(web):
-    yield web.heading( 2, trn['Edit API key'])
-    
-    yield web.form_head('apiset')
-    yield web.form_input('API key', 'key',  ui.apikey)
-    yield web.form_tail()
+@web.webpage_handler(__name__)
+def www(page, args):
+    page.heading(2, trn('Edit API key'))
+
+    with page.form('apiset') as form:
+        form.input('API key', 'key',  ui.apikey)

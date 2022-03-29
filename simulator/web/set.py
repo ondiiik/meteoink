@@ -1,22 +1,20 @@
 from config import connection
-from log    import dump_exception
-from web    import bssid2bytes
+import web
 
 
-def page(web):
-    # Checks if this bssid exists and modify it
-    try:
-        bssid = bssid2bytes(web.args['bssid'])
-        
-        for i in range(len(connection)):
-            if connection[i].bssid == bssid:
-                l = int(web.args['location']), web.args['psw']
-                connection[i].location, connection[i].passwd = l
-                connection[i].flush()
-                break
-    
-    except Exception as e:
-        dump_exception('WEB error:', e)
-    
-    # Write result to configuration
-    yield web.index
+def set(page, args):
+    bssid = web.bssid2bytes(args['bssid'])
+
+    for i in range(len(connection)):
+        if connection[i].bssid == bssid:
+            l = int(args['location']), args['psw']
+            connection[i].location, connection[i].passwd = l
+            connection[i].flush()
+            break
+
+    web.index(page)
+
+
+@web.webpage_handler(__name__)
+def www(page, args):
+    set(page, args)

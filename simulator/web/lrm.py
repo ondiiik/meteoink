@@ -1,18 +1,15 @@
 from config import location, Location
-from log    import dump_exception
+import web
 
 
-def page(web):
-    try:
-        name = web.args['name']
-        
-        for i in range(len(location)):
-            if location[i].name == name:
-                location.remove(location[i])
-                Location.flush()
-                break
-        
-    except Exception as e:
-        dump_exception('WEB error:', e)
-    
-    yield web.index
+@web.webpage_handler(__name__)
+def www(page, args):
+    name = args['name']
+
+    for i in range(len(location)):
+        if location[i].name == name:
+            location.remove(location[i])
+            Location.flush()
+            break
+
+    web.index(page)
