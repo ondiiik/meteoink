@@ -2,7 +2,7 @@ from config import connection, Connection
 import web
 
 
-@web.webpage_handler(__name__)
+@web.action_handler(__name__)
 def www(page, args):
     bssid = web.bssid2bytes(args['bssid'])
 

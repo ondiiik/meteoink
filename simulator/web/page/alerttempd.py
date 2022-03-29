@@ -2,7 +2,7 @@ from config import alert
 import web
 
 
-@web.webpage_handler(__name__)
+@web.action_handler(__name__)
 def www(page, args):
     if alert.temp_balanced:
         alert.temp_balanced = False

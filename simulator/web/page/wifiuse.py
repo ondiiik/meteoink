@@ -3,7 +3,7 @@ from lang import trn
 import web
 
 
-@web.webpage_handler(__name__)
+@web.action_handler(__name__)
 def www(page, args):
     page.heading(2, trn('Add new location'))
 

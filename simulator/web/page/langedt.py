@@ -4,7 +4,7 @@ import web
 _langs = 'EN', 'CZ'
 
 
-@web.webpage_handler(__name__)
+@web.action_handler(__name__)
 def www(page, args):
     page.heading(2, trn('Choose Language'))
 

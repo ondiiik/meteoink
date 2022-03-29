@@ -78,3 +78,13 @@ def index(page):
 @web.webpage_handler(__name__, 'GET')
 def www(page, args):
     index(page)
+
+
+@web.webpage_handler(__name__, 'POST')
+def www(page, args):
+    action = args.get('action', None)
+
+    if action:
+        web.actions[action](page, args)
+    else:
+        index(page)

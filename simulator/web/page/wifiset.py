@@ -16,6 +16,6 @@ def wifiset(page, args):
     web.index(page)
 
 
-@web.webpage_handler(__name__)
+@web.action_handler(__name__)
 def www(page, args):
     wifiset(page, args)

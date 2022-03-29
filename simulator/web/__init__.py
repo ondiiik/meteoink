@@ -15,6 +15,7 @@ import socket
 
 SPACES = const(4)
 CONN_RETRY_CNT = const(6)
+actions = dict()
 
 
 class WebServer:
@@ -40,8 +41,8 @@ class WebServer:
         server.Start()
 
 
-def button(caption, url, args_list={}):
-    ret = f'<form method="post" action="{url}" class="inline">'
+def button(caption, action, args_list={}):
+    ret = f'<form method="post" class="inline"><input type="hidden" name="action" value="{action}">'
 
     for name, value in args_list.items():
         ret += f'<input type="hidden" name="{name}" value="{value}">'
@@ -102,14 +103,14 @@ class _Table:
 
 
 class _Form(_Table):
-    def __init__(self, page, url, label_submit=trn('Submit'), label_cancel=trn('Cancel')):
+    def __init__(self, page, action, label_submit=trn('Submit'), label_cancel=trn('Cancel')):
         super().__init__(page, ("", ""))
-        self.url = url
+        self.action = action
         self.label_submit = label_submit
         self.label_cancel = label_cancel
 
     def __enter__(self):
-        self.page += f'<form  method="post" action="/{self.url}">'
+        self.page += f'<form  method="post"><input type="hidden" name="action" value="{self.action}">'
         super().__enter__()
         return self
 
@@ -190,6 +191,13 @@ def webpage_handler(name, method='POST'):
 
         return wrapper
 
+    return builder
+
+
+def action_handler(name):
+    def builder(fn):
+        actions[name2page(name)[1:]] = fn
+        return fn
     return builder
 
 
