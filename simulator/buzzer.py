@@ -1,12 +1,12 @@
-from config  import pins
+from config import pins
 from machine import Pin, PWM
-from utime   import sleep_ms
+from utime import sleep_ms
 
 
 def play(*pattern):
     if pins.BUZZER < 0:
         return
-    
+
     for tone in pattern:
         if isinstance(tone, int):
             sleep_ms(tone)

@@ -1,5 +1,5 @@
-import                  re
-from framebuf    import FrameBuffer, MONO_HLSB
+import re
+from framebuf import FrameBuffer, MONO_HLSB
 from micropython import const
 
 ERROR_CORRECT_L = const(1)
@@ -18,11 +18,11 @@ rsPoly_LUT = {
     22: [1, 89, 179, 131, 176, 182, 244, 19, 189, 69, 40, 28, 137, 29, 123, 67, 253, 86, 218, 230, 26, 145, 245],
     24: [1, 122, 118, 169, 70, 178, 237, 216, 102, 115, 150, 229, 73, 130, 72, 61, 43, 206, 1, 237, 247, 127, 217, 144, 117],
     26: [1, 246, 51, 183, 4, 136, 98, 199, 152, 77, 56, 206, 24, 145, 40, 209, 117, 233, 42, 135, 68, 70, 144, 146, 77, 43, 94]
-              }
+}
 
 ###
 # Base
-# 
+#
 # Formerly in base.py
 ###
 gexp = b'\x01\x02\x04\x08\x10 @\x80\x1d:t\xe8\xcd\x87\x13&L\x98-Z\xb4u\xea\xc9\x8f\x03\x06\x0c\x180`\xc0\x9d\'N\x9c%J\x945j\xd4\xb5w\xee\xc1\x9f#F\x8c\x05\n\x14(P\xa0]\xbai\xd2\xb9o\xde\xa1_\xbea\xc2\x99/^\xbce\xca\x89\x0f\x1e<x\xf0\xfd\xe7\xd3\xbbk\xd6\xb1\x7f\xfe\xe1\xdf\xa3[\xb6q\xe2\xd9\xafC\x86\x11"D\x88\r\x1a4h\xd0\xbdg\xce\x81\x1f>|\xf8\xed\xc7\x93;v\xec\xc5\x973f\xcc\x85\x17.\\\xb8m\xda\xa9O\x9e!B\x84\x15*T\xa8M\x9a)R\xa4U\xaaI\x929r\xe4\xd5\xb7s\xe6\xd1\xbfc\xc6\x91?~\xfc\xe5\xd7\xb3{\xf6\xf1\xff\xe3\xdb\xabK\x961b\xc4\x957n\xdc\xa5W\xaeA\x82\x192d\xc8\x8d\x07\x0e\x1c8p\xe0\xdd\xa7S\xa6Q\xa2Y\xb2y\xf2\xf9\xef\xc3\x9b+V\xacE\x8a\t\x12$H\x90=z\xf4\xf5\xf7\xf3\xfb\xeb\xcb\x8b\x0b\x16,X\xb0}\xfa\xe9\xcf\x83\x1b6l\xd8\xadG\x8e\x01'
@@ -283,7 +283,7 @@ def make_rs_blocks(version, error_correction):
 
 ###
 # Utilities
-# 
+#
 # Formerly in utils.py
 ###
 
@@ -376,20 +376,24 @@ PAD0 = 0xEC
 PAD1 = 0x11
 
 # Precompute bit count limits, indexed by error correction level and code size
-_data_count = lambda block: block.data_count
+
+
+def _data_count(block): return block.data_count
+
+
 BIT_LIMIT_TABLE = [
-    [0] + [8*sum(map(_data_count, make_rs_blocks(version, error_correction)))
+    [0] + [8 * sum(map(_data_count, make_rs_blocks(version, error_correction)))
            for version in range(1, 41)]
     for error_correction in range(4)
 ]
 
 
 def BCH_type_info(data):
-        d = data << 10
-        while BCH_digit(d) - BCH_digit(G15) >= 0:
-            d ^= (G15 << (BCH_digit(d) - BCH_digit(G15)))
+    d = data << 10
+    while BCH_digit(d) - BCH_digit(G15) >= 0:
+        d ^= (G15 << (BCH_digit(d) - BCH_digit(G15)))
 
-        return ((data << 10) | d) ^ G15_MASK
+    return ((data << 10) | d) ^ G15_MASK
 
 
 def BCH_type_number(data):
@@ -504,7 +508,7 @@ def _lost_point_level1(modules, modules_count):
             container[length] += 1
 
     lost_point += sum(container[each_length] * (each_length - 2)
-        for each_length in range(5, modules_count + 1))
+                      for each_length in range(5, modules_count + 1))
 
     return lost_point
 
@@ -545,7 +549,7 @@ def _lost_point_level3(modules, modules_count):
     # pattern1:     10111010000
     # pattern2: 00001011101
     modules_range = range(modules_count)
-    modules_range_short = range(modules_count-10)
+    modules_range_short = range(modules_count - 10)
     lost_point = 0
 
     for row in modules_range:
@@ -554,27 +558,27 @@ def _lost_point_level3(modules, modules_count):
         col = 0
         for col in modules_range_short_iter:
             if (
-                        not this_row[col + 1]
-                    and this_row[col + 4]
-                    and not this_row[col + 5]
-                    and this_row[col + 6]
-                    and not this_row[col + 9]
-                and (
+                    not this_row[col + 1]
+                and this_row[col + 4]
+                and not this_row[col + 5]
+                and this_row[col + 6]
+                and not this_row[col + 9]
+                    and (
                         this_row[col + 0]
-                    and this_row[col + 2]
-                    and this_row[col + 3]
-                    and not this_row[col + 7]
-                    and not this_row[col + 8]
-                    and not this_row[col + 10]
-                or
+                        and this_row[col + 2]
+                        and this_row[col + 3]
+                        and not this_row[col + 7]
+                        and not this_row[col + 8]
+                        and not this_row[col + 10]
+                        or
                         not this_row[col + 0]
-                    and not this_row[col + 2]
-                    and not this_row[col + 3]
-                    and this_row[col + 7]
-                    and this_row[col + 8]
-                    and this_row[col + 10]
-                    )
-                ):
+                        and not this_row[col + 2]
+                        and not this_row[col + 3]
+                        and this_row[col + 7]
+                        and this_row[col + 8]
+                        and this_row[col + 10]
+                )
+            ):
                 lost_point += 40
 # horspool algorithm.
 # if this_row[col + 10] == True,  pattern1 shift 4, pattern2 shift 2. So min=2.
@@ -590,27 +594,27 @@ def _lost_point_level3(modules, modules_count):
         row = 0
         for row in modules_range_short_iter:
             if (
-                        not modules[row + 1][col]
-                    and modules[row + 4][col]
-                    and not modules[row + 5][col]
-                    and modules[row + 6][col]
-                    and not modules[row + 9][col]
-                and (
+                    not modules[row + 1][col]
+                and modules[row + 4][col]
+                and not modules[row + 5][col]
+                and modules[row + 6][col]
+                and not modules[row + 9][col]
+                    and (
                         modules[row + 0][col]
-                    and modules[row + 2][col]
-                    and modules[row + 3][col]
-                    and not modules[row + 7][col]
-                    and not modules[row + 8][col]
-                    and not modules[row + 10][col]
-                or
+                        and modules[row + 2][col]
+                        and modules[row + 3][col]
+                        and not modules[row + 7][col]
+                        and not modules[row + 8][col]
+                        and not modules[row + 10][col]
+                        or
                         not modules[row + 0][col]
-                    and not modules[row + 2][col]
-                    and not modules[row + 3][col]
-                    and modules[row + 7][col]
-                    and modules[row + 8][col]
-                    and modules[row + 10][col]
-                    )
-                ):
+                        and not modules[row + 2][col]
+                        and not modules[row + 3][col]
+                        and modules[row + 7][col]
+                        and modules[row + 8][col]
+                        and modules[row + 10][col]
+                )
+            ):
                 lost_point += 40
             if modules[row + 10][col]:
                 try:
@@ -869,7 +873,7 @@ def create_data(version, error_correction, data_list):
 
 ###
 # Main
-# 
+#
 # Formerly in app.py
 ###
 def make(data=None, **kwargs):
@@ -899,6 +903,7 @@ def _check_mask_pattern(mask_pattern):
     if mask_pattern < 0 or mask_pattern > 7:
         raise ValueError(
             "Mask pattern should be in range(8) (got %s)" % mask_pattern)
+
 
 class QRCode:
 
@@ -1015,7 +1020,7 @@ class QRCode:
         self.version = start
         end = len(BIT_LIMIT_TABLE[self.error_correction])
 
-        while (self.version < end and 
+        while (self.version < end and
                needed_bits > BIT_LIMIT_TABLE[self.error_correction][self.version]):
             self.version += 1
 
@@ -1045,7 +1050,6 @@ class QRCode:
                 pattern = i
 
         return pattern
-
 
     def setup_timing_pattern(self):
         for r in range(8, self.modules_count - 8):
@@ -1138,7 +1142,7 @@ class QRCode:
             if col <= 6:
                 col -= 1
 
-            col_range = (col, col-1)
+            col_range = (col, col - 1)
 
             while True:
 
@@ -1171,15 +1175,15 @@ class QRCode:
     def get_matrix(self):
         if self.data_cache is None:
             self.make()
-        
+
         if not self.border:
             return self.modules
-        
+
         width = len(self.modules) + self.border * 2
-        buf   = bytearray(width * (width + 7) // 8)
-        fb    = FrameBuffer(buf, width, width, MONO_HLSB)
+        buf = bytearray(width * (width + 7) // 8)
+        fb = FrameBuffer(buf, width, width, MONO_HLSB)
         fb.fill(0)
-        
+
         y = self.border
         for module in self.modules:
             x = self.border
@@ -1187,5 +1191,5 @@ class QRCode:
                 fb.pixel(x, y, p)
                 x += 1
             y += 1
-        
+
         return (fb, width)

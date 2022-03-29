@@ -1,5 +1,5 @@
 from machine import reset
-from log     import log
+from log import log
 
 
 def _check_alert(args, assign):
@@ -12,7 +12,7 @@ def _write_alert(args):
         from var.alert import _cnt as cnt
     except:
         cnt = 0
-    
+
     cnt += 1
     log('Rebuild variables', f'alert ({cnt} times)')
     with open(f'var/alert.py', 'w') as f:
@@ -29,27 +29,27 @@ def _write_display(args):
         from var.display import _cnt as cnt
     except:
         cnt = 0
-    
+
     cnt += 1
     log('Rebuild variables', f'display ({cnt} times)')
     with open('var/display.py', 'w') as f:
         f.write(f'DISPLAY_STATE = {args[0]}\n_cnt = {cnt}\n')
 
 
-_modules = { 'alert'   : (_check_alert,   _write_alert),
-             'display' : (_check_display, _write_display) }
+_modules = {'alert': (_check_alert,   _write_alert),
+            'display': (_check_display, _write_display)}
 
 
-def write(m, args, assign = True, force = False):
+def write(m, args, assign=True, force=False):
     m = _modules[m]
     try:
         change = m[0](args, assign)
     except:
         change = True
-    
+
     if force or change:
         m[1](args)
-    
+
     return change
 
 
