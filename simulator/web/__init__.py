@@ -254,6 +254,8 @@ from .page.refrset import www
 from .page.reset import www
 from .page.ssidedt import www
 from .page.ssidset import www
+from .page.summertd import www
+from .page.summerte import www
 from .page.tempedt import www
 from .page.tempset import www
 from .page.variantedt import www

@@ -1,4 +1,4 @@
-from config import connection, location, ui, hotspot, alert, vbat, temp
+from config import connection, location, ui, hotspot, alert, vbat, temp, time
 from battery import battery
 from lang import trn
 import web
@@ -54,6 +54,7 @@ def index(page):
 
     page.heading(2, trn('General setup'))
     with page.table(None, 'frame="hsides"') as table:
+        table.row((trn('Summer time'), '',           web.button_enable(not time.winter, 'summert')), web.SPACES)
         table.row((trn('Refresh time'), trn('{} min (doubled from {}:00 to {}:00)').format(ui.refresh, ui.dbl[0], ui.dbl[1]),
                    web.button(trn('Edit'), 'refredt')),      web.SPACES)
         table.row((trn('Language'), ui.language,             web.button(trn('Edit'), 'langedt')),    web.SPACES)

@@ -180,6 +180,25 @@ _cnt = {_cnt}
 ''')
 
 
+class Time:
+    def __init__(self, winter):
+        self.winter = winter
+
+    def flush(self):
+        try:
+            from .time import _cnt
+        except:
+            _cnt = 0
+
+        _cnt += 1
+        with open('config/time.py', 'w') as f:
+            f.write(f'''from config import Time
+time = Time({self.winter})
+
+_cnt = {_cnt}
+''')
+
+
 def _rebuild(name, tp, *args):
     print('Rebuildng config for', name)
     i = tp(*args)
@@ -230,6 +249,11 @@ try:
     from .temp import temp
 except:
     reload = _rebuild('temp', Temp, 26.0, 27.0, -5.0) or reload
+
+try:
+    from .time import time
+except:
+    reload = _rebuild('time', Time, 0) or reload
 
 
 if reload:
