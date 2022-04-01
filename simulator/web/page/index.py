@@ -55,10 +55,11 @@ def index(page):
     page.heading(2, trn('General setup'))
     with page.table(None, 'frame="hsides"') as table:
         table.row((trn('Refresh time'), trn('{} min (doubled from {}:00 to {}:00)').format(ui.refresh, ui.dbl[0], ui.dbl[1]),
-                   web.button(trn('Edit'), 'refredt')),   web.SPACES)
-        table.row((trn('Language'),     ui.language, web.button(trn('Edit'), 'langedt')), web.SPACES)
-        table.row((trn('Units'),        ui.units,    ''),                                 web.SPACES)
-        table.row(('API key',           ui.apikey,   web.button(trn('Edit'), 'apiedt')),  web.SPACES)
+                   web.button(trn('Edit'), 'refredt')),      web.SPACES)
+        table.row((trn('Language'), ui.language,             web.button(trn('Edit'), 'langedt')),    web.SPACES)
+        table.row((trn('Units'),    ui.units,           ''),                                         web.SPACES)
+        table.row((trn('Variant'),  trn(ui.variant_string),  web.button(trn('Edit'), 'variantedt')), web.SPACES)
+        table.row(('API key',       ui.apikey,               web.button(trn('Edit'), 'apiedt')),     web.SPACES)
 
     page.heading(2, trn('Hotspot setup'))
     with page.table(None, 'frame="hsides"') as table:

@@ -7,10 +7,12 @@
 
 Meteoink is home meteostation based on [4.2 inch dual color E-Ink display](https://www.waveshare.com/4.2inch-e-paper-module-c.htm),
 [TTGO-T8-ESP32](https://github.com/LilyGO/TTGO-T8-ESP32) and [micropython 1.17](https://micropython.org/). Meteostation
-uses data from [OpenWeatherMap](https://openweathermap.org/) project for obtaining weather forecast and
-[DHT22](https://github.com/semestrinis/Arduino/wiki/DHT22-temperature-humidity-sensor) sensor for measuring
-indoor temperature and humidity. Whole system is powered from one [18650 Li-On battery](https://en.wikipedia.org/wiki/List_of_battery_sizes#Lithium-ion_batteries_(rechargeable))
-charged through the usb on ESP board.
+is connected to your home WiFi and uses data from [OpenWeatherMap](https://openweathermap.org/) project for obtaining
+weather forecast. It also uses [DHT22](https://github.com/semestrinis/Arduino/wiki/DHT22-temperature-humidity-sensor)
+sensor for measuring indoor temperature and humidity. Whole system is powered from one
+[18650 Li-On battery](https://en.wikipedia.org/wiki/List_of_battery_sizes#Lithium-ion_batteries_(rechargeable))
+charged through the USB on ESP board. Meteostation is usually operating half a year when refresh time is set to
+20 minutes and there is good internet WiFi access.
 
 
 ## Wiring
@@ -24,11 +26,15 @@ Also battery is not displayed in wiring as it has its own connector so its conne
 
 ## Box
 
-![3D printed frame](graphics/doc/frame01.jpeg "3D printed frame")
-![3D printed frame](graphics/doc/frame02.jpeg "3D printed frame")
 ![3D printed frame](graphics/doc/frame03.jpeg "3D printed frame")
+![3D printed frame](graphics/doc/frame02.jpeg "3D printed frame")
+![3D printed frame](graphics/doc/frame01.jpeg "3D printed frame")
 
-You can print one with balanced space for 18650 battery [here on Thingiverse](https://www.thingiverse.com/thing:5334645)
+You can print one with balanced space for 18650 battery [here on Thingiverse](https://www.thingiverse.com/thing:5334645).
+DHT22 sensor is glued to chassis (grid for air access sahll be on the side pointing outside the box). When you glue it,
+apply glue very carefully as it shall not pass inside electronics. When all electronics is inside, then chassis
+shall be be glued to frame.
+
 
 
 ## Micropython
@@ -51,7 +57,8 @@ through this port.
     (name='micropython', version=(1, 17, 0))
 
 As meteostation may time after time writes something on internal flash, then for flash healthy is better to use
-`littlefs` instead of `FAT`. This can be done according to [this tutorial](https://docs.micropython.org/en/latest/reference/filesystem.html#littlefs)
+`littlefs` instead of `FAT`. This can be done according to
+[this tutorial](https://docs.micropython.org/en/latest/reference/filesystem.html#littlefs)
 
     import os
     os.umount('/')
@@ -67,7 +74,8 @@ files stored used to speed up startup of software and for better usage of RAM (c
 All files from this folder shall be copied into board. For this purpose REPL based file access engine such as
 [ampy](https://techtutorialsx.com/2017/06/04/esp32-esp8266-micropython-uploading-files-to-the-file-system/) or
 [thonny IDE](https://randomnerdtutorials.com/getting-started-thonny-micropython-python-ide-esp32-esp8266/)
-which can be also used for flashing of Micropython firmware.
+can be used for writing files into file system. Just keep in mind that you shall be disconnected from console
+otherwise this tools will not work properly.
 
 
 ## Configuration - first run

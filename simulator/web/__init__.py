@@ -256,6 +256,8 @@ from .page.ssidedt import www
 from .page.ssidset import www
 from .page.tempedt import www
 from .page.tempset import www
+from .page.variantedt import www
+from .page.variantuse import www
 from .page.wifidlt import www
 from .page.wifiedt import www
 from .page.wifimake import www

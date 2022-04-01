@@ -121,8 +121,8 @@ class Forecast:
     def _read2_short(self, connection, ui):
         # Download hourly weather forecast for today
         url = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}'
-        fcast = connection.http_get_json(url.format(connection.config.lat,
-                                                    connection.config.lon,
+        fcast = connection.http_get_json(url.format(location[connection.config.location].lat,
+                                                    location[connection.config.location].lon,
                                                     ui.apikey,
                                                     ui.units,
                                                     'EN',
