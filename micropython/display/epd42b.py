@@ -23,6 +23,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import micropython
+from struct import pack
+from time import sleep_ms
 
 # also works for black/white/yellow GDEW042C37?
 
@@ -70,7 +72,6 @@ class EPD:
 
     @micropython.native
     def _set_window(self, x, y, w, h):
-        from struct import pack
         xe = (x + w - 1) | 0x0007  # Byte boundary inclusive (last byte)
         ye = y + h - 1
         x &= 0xFFF8               # Byte boundary
@@ -80,7 +81,6 @@ class EPD:
 
     @micropython.native
     def _reset(self):
-        from time import sleep_ms
         self._rst(0)
         sleep_ms(200)
         self._rst(1)
@@ -88,7 +88,6 @@ class EPD:
 
     @micropython.native
     def _init(self):
-        from struct import pack
         self._reset()
         self._command(0x06, b'\x17\x17\x17')                      # Boost start ...
         self._command(0x00, b'\x0F')                              # LUT from OTP Pixel with B/W/Y
@@ -106,7 +105,6 @@ class EPD:
 
     @micropython.native
     def _wait_until_idle(self):
-        from time import sleep_ms
         for i in range(150):
             if not self._busy.value() == 0:
                 return

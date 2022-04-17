@@ -3,6 +3,8 @@ from config import pins
 from micropython import const
 from struct import unpack
 import micropython
+from display import epd42b as epaper
+from machine import SPI, Pin
 
 
 WHITE = const(3)
@@ -22,12 +24,12 @@ class Vect:
         return int(self.x) * int(self.y)
 
     @micropython.viper
-    def __add__(self, v):
+    def __add__(self, v: int):
         return Vect(int(self.x) + int(v.x),
                     int(self.y) + int(v.y))
 
     @micropython.viper
-    def __sub__(self, v):
+    def __sub__(self, v: int):
         return Vect(int(self.x) - int(v.x),
                     int(self.y) - int(v.y))
 
@@ -53,7 +55,7 @@ class Bitmap:
         self.buf_width = ((self.dim.x + 7) // 8) * 8
         cnt = (self.buf_width * self.dim.y) // 8
         self.buf = bmp[2]
-        self.fb = (framebuf.FrameBuffer(bytearray(self.buf[:     cnt]), self.buf_width, self.dim.y, framebuf.MONO_HLSB),
+        self.fb = (framebuf.FrameBuffer(bytearray(self.buf[:cnt]), self.buf_width, self.dim.y, framebuf.MONO_HLSB),
                    framebuf.FrameBuffer(bytearray(self.buf[cnt: 2 * cnt]), self.buf_width, self.dim.y, framebuf.MONO_HLSB),
                    framebuf.FrameBuffer(bytearray(self.buf[2 * cnt: 3 * cnt]), self.buf_width, self.dim.y, framebuf.MONO_HLSB),
                    framebuf.FrameBuffer(bytearray(self.buf[3 * cnt:]), self.buf_width, self.dim.y, framebuf.MONO_HLSB))
@@ -178,10 +180,6 @@ class Canvas:
     @micropython.native
     def __init__(self):
         print("Building EPD:")
-        # Load modules and set constants
-        from display import epd42b as epaper
-        from machine import SPI, Pin
-
         # Initializes SPI
         spi = SPI(1)
         spi.init(baudrate=2000000,
