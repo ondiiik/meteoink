@@ -3,25 +3,25 @@ GS4_HMSB = 0
 
 class FrameBuffer:
     def __init__(self, buf, w, h, f):
-        self.buf = buf
-        self.width = w
-        self.height = h
+        self._buf = buf
+        self._width = w
+        self._height = h
 
     def fill(self, c):
         p = (c << 4) | c
-        for i in range(len(self.buf)):
-            self.buf[i] = p
+        for i in range(len(self._buf)):
+            self._buf[i] = p
 
     def pixel(self, x, y, c=-1):
-        if x not in range(self.width) or y not in range(self.height):
+        if x not in range(self._width) or y not in range(self._height):
             return c
 
-        pix_index = self.width * y + x
+        pix_index = self._width * y + x
         byte_index = pix_index // 2
         bit_index = 4 - (pix_index % 2) * 4
 
         try:
-            b = self.buf[byte_index]
+            b = self._buf[byte_index]
         except:
             return c
 
@@ -30,8 +30,8 @@ class FrameBuffer:
         else:
             m = 0xF0 >> bit_index
             b = c << bit_index
-            self.buf[byte_index] &= m
-            self.buf[byte_index] |= b
+            self._buf[byte_index] &= m
+            self._buf[byte_index] |= b
 
         return c
 
@@ -61,32 +61,24 @@ class FrameBuffer:
 
         if abs(dx) > abs(dy):
             if x1 > x2:
-                x = x2
-                x2 = x1
-                x1 = x
-                y = y2
-                y2 = y1
-                y1 = y
+                x1, x2 = x2, x1
+                y1, y2 = y2, y1
 
             for x in range(x1, x2):
                 y = y1 + dy * (x - x1) / dx
                 self.pixel(int(x), int(y), c)
         else:
             if y1 > y2:
-                x = x2
-                x2 = x1
-                x1 = x
-                y = y2
-                y2 = y1
-                y1 = y
+                x1, x2 = x2, x1
+                y1, y2 = y2, y1
 
             for y in range(y1, y2):
                 x = x1 + dx * (y - y1) / dy
                 self.pixel(int(x), int(y), c)
 
     def blit(self, fb, x, y, transparent=-1):
-        for yy in range(fb.height):
-            for xx in range(fb.width):
+        for yy in range(fb._height):
+            for xx in range(fb._width):
                 c = fb.pixel(xx, yy)
 
                 if c == transparent:

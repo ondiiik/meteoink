@@ -19,25 +19,7 @@ def _write_alert(args):
         f.write(f'ALREADY_TRIGGERED = {args[0]}\n_cnt = {cnt}\n')
 
 
-def _check_display(args, assign):
-    import var.display
-    return assign and (not (display.DISPLAY_STATE == args[0]))
-
-
-def _write_display(args):
-    try:
-        from var.display import _cnt as cnt
-    except:
-        cnt = 0
-
-    cnt += 1
-    log('Rebuild variables', f'display ({cnt} times)')
-    with open('var/display.py', 'w') as f:
-        f.write(f'DISPLAY_STATE = {args[0]}\n_cnt = {cnt}\n')
-
-
-_modules = {'alert': (_check_alert,   _write_alert),
-            'display': (_check_display, _write_display)}
+_modules = {'alert': (_check_alert,   _write_alert)}
 
 
 def write(m, args, assign=True, force=False):
@@ -55,7 +37,6 @@ def write(m, args, assign=True, force=False):
 
 reboot = False
 reboot = write('alert',   (False,), False) or reboot
-reboot = write('display', (0,),     False) or reboot
 
 if reboot:
     log('Variables rebuilt - rebooting')

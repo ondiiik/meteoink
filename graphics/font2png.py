@@ -29,6 +29,7 @@
 import freetype
 import imageio
 import numpy
+from itertools import product
 
 
 class Bitmap(object):
@@ -258,10 +259,9 @@ if __name__ == '__main__':
             glyph = fnt.glyph_for_character(chr)
             im = numpy.zeros((max_heigth, glyph.width, 4), dtype=numpy.uint8)
             idx = 0
-            for y in range(glyph.height):
-                for x in range(glyph.width):
-                    im[y + max_heigth - glyph.ascent - baseline][x][3] = 255 if not glyph.bitmap.pixels[idx] == 0 else 0
-                    idx += 1
+            for y, x in product(range(glyph.height), range(glyph.width)):
+                im[y + max_heigth - glyph.ascent - baseline][x][3] = 255 if not glyph.bitmap.pixels[idx] == 0 else 0
+                idx += 1
 
             # for color in range(7):
             #file_name = f'bitmap/font/{color:X}{font_size:02X}{ord(chr):X}.png'

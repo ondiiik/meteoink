@@ -1,6 +1,5 @@
 from . import Ui
-from config import DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_JUST_REPAINT, DISPLAY_DONT_REFRESH
-from display import Vect, WHITE
+from display import Vect, WHITE, BLUE, GREEN, YELLOW, RED, BLACK
 from micropython import const
 from var import write
 
@@ -8,7 +7,7 @@ from var import write
 _CHART_HEIGHT = const(90)
 
 
-class Epd42(Ui):
+class Epd_ACEP(Ui):
     def __init__(self, canvas, forecast, connection):
         super().__init__(canvas)
         self.forecast = forecast
@@ -66,15 +65,10 @@ class Epd42(Ui):
         led.mode(led.FLUSHING)
         self.canvas.flush()
 
-        # Display is repainted, so next can be just partial repaint
-        write('display', (DISPLAY_JUST_REPAINT,))
-
     def repaint_config(self, led, volt):
         from config.spot import hotspot
 
         # After config we will need to repaint all
-        write('display', (DISPLAY_REQUIRES_FULL_REFRESH,))
-
         print('Drawing config ...')
         led.mode(led.DRAWING)
         self.canvas.fill(WHITE)
@@ -97,20 +91,15 @@ class Epd42(Ui):
         self.canvas.flush()
 
     def repaint_lowbat(self, volt):
-        if not display.DISPLAY_STATE == DISPLAY_DONT_REFRESH:
-            print('Drawing lowbat ...')
-            self.canvas.fill(WHITE)
-            v = Vect(self.canvas.dim.x // 2 - 30, self.canvas.dim.y // 2)
-            d = Vect(60, 30)
-            vbat_dr(self, v, d, volt)
+        print('Drawing lowbat ...')
+        self.canvas.fill(WHITE)
+        v = Vect(self.canvas.dim.x // 2 - 30, self.canvas.dim.y // 2)
+        d = Vect(60, 30)
+        vbat_dr(self, v, d, volt)
 
-            print('Flushing ...')
-            self.canvas.flush((v.x - 20, v.y - 26, d.x + 46, d.y + 40))
-
-            display.DISPLAY_STATE = DISPLAY_DONT_REFRESH
-            write('display')
-        else:
-            print('Already painted ... saving battery')
+        print('Flushing ...')
+        self.canvas.flush()
+        write('display')
 
 
 def weather_dr(ui, p, d):
@@ -195,7 +184,7 @@ def vbat_dr(ui, p, d, volt):
 
 class MeteoUi:
     def __init__(self, canvas, forecast, connection):
-        self.ui = Epd42(canvas, forecast, connection)
+        self.ui = Epd_ACEP(canvas, forecast, connection)
         self.repaint_welcome = self.ui.repaint_welcome
         self.repaint_weather = self.ui.repaint_weather
         self.repaint_config = self.ui.repaint_config

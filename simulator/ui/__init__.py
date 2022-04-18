@@ -67,8 +67,8 @@ class Ui:
                     fonts.fonts[size][ord(char)][color] = b
                     f = Bitmap(b)
 
-                self.canvas.bitmap(pos, f, color)
-                pos.x += f.dim.x + 1
+                self.canvas.bitmap(pos, f)
+                pos.x += f.dim.y + 1
 
         return pos
 

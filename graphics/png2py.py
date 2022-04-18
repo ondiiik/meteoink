@@ -29,6 +29,8 @@
 import sys
 import os
 import imageio
+import numpy
+from itertools import product
 
 from ctypes import c_uint8, LittleEndianStructure, Union
 
@@ -87,29 +89,35 @@ def convert(name, src_file_name, dst, scales=(None,)):
         png = imageio.imread(src_file_name)
         width = int(png.shape[1]) // scale
         height = int(png.shape[0]) // scale
-        bwidth = width + (1 if width % 2 else 0)
+        bheight = height + (1 if height % 2 else 0)
 
         if use_scale:
-            dst.write(f'{scale} : ({bwidth}, {height},')
+            dst.write(f'{scale} : ({bheight}, {width}, ')
         else:
-            dst.write(f'({bwidth}, {height},')
+            dst.write(f'({bheight}, {width}, ')
 
         buff = bytearray()
 
-        print(f'Converting "{src_file_name}" to "{name}" - {bwidth} x {height} ({scale} : 1) ...')
+        print(f'Converting "{src_file_name}" to "{name}" - {width} x {bheight} ({scale} : 1) ...')
         pix = Flags()
         pix.asbyte = 0
+
+        im = numpy.zeros((bheight, width), dtype=numpy.uint8)
 
         for y, row in zip(range(height), png[::scale]):
             for x, rgba in zip(range(width), row[::scale]):
                 color = rgb2color(rgba)[(x + y) % 2]
+                im[y][x] = color
 
-                if x % 2:
+        for x in range(width):
+            for y in range(height):
+                color = im[y][width - x - 1]
+                if y % 2:
                     pix.colors.c1 = color
                     buff.extend([pix.asbyte])
                 else:
                     pix.colors.c0 = color
-            if not x % 2:
+            if not y % 2:
                 pix.colors.c1 = Color.TRANSPARENT
                 buff.extend([pix.asbyte])
 

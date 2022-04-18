@@ -32,6 +32,10 @@ class Vect:
     def __call__(self):
         return self.x, self.y
 
+    @micropython.native
+    def swapped(self):
+        return Vect(self.y, self.x)
+
     @micropython.viper
     def __add__(self, v):
         return Vect(int(self.x) + int(v.x),
@@ -91,7 +95,8 @@ class Canvas:
         print("\tSPI - [ OK ]")
 
         self.epd = epaper.EPD(spi, cs, dc, rst, busy)
-        self.dim = Vect(self.epd.width, self.epd.height)
+        self.dim = Vect(self.epd.height, self.epd.width)
+        self._r = self.epd.height - 1
         self.ofs = Vect(0, 0)
         print("\tEPD - [ OK ]")
 
@@ -115,33 +120,41 @@ class Canvas:
     @micropython.native
     def hline(self, v, w, c=BLACK):
         v += self.ofs
-        self.fb.hline(v.x, v.y, w, c)
-
-    @micropython.native
-    def vline(self, v, h, c=BLACK):
-        v += self.ofs
-        self.fb.vline(v.x, v.y, h, c)
+        self.fb.vline(v.y, self._r - v.x - w, w, c)
 
     @micropython.native
     def htline(self, v, w, c=BLACK):
         v += self.ofs
-        x, y = v()
-        w += x
-        x += y % 2
-        for i in range(x, w, 2):
-            self.fb.pixel(i, y, c)
+        self._vtline(v.y, self._r - v.x - w, w, c)
+
+    @micropython.native
+    def _vtline(self, x, y, h, c):
+        pixel = self.fb.pixel
+        for y in range(y + (1 if (x + y) % 2 else 0), y + h, 2):
+            pixel(x, y, c)
+
+    @micropython.native
+    def vline(self, v, h, c=BLACK):
+        v += self.ofs
+        self.fb.hline(v.y, self._r - v.x, h, c)
 
     @micropython.native
     def vtline(self, v, h, c=BLACK):
         v += self.ofs
-        self.fb.vtline(v.x, v.y, h, c)
+        self._htline(v.y, self._r - v.x, h, c)
+
+    @micropython.native
+    def _htline(self, x, y, w, c):
+        pixel = self.fb.pixel
+        for x in range(x + (1 if (x + y) % 2 else 0), x + w, 2):
+            pixel(x, y, c)
 
     @micropython.native
     def line(self, v1, v2, c=BLACK, w=1):
         if w < 2:
             v1 += self.ofs
             v2 += self.ofs
-            self.fb.line(v1.x, v1.y, v2.x, v2.y, c)
+            self.fb.line(v1.y, self._r - v1.x, v2.y, self._r - v2.x, c)
         elif w == 2:
             for a in (Vect(1, 0), Vect(0, 1), Vect(1, 1)):
                 self.line(v1 + a, v2 + a, c)
@@ -154,7 +167,7 @@ class Canvas:
     @micropython.native
     def rect(self, v, d, c=BLACK):
         v += self.ofs
-        self.fb.rect(v.x, v.y, d.x, d.y, c)
+        self.fb.rect(v.y, self._r - v.x - d.x, d.y, d.x, c)
 
     @micropython.native
     def trect(self, v, d, c=BLACK):
@@ -167,14 +180,14 @@ class Canvas:
     @micropython.native
     def fill_rect(self, v, d, c=BLACK):
         v += self.ofs
-        self.fb.fill_rect(v.x, v.y, d.x, d.y, c)
+        self.fb.fill_rect(v.y, self._r - v.x - d.x, d.y, d.x, c)
 
     @micropython.native
     def text(self, s, v, c=BLACK):
         v += self.ofs
-        self.fb.text(s, v.x, v.y, c)
+        self.fb.text(s, v.y, self._r - v.x, c)
 
     @micropython.native
-    def bitmap(self, v, bitmap, color=None):
+    def bitmap(self, v, bitmap):
         v += self.ofs
-        self.fb.blit(bitmap.fb, v.x, v.y, ALPHA)
+        self.fb.blit(bitmap.fb, v.y, self._r - v.x - bitmap.dim.y, ALPHA)
