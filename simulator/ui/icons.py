@@ -22,7 +22,7 @@ class UiIcons(UiFrame):
             try:
                 bitmap = icon[id]
             except KeyError:
-                bitmap = ui.bitmap(5, id)
+                bitmap = ui.bitmap(4, id)
                 icon[id] = bitmap
 
             ui.canvas.bitmap(Vect(xx, i % rows_cnt * h_icons), bitmap)

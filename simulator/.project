@@ -16,9 +16,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>mp_esp/epd42b.py</name>
+			<name>mp_esp/epd_acep.py</name>
 			<type>1</type>
-			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/micropython/display/epd42b.py</locationURI>
+			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/micropython/display/epd_acep.py</locationURI>
 		</link>
 		<link>
 			<name>mp_esp/net.py</name>
@@ -39,6 +39,16 @@
 			<name>tools/build.py</name>
 			<type>1</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/esp32/build.py</locationURI>
+		</link>
+		<link>
+			<name>tools/font2png.py</name>
+			<type>1</type>
+			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/graphics/font2png.py</locationURI>
+		</link>
+		<link>
+			<name>tools/png2py.py</name>
+			<type>1</type>
+			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/graphics/png2py.py</locationURI>
 		</link>
 		<link>
 			<name>tools/wiring.odg</name>

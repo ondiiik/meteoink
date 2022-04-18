@@ -10,7 +10,7 @@ from pathlib import Path
 cwd = Path(os.getcwd(), "../micropython")
 dwd = os.path.abspath('micropython')
 fw = os.path.abspath('meteoink.fw')
-mpc = os.path.abspath('./mpy-cross -v -march=xtensawin')
+mpc = os.path.abspath('mpy-cross -v -march=xtensawin')
 repo = git.Repo(search_parent_directories=True)
 sha = repo.head.object.hexsha.encode()
 

@@ -1,20 +1,23 @@
+print('Loading module SYSTEM')
+from log import log, dump_exception
+from net import Connection
+print('Loading module DB')
 from var import write, display
 from var import alert as alert_var
+from config import alert, vbat, temp, ui as ui_cfg, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_GREETINGS
+print('Loading module HW')
+from machine import deepsleep, reset, reset_cause, DEEPSLEEP, WDT
 from battery import battery
 from buzzer import play
-from config import alert, vbat, temp, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_GREETINGS
-from display import Canvas
 from esp32 import raw_temperature
-from forecast import Forecast
 from jumpers import jumpers
 from led import Led
-from machine import deepsleep, reset, reset_cause, DEEPSLEEP
-from net import Connection
+print('Loading module DISPLAY')
+from display import Canvas
+print('Loading module FORECAST')
+from forecast import Forecast
+print('Loading module UI')
 from ui.main import MeteoUi
-from log import log, dump_exception
-from web import WebServer
-from machine import WDT
-from config import ui as ui_cfg
 
 
 def run(sha):
@@ -157,6 +160,8 @@ class App:
         ui.repaint_config(self.led, self.volt)
         self.led.mode(Led.DOWNLOAD)
 
+        print('Loading module WEB')
+        from web import WebServer
         server = WebServer(self.net, self.wdt)
 
         play((1047, 30), 120, (1319, 30), 120, (1568, 30), 120, (2093, 30))

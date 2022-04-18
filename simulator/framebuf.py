@@ -1,26 +1,4 @@
-MONO_HLSB = 0
-MONO_VLSB = 1
-MHLSB = MONO_HLSB
-MVLSB = MONO_VLSB
-
-
-_amask = (0b01111111,
-          0b10111111,
-          0b11011111,
-          0b11101111,
-          0b11110111,
-          0b11111011,
-          0b11111101,
-          0b11111110)
-
-_omask = (0b10000000,
-          0b01000000,
-          0b00100000,
-          0b00010000,
-          0b00001000,
-          0b00000100,
-          0b00000010,
-          0b00000001)
+GS4_HMSB = 0
 
 
 class FrameBuffer:
@@ -30,17 +8,17 @@ class FrameBuffer:
         self.height = h
 
     def fill(self, c):
-        p = 0 if 0 == c else 0xFF
+        p = (c << 4) | c
         for i in range(len(self.buf)):
             self.buf[i] = p
 
     def pixel(self, x, y, c=-1):
-        if (x < 0) or (x > self.width) or (y < 0) or (y > self.height):
+        if x not in range(self.width) or y not in range(self.height):
             return c
 
         pix_index = self.width * y + x
-        byte_index = pix_index // 8
-        bit_index = pix_index % 8
+        byte_index = pix_index // 2
+        bit_index = 4 - (pix_index % 2) * 4
 
         try:
             b = self.buf[byte_index]
@@ -48,14 +26,12 @@ class FrameBuffer:
             return c
 
         if c < 0:
-            c = 0 if (b & _omask[bit_index]) == 0 else 1
+            c = (b >> bit_index) & 0xF
         else:
-            if c == 0:
-                b &= _amask[bit_index]
-            else:
-                b |= _omask[bit_index]
-
-            self.buf[byte_index] = b
+            m = 0xF0 >> bit_index
+            b = c << bit_index
+            self.buf[byte_index] &= m
+            self.buf[byte_index] |= b
 
         return c
 
@@ -69,7 +45,7 @@ class FrameBuffer:
 
     def fill_rect(self, x, y, w, h, c):
         for yy in range(y, y + h):
-            self.hline(x, yy, w, c)
+            FrameBuffer.hline(self, x, yy, w, c)
 
     def vline(self, x, y, h, c):
         for yy in range(y, y + h):

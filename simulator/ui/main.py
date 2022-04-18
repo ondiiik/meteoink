@@ -1,7 +1,6 @@
 from . import Ui
 from config import DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_JUST_REPAINT, DISPLAY_DONT_REFRESH
 from display import Vect, WHITE
-from forecast import TEMPERATURE, WEATHER, ALL
 from micropython import const
 from var import write
 
@@ -43,43 +42,29 @@ class Epd42(Ui):
             # We have forecast, so lets draw it on screen. Don't draw
             # always everything as forecast is changing not so often,
             # but temperature is.
-            status = self.forecast.status
-
-            if not status.refresh == TEMPERATURE:
-                weather_dr(self, Vect(0,   0), Vect(400, 100))
-                l = outside_dr(self, Vect(105, 0), Vect(295, 50))
+            weather_dr(self, Vect(0,   0), Vect(400, 100))
+            l = outside_dr(self, Vect(105, 0), Vect(295, 50))
 
             outtemp_dr(self, Vect(105, 0), Vect(295, 50))
 
-            if status.refresh == ALL:
-                cal_dr(self, Vect(0, 100), Vect(400, 26))
+            cal_dr(self, Vect(0, 100), Vect(400, 26))
 
-            if not status.refresh == TEMPERATURE:
-                inside_dr(self, Vect(105, 50), Vect(295, 50), l, self.connection)
-                vbat_dr(self, Vect(284, 87), Vect(14, 10), volt)
+            inside_dr(self, Vect(105, 50), Vect(295, 50), l, self.connection)
+            vbat_dr(self, Vect(284, 87), Vect(14, 10), volt)
 
             intemp_dr(self, Vect(105, 50), Vect(295, 50))
 
-            if status.refresh == ALL:
-                cal_dr(self, Vect(0, 176), Vect(400, _CHART_HEIGHT + 5), False)
-                tempg_dr(self, Vect(0, 176), Vect(400, _CHART_HEIGHT))
-                icons_dr(self, Vect(0, 137), Vect(400, 40))
-                wind_dr(self, Vect(0, 282), Vect(400, 20))
-                rain_dr(self, Vect(0, 176), Vect(400, _CHART_HEIGHT))
-                tempt_dr(self, Vect(0, 176), Vect(400, _CHART_HEIGHT))
+            cal_dr(self, Vect(0, 176), Vect(400, _CHART_HEIGHT + 5), False)
+            tempg_dr(self, Vect(0, 176), Vect(400, _CHART_HEIGHT))
+            icons_dr(self, Vect(0, 137), Vect(400, 40))
+            wind_dr(self, Vect(0, 282), Vect(400, 20))
+            rain_dr(self, Vect(0, 176), Vect(400, _CHART_HEIGHT))
+            tempt_dr(self, Vect(0, 176), Vect(400, _CHART_HEIGHT))
 
         # Flush drawing on display (upper or all parts)
         print('Flushing ...')
         led.mode(led.FLUSHING)
-
-        if self.connection is None:
-            self.canvas.flush((180, 0, 32, 27))
-        elif status.refresh == TEMPERATURE:
-            self.canvas.flush((124, 0, 92, 98))
-        elif status.refresh == WEATHER:
-            self.canvas.flush((0, 0, 400, 98))
-        else:
-            self.canvas.flush()
+        self.canvas.flush()
 
         # Display is repainted, so next can be just partial repaint
         write('display', (DISPLAY_JUST_REPAINT,))

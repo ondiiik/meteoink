@@ -1,7 +1,6 @@
 from bitmap import fonts, bmp
 from config import sys, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_JUST_REPAINT, DISPLAY_DONT_REFRESH
 from display import Vect, Bitmap, BLACK, WHITE, YELLOW
-from forecast import TEMPERATURE, WEATHER, ALL
 from micropython import const
 
 
@@ -47,7 +46,27 @@ class Ui:
             if ' ' == char:
                 pos.x += int(0.3 * size) + 1
             else:
-                f = Bitmap(fonts.fonts[size][ord(char)])
+                try:
+                    f = Bitmap(fonts.fonts[size][ord(char)][color])
+                except KeyError:
+                    s = fonts.fonts[size][ord(char)][0][2]
+                    l = len(s)
+                    a = bytearray(l)
+                    for i in range(l):
+                        b = s[i]
+                        if b & 0x0F != 0x07:
+                            b &= 0xF0
+                            b |= color
+                        if b & 0xF0 != 0x70:
+                            b &= 0x0F
+                            b |= color << 4
+                        a[i] = b
+
+                    s = fonts.fonts[size][ord(char)][0]
+                    b = s[0], s[1], a
+                    fonts.fonts[size][ord(char)][color] = b
+                    f = Bitmap(b)
+
                 self.canvas.bitmap(pos, f, color)
                 pos.x += f.dim.x + 1
 
@@ -59,7 +78,7 @@ class Ui:
             if ' ' == char:
                 l += int(0.3 * size) + 1
             else:
-                f = Bitmap(fonts.fonts[size][ord(char)])
+                f = Bitmap(fonts.fonts[size][ord(char)][0])
                 l += f.dim.x + 1
 
         return l

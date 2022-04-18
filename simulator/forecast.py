@@ -32,21 +32,19 @@ ALL = const(3)
 class Forecast:
     Weather = namedtuple('Weather', ('icon', 'dt', 'temp', 'feel', 'rh', 'rain', 'snow', 'speed', 'dir'))
     Home = namedtuple('Home',    ('temp', 'rh'))
-    Status = namedtuple('Status',  ('refresh', 'sleep_time'))
+    Status = namedtuple('Status',  ('sleep_time',))
 
     def __init__(self, connection, in_temp):
         print("Reading forecast data")
         self._read1(connection, ui)
 
-        self._get_status(ui)
-
-        if self.status.refresh == ALL:
-            if ui.variant == VARIANT_2DAYS:
-                self._read2_short(connection, ui)
-            else:
-                self._read2_long(connection, ui, 96)
+        if ui.variant == VARIANT_2DAYS:
+            self._read2_short(connection, ui)
+        else:
+            self._read2_long(connection, ui, 96)
 
         self._get_dht(in_temp)
+        self._get_status(ui)
 
     @staticmethod
     def _mk_id(id, rain):
@@ -198,32 +196,14 @@ class Forecast:
                                                   wind['deg']))
 
     def _get_status(self, ui):
-        # Set forecast redraw status
-        refresh = TEMPERATURE
-
         dt = self.time.get_date_time(self.weather.dt)
+
         if (dt[3] < 6):
             sleep_time = 30
         else:
             sleep_time = 30 // DISPLAY_REFRESH_DIV
 
-        # Once per 30 minutes refresh wather
-        t = (dt[3] * 60 + dt[4])
-
-        ta = t % 30
-        if (0 <= ta) and (ta < sleep_time):
-            refresh = WEATHER
-
-        # Refresh all once per 90 or 60 minutes minutes
-        ta = t % (60 if ui.variant == VARIANT_2DAYS else 90)
-        if (0 <= ta) and (ta < sleep_time):
-            refresh = ALL
-
-        # Regardless on result - refresh all on first run
-        if not display.DISPLAY_STATE == DISPLAY_JUST_REPAINT:
-            refresh = ALL
-
-        self.status = Forecast.Status(refresh, sleep_time)
+        self.status = Forecast.Status(sleep_time)
 
     def _get_dht(self, in_temp):
         # DHT22 is powered only when display is powered

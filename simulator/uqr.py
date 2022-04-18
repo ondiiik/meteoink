@@ -1,5 +1,5 @@
 import re
-from framebuf import FrameBuffer, MONO_HLSB
+from display import Frame
 from micropython import const
 
 ERROR_CORRECT_L = const(1)
@@ -577,7 +577,7 @@ def _lost_point_level3(modules, modules_count):
                         and this_row[col + 7]
                         and this_row[col + 8]
                         and this_row[col + 10]
-                )
+                    )
             ):
                 lost_point += 40
 # horspool algorithm.
@@ -613,7 +613,7 @@ def _lost_point_level3(modules, modules_count):
                         and modules[row + 7][col]
                         and modules[row + 8][col]
                         and modules[row + 10][col]
-                )
+                    )
             ):
                 lost_point += 40
             if modules[row + 10][col]:
@@ -1180,16 +1180,12 @@ class QRCode:
             return self.modules
 
         width = len(self.modules) + self.border * 2
-        buf = bytearray(width * (width + 7) // 8)
-        fb = FrameBuffer(buf, width, width, MONO_HLSB)
+        fb = Frame(width, width)
         fb.fill(0)
+        b = self.border
 
-        y = self.border
-        for module in self.modules:
-            x = self.border
-            for p in module:
+        for y, module in zip(range(b, len(self.modules) + b), self.modules):
+            for x, p in zip(range(b, len(self.modules) + b), module):
                 fb.pixel(x, y, p)
-                x += 1
-            y += 1
 
-        return (fb, width)
+        return fb, width
