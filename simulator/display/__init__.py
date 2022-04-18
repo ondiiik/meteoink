@@ -1,3 +1,4 @@
+print('Loading module DISPLAY')
 from framebuf import FrameBuffer, GS4_HMSB
 from config import pins
 from micropython import const
@@ -175,7 +176,7 @@ class Canvas:
         x, y = v()
         w, h = d()
         for y in range(y, y + h):
-            self.htline(Vect(x, y), w, c)
+            self._vtline(y, self._r - x - w, w, c)
 
     @micropython.native
     def fill_rect(self, v, d, c=BLACK):

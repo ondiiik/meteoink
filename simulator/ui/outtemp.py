@@ -1,12 +1,9 @@
-from ui import UiFrame, Vect, BLACK, YELLOW
+from ui import UiFrame, Vect as V, BLACK, YELLOW
 from config import temp
 
 
 class UiOutTemp(UiFrame):
-    def __init__(self, ofs, dim):
-        super().__init__(ofs, dim)
-
-    def draw(self, ui, d):
+    def draw(self, ui):
         t = ui.forecast.weather.temp
 
         if t >= temp.outdoor_high:
@@ -14,7 +11,7 @@ class UiOutTemp(UiFrame):
         else:
             hl = None
 
-        ui.text(50, '{:.1f}'.format(t), Vect(21, -5), BLACK, hl, 3)
+        ui.text(50, '{:.1f}'.format(t), V(21, -5), BLACK, hl, 3)
 
         bitmap = ui.bitmap(1, 'out')
-        ui.canvas.bitmap(Vect(0, 30), bitmap)
+        ui.canvas.bitmap(V(0, 30), bitmap)

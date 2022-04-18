@@ -1,191 +1,112 @@
 from . import Ui
-from display import Vect, WHITE, BLUE, GREEN, YELLOW, RED, BLACK
+from display import Vect as V
 from micropython import const
-from var import write
 
 
-_CHART_HEIGHT = const(90)
-
-
-class Epd_ACEP(Ui):
-    def __init__(self, canvas, forecast, connection):
+class Epd(Ui):
+    def __init__(self, canvas, forecast, connection, led):
         super().__init__(canvas)
         self.forecast = forecast
         self.connection = connection
-
-    def repaint_welcome(self, led):
-        # Redraw display
-        print('Drawing welcome ...')
-        led.mode(led.DRAWING)
-
-        bitmap = self.bitmap(1, 'greetings')
-        self.canvas.bitmap(Vect(0, 0), bitmap)
-
-        print('Flushing ...')
-        led.mode(led.FLUSHING)
-        self.canvas.flush()
-
-    def repaint_weather(self, led, volt):
-        # Redraw display
-        print('Drawing weather ...')
-        led.mode(led.DRAWING)
-
-        self.canvas.fill(WHITE)
-
-        if self.connection is None:
-            # No forecast when there is no connection. Just draw no-wifi
-            # symbol into middle of screen and leave
-            bitmap = self.bitmap(1, 'nowifi')
-            self.canvas.bitmap(Vect(177, 0), bitmap)
-        else:
-            # We have forecast, so lets draw it on screen. Don't draw
-            # always everything as forecast is changing not so often,
-            # but temperature is.
-            weather_dr(self, Vect(0,   0), Vect(400, 100))
-            l = outside_dr(self, Vect(105, 0), Vect(295, 50))
-
-            outtemp_dr(self, Vect(105, 0), Vect(295, 50))
-
-            cal_dr(self, Vect(0, 100), Vect(400, 26))
-
-            inside_dr(self, Vect(105, 50), Vect(295, 50), l, self.connection)
-            vbat_dr(self, Vect(284, 87), Vect(14, 10), volt)
-
-            intemp_dr(self, Vect(105, 50), Vect(295, 50))
-
-            cal_dr(self, Vect(0, 176), Vect(400, _CHART_HEIGHT + 5), False)
-            tempg_dr(self, Vect(0, 176), Vect(400, _CHART_HEIGHT))
-            icons_dr(self, Vect(0, 137), Vect(400, 40))
-            wind_dr(self, Vect(0, 282), Vect(400, 20))
-            rain_dr(self, Vect(0, 176), Vect(400, _CHART_HEIGHT))
-            tempt_dr(self, Vect(0, 176), Vect(400, _CHART_HEIGHT))
-
-        # Flush drawing on display (upper or all parts)
-        print('Flushing ...')
-        led.mode(led.FLUSHING)
-        self.canvas.flush()
+        self.led = led
 
     def repaint_config(self, led, volt):
         from config.spot import hotspot
+        from ui.qr import UiQr
+        from ui.url import UiUrl
+        from ui.vbat import UiVBat
+        from ui.wifi import UiWifi
 
-        # After config we will need to repaint all
-        print('Drawing config ...')
-        led.mode(led.DRAWING)
-        self.canvas.fill(WHITE)
+        with self.Drawing('hotspot', self):
+            url = f'http://{self.connection.ifconfig[0]}:5555'
+            wifi = f'WIFI:T:WPA;S:{hotspot.ssid};P:{hotspot.passwd};;'
 
-        qr_dr(self,
-              Vect(0, 0),
-              Vect(0, 0),
-              ('WIFI:T:WPA;S:{};P:{};;'.format(hotspot.ssid, hotspot.passwd), 'WiFi', False))
+            UiQr(V(0, 0), V(0, 0)).repaint(self, wifi, 'WiFi', False)
+            UiQr(V(self.width - 122, self.height - 122), V(0, 0)).repaint(self, url, 'Config URL', True)
+            UiUrl(V(0, self.canvas.dim.y // 2), V(self.canvas.dim.x - 132, self.canvas.dim.y // 2)).repaint(self, url)
+            UiWifi(V(200, 0), V(self.canvas.dim.x - 132, self.canvas.dim.y // 2)).repaint(self, hotspot)
+            UiVBat(V(self.canvas.dim.x // 2 - 10, self.canvas.dim.y // 2),  V(20, 10)).repaint(self, volt)
 
-        url = 'http://{}:5555'.format(self.connection.ifconfig[0])
-        qr_dr(self, Vect(278, 178), Vect(0, 0), (url, 'Config URL', True))
+    class Drawing:
+        def __init__(self, name, epd):
+            self.name = name
+            self.epd = epd
 
-        url_dr(self,  Vect(0,   self.canvas.dim.y // 2), Vect(self.canvas.dim.x - 132, self.canvas.dim.y // 2), url)
-        wifi_dr(self, Vect(200, 0),                      Vect(self.canvas.dim.x - 132, self.canvas.dim.y // 2), hotspot)
+        def __enter__(self):
+            print(f'Drawing {self.name} ...')
+            self.epd.led.mode(self.epd.led.DRAWING)
+            self.epd.canvas.clear()
 
-        vbat_dr(self,  Vect(self.canvas.dim.x // 2 - 10, self.canvas.dim.y // 2),  Vect(20, 10), volt)
+        def __exit__(self, *args):
+            print(f'Flushing {self.name} ...')
+            self.epd.led.mode(self.epd.led.FLUSHING)
+            self.epd.canvas.flush()
 
-        print('Flushing ...')
-        led.mode(led.FLUSHING)
-        self.canvas.flush()
+
+class Epd_ACEP(Epd):
+    def repaint_welcome(self, led):
+        with self.Drawing('welcome', self):
+            bitmap = self.bitmap(1, 'greetings')
+            self.canvas.bitmap(V(0, 0), bitmap)
+
+    def repaint_forecast(self, led, volt):
+        with self.Drawing('weather', self):
+            if self.connection is None:
+                # No forecast when there is no connection. Just draw no-wifi
+                # symbol into middle of screen and leave
+                bitmap = self.bitmap(1, 'nowifi')
+                self.canvas.bitmap(V(177, 0), bitmap)
+            else:
+                # We have forecast, so lets draw it on screen. Don't draw
+                # always everything as forecast is changing not so often,
+                # but temperature is.
+                from ui.calendar import UiCalendar
+                from ui.icons import UiIcons
+                from ui.inside import UiInside
+                from ui.intemp import UiInTemp
+                from ui.outside import UiOutside
+                from ui.outtemp import UiOutTemp
+                from ui.rain import UiRain
+                from ui.tempg import UiTempGr
+                from ui.vbat import UiVBat
+                from ui.weather import UiWeather
+                from ui.wind import UiWind
+
+                weather = UiWeather(V(0, 0), V(self.width, 120))
+                outside = UiOutside(V(105, 0), V(295, weather.height // 2))
+                inside = UiInside(V(105, outside.bellow), V(295, outside.height))
+                out_temp = UiOutTemp(V(105, 0), V(295, outside.height))
+                in_temp = UiInTemp(V(105, out_temp.bellow), V(295, outside.height))
+
+                calendar_head = UiCalendar(V(0, weather.bellow), V(self.width, 32))
+                icons = UiIcons(V(0, calendar_head.bellow + 6), V(self.width, 55))
+                calendar_tail = UiCalendar(V(0, icons.bellow), V(self.width, 110))
+                graph_temp = UiTempGr(*calendar_tail.same)
+                graph_rain = UiRain(*calendar_tail.same)
+                wind = UiWind(V(0, calendar_tail.bellow), V(self.width, 30))
+                batt = UiVBat(V(284, in_temp.bellow), V(14, 10))
+
+                calendar_head.repaint(self, True)
+                calendar_tail.repaint(self, False)
+                graph_temp.repaint(self)
+                graph_rain.repaint(self)
+                wind.repaint(self)
+                icons.repaint(self)
+                weather.repaint(self)
+                l = outside.repaint(self)
+                inside.repaint(self, l, self.connection)
+                out_temp.repaint(self)
+                in_temp.repaint(self)
+                batt.repaint(self, volt)
 
     def repaint_lowbat(self, volt):
-        print('Drawing lowbat ...')
-        self.canvas.fill(WHITE)
-        v = Vect(self.canvas.dim.x // 2 - 30, self.canvas.dim.y // 2)
-        d = Vect(60, 30)
-        vbat_dr(self, v, d, volt)
+        with self.Drawing('lowbat', self):
+            from ui.vbat import UiVBat
 
-        print('Flushing ...')
-        self.canvas.flush()
-        write('display')
+            v = V(self.canvas.dim.x // 2 - 30, self.canvas.dim.y // 2)
+            d = V(60, 30)
+            UiVBat(v, d).repaint(self, volt)
 
 
-def weather_dr(ui, p, d):
-    from ui.weather import UiWeather
-    UiWeather(p, d).repaint(ui)
-
-
-def outside_dr(ui, p, d):
-    from ui.outside import UiOutside
-    return UiOutside(p, d).repaint(ui)
-
-
-def outtemp_dr(ui, p, d):
-    from ui.outtemp import UiOutTemp
-    UiOutTemp(p, d).repaint(ui)
-
-
-def inside_dr(ui, p, d, tab, connection):
-    from ui.inside import UiInside
-    UiInside(p, d).repaint(ui, (tab, connection))
-
-
-def intemp_dr(ui, p, d):
-    from ui.intemp import UiInTemp
-    UiInTemp(p, d).repaint(ui)
-
-
-def cal_dr(ui, p, d, title=True):
-    from ui.calendar import UiCalendar
-    UiCalendar(p, d).repaint(ui, title)
-
-
-def icons_dr(ui, p, d):
-    from ui.icons import UiIcons
-    UiIcons(p, d).repaint(ui)
-
-
-def rain_dr(ui, p, d):
-    from ui.rain import UiRain
-    UiRain(p, d).repaint(ui)
-
-
-def tempg_dr(ui, p, d):
-    from ui.tempg import UiTempGr
-    UiTempGr(p, d).repaint(ui)
-
-
-def wind_dr(ui, p, d):
-    from ui.wind import UiWind
-    UiWind(p, d).repaint(ui)
-
-
-def tempt_dr(ui, p, d):
-    from ui.tempt import UiTempTxt
-    UiTempTxt(p, d).repaint(ui)
-
-
-def fore_dr(ui, p, d):
-    from ui.forecast import UiForecast
-    UiForecast(p, d).repaint(ui)
-
-
-def qr_dr(ui, p, d, a):
-    from ui.qr import UiQr
-    UiQr(p, d, a).repaint(ui)
-
-
-def wifi_dr(ui, p, d, h):
-    from ui.wifi import UiWifi
-    UiWifi(p, d, h).repaint(ui)
-
-
-def url_dr(ui, p, d, u):
-    from ui.url import UiUrl
-    UiUrl(p, d, u).repaint(ui)
-
-
-def vbat_dr(ui, p, d, volt):
-    from ui.vbat import UiVBat
-    UiVBat(p, d).repaint(ui, volt)
-
-
-class MeteoUi:
-    def __init__(self, canvas, forecast, connection):
-        self.ui = Epd_ACEP(canvas, forecast, connection)
-        self.repaint_welcome = self.ui.repaint_welcome
-        self.repaint_weather = self.ui.repaint_weather
-        self.repaint_config = self.ui.repaint_config
-        self.repaint_lowbat = self.ui.repaint_lowbat
+class MeteoUi(Epd_ACEP):
+    pass

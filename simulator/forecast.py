@@ -1,3 +1,4 @@
+print('Loading module FORECAST')
 import dht
 from machine import Pin, deepsleep, RTC
 from micropython import const

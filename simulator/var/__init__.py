@@ -1,3 +1,4 @@
+print('Loading module DB')
 from machine import reset
 from log import log
 

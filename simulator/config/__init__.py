@@ -1,3 +1,4 @@
+print('Loading module CONFIG')
 from micropython import const
 from machine import reset
 

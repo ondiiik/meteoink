@@ -1,12 +1,9 @@
-from ui import UiFrame, Vect, BLACK, WHITE
+from ui import UiFrame, Vect as V, BLACK, WHITE
 from micropython import const
 
 
 class UiTempTxt(UiFrame):
-    def __init__(self, ofs, dim):
-        super().__init__(ofs, dim)
-
-    def draw(self, ui, d):
+    def draw(self, ui):
         # Pre-calculates some range values and draw icons bar
         forecast = ui.forecast.forecast
         cnt = len(forecast)
@@ -39,7 +36,7 @@ class UiTempTxt(UiFrame):
                 f = (forecast[i - 1], forecast[i], forecast[i + 1])
 
                 if (f[0].temp < f[1].temp) and (f[1].temp > f[2].temp):
-                    ui.text_center(16, '{:.0f}°C'.format(f[1].temp), Vect(x1, chart_y(f[1].temp) - 20), BLACK, WHITE)
+                    ui.text_center(16, '{:.0f}°C'.format(f[1].temp), V(x1, chart_y(f[1].temp) - 20), BLACK, WHITE)
 
                 if (f[0].temp > f[1].temp) and (f[1].temp < f[2].temp):
-                    ui.text_center(16, '{:.0f}°C'.format(f[1].temp), Vect(x1, chart_y(f[1].temp) + 4),  BLACK, WHITE)
+                    ui.text_center(16, '{:.0f}°C'.format(f[1].temp), V(x1, chart_y(f[1].temp) + 4),  BLACK, WHITE)

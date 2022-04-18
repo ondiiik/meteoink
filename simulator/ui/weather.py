@@ -1,14 +1,11 @@
-from ui import UiFrame, Vect, BLACK, WHITE
+from ui import UiFrame, Vect as V, BLACK, WHITE
 
 
 class UiWeather(UiFrame):
-    def __init__(self, ofs, dim):
-        super().__init__(ofs, dim)
-
-    def draw(self, ui, d):
+    def draw(self, ui):
         weather = ui.forecast.weather
         bitmap = ui.bitmap(1, weather.icon)
-        ui.canvas.bitmap(Vect(5, 0), bitmap)
+        ui.canvas.bitmap(V(5, 0), bitmap)
 
         if weather.rain > 0:
-            ui.text(10, f'{weather.rain:.1f} mm/h', Vect(2, self.dim.y - 14), BLACK, WHITE)
+            ui.text(10, f'{weather.rain:.1f} mm/h', V(2, self.dim.y - 14), BLACK, WHITE)

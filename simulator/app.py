@@ -1,7 +1,6 @@
 print('Loading module SYSTEM')
 from log import log, dump_exception
 from net import Connection
-print('Loading module DB')
 from var import write, display
 from var import alert as alert_var
 from config import alert, vbat, temp, ui as ui_cfg, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_GREETINGS
@@ -12,11 +11,8 @@ from buzzer import play
 from esp32 import raw_temperature
 from jumpers import jumpers
 from led import Led
-print('Loading module DISPLAY')
 from display import Canvas
-print('Loading module FORECAST')
 from forecast import Forecast
-print('Loading module UI')
 from ui.main import MeteoUi
 
 
@@ -156,7 +152,7 @@ class App:
         play((2093, 30), 120, (2093, 30))
         self.led.mode(Led.DOWNLOAD)
 
-        ui = MeteoUi(self.canvas, None, self.net)
+        ui = MeteoUi(self.canvas, None, self.net, self.led)
         ui.repaint_config(self.led, self.volt)
         self.led.mode(Led.DOWNLOAD)
 
@@ -179,8 +175,8 @@ class App:
         return None if self.net is None else Forecast(self.net, self.temp)
 
     def repaint(self, forecast):
-        ui = MeteoUi(self.canvas, forecast, self.net)
-        ui.repaint_weather(self.led, self.volt)
+        ui = MeteoUi(self.canvas, forecast, self.net, self.led)
+        ui.repaint_forecast(self.led, self.volt)
 
     def allerts(self, forecast):
         if not alert.temp_balanced:

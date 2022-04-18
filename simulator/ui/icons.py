@@ -1,13 +1,9 @@
-from ui import UiFrame, Vect
-from forecast import id2icon
+from ui import UiFrame, Vect as V
 from micropython import const
 
 
 class UiIcons(UiFrame):
-    def __init__(self, ofs, dim):
-        super().__init__(ofs, dim)
-
-    def draw(self, ui, d):
+    def draw(self, ui):
         # Pre-calculates some range values and draw icons bar
         rows_cnt = const(2)
         forecast = ui.forecast.forecast
@@ -25,4 +21,4 @@ class UiIcons(UiFrame):
                 bitmap = ui.bitmap(4, id)
                 icon[id] = bitmap
 
-            ui.canvas.bitmap(Vect(xx, i % rows_cnt * h_icons), bitmap)
+            ui.canvas.bitmap(V(xx, i % rows_cnt * h_icons), bitmap)

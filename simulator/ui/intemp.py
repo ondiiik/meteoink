@@ -1,12 +1,9 @@
-from ui import UiFrame, Vect, BLACK, YELLOW
+from ui import UiFrame, Vect as V, BLACK, YELLOW
 from config import temp
 
 
 class UiInTemp(UiFrame):
-    def __init__(self, ofs, dim):
-        super().__init__(ofs, dim)
-
-    def draw(self, ui, d):
+    def draw(self, ui):
         t = ui.forecast.home.temp
         hl = None
 
@@ -18,7 +15,7 @@ class UiInTemp(UiFrame):
         else:
             t = '--'
 
-        ui.text(50, t, Vect(21, -5), BLACK, hl, 3)
+        ui.text(50, t, V(21, -5), BLACK, hl, 3)
 
         bitmap = ui.bitmap(1, 'in')
-        ui.canvas.bitmap(Vect(0, 30), bitmap)
+        ui.canvas.bitmap(V(0, 30), bitmap)

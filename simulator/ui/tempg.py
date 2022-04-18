@@ -1,15 +1,12 @@
-from ui import UiFrame, Vect, BLACK, WHITE, YELLOW
+from ui import UiFrame, Vect as V, BLACK, WHITE, YELLOW
 from micropython import const
 from config import temp
 
 
 class UiTempGr(UiFrame):
-    def __init__(self, ofs, dim):
-        super().__init__(ofs, dim)
-        self.temp_min = 273.0
-
-    def draw(self, ui, d):
+    def draw(self, ui):
         # Pre-calculates some range values
+        self.temp_min = 273.0
         forecast = ui.forecast.forecast
         cnt = len(forecast)
         self.block = ui.canvas.dim.x / cnt
@@ -43,13 +40,13 @@ class UiTempGr(UiFrame):
                 f2 = forecast[i2].feel
 
                 if (th is None):
-                    v1 = Vect(x1, self.chart_y(f1))
-                    v2 = Vect(x2, self.chart_y(f2))
+                    v1 = V(x1, self.chart_y(f1))
+                    v2 = V(x2, self.chart_y(f2))
                     ui.canvas.line(v1, v2, c, w)
 
                 if (th is None) or (f1 > th) or (f2 > th) or (f1 < tl) or (f2 < tl):
-                    v1 = Vect(x1, self.chart_y(forecast[i1].temp))
-                    v2 = Vect(x2, self.chart_y(forecast[i2].temp))
+                    v1 = V(x1, self.chart_y(forecast[i1].temp))
+                    v2 = V(x2, self.chart_y(forecast[i2].temp))
                     ui.canvas.line(v1, v2, c, w * 2)
 
     def chart_y(self, temp):

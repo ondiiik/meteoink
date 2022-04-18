@@ -1,6 +1,8 @@
+print('Loading module UI')
 from bitmap import fonts, bmp
 from config import sys, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_JUST_REPAINT, DISPLAY_DONT_REFRESH
-from display import Vect, Bitmap, BLACK, WHITE, YELLOW
+from display import Vect, Bitmap, BLACK, WHITE, GREEN, BLUE, RED, YELLOW, ORANGE, ALPHA
+
 from micropython import const
 
 
@@ -9,9 +11,37 @@ class UiFrame:
         self.ofs = ofs
         self.dim = dim
 
-    def repaint(self, ui, d=None):
+    @property
+    def same(self):
+        return self.ofs, self.dim
+
+    @property
+    def above(self):
+        return self.ofs.y
+
+    @property
+    def bellow(self):
+        return self.dim.y + self.ofs.y
+
+    @property
+    def left(self):
+        return self.ofs.x
+
+    @property
+    def right(self):
+        return self.dim.x + self.ofs.x
+
+    @property
+    def width(self):
+        return self.dim.x
+
+    @property
+    def height(self):
+        return self.dim.y
+
+    def repaint(self, ui, *args):
         ui.canvas.ofs += self.ofs
-        r = self.draw(ui, d)
+        r = self.draw(ui, *args)
         ui.canvas.ofs -= self.ofs
         return r
 
@@ -19,6 +49,8 @@ class UiFrame:
 class Ui:
     def __init__(self, canvas):
         self.canvas = canvas
+        self.width = canvas.dim.x
+        self.height = canvas.dim.y
 
     def bitmap(self, size, name):
         return Bitmap(bmp.bmp[name][size])
