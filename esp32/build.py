@@ -77,10 +77,11 @@ def packfw(l):
 
 
 with open(Path(cwd, 'main.py'), 'w') as f:
-    f.write(f'''from log import dump_exception
+    f.write(f'''from ulogging import getLogger, dump_exception
+logger = getLogger('main')
 
 try:
-    print('Starting the application ...')
+    logger.info('Starting the application ...')
     from app import run
     run({sha})
     
@@ -105,6 +106,7 @@ convert(find('bitmap'))
 convert(find('config'))
 convert(find('display'))
 convert(find('lang'))
+convert(find('setup'))
 convert(find('ui'))
 convert(find('var'))
 convert(find('web'))

@@ -1,10 +1,11 @@
-from config import connection
+from ulogging import getLogger
+logger = getLogger(__name__)
 from gc import collect
 from jumpers import jumpers
-from log import log
 from micropython import const
 from uerrno import ECONNRESET
 import urequests
+from config import connection, location, ui
 
 
 CONN_RETRY_CNT = const(6)
@@ -18,7 +19,7 @@ class Wifi:
 
 class Connection:
     def __init__(self):
-        self.is_hotspot = jumpers.hotspot
+        self.is_hotspot = (jumpers.hotspot or 0 == len(connection) or 0 == len(location) or '' == ui.apikey)
 
         if not self.is_hotspot:
             self.config = connection[0]
@@ -30,7 +31,7 @@ class Connection:
         return ('192.168.1.254', '255.255.255.0', '192.168.1.255')
 
     def http_get_json(self, url):
-        log("HTTP GET: " + url)
+        logger.info("HTTP GET: " + url)
 
         for retry in range(CONN_RETRY_CNT):
             try:
@@ -38,7 +39,7 @@ class Connection:
                 collect()
                 return
             except OSError as e:
-                log('ECONNRESET -> retry')
+                logger.info('ECONNRESET -> retry')
                 if e.errno == ECONNRESET:
                     continue
 

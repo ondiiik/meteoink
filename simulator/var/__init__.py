@@ -1,6 +1,7 @@
-print('Loading module DB')
+from ulogging import getLogger
+logger = getLogger(__name__)
+
 from machine import reset
-from log import log
 
 
 def _check_alert(args, assign):
@@ -15,7 +16,7 @@ def _write_alert(args):
         cnt = 0
 
     cnt += 1
-    log('Rebuild variables', f'alert ({cnt} times)')
+    logger.info('Rebuild variables', f'alert ({cnt} times)')
     with open(f'var/alert.py', 'w') as f:
         f.write(f'ALREADY_TRIGGERED = {args[0]}\n_cnt = {cnt}\n')
 
@@ -40,7 +41,7 @@ reboot = False
 reboot = write('alert',   (False,), False) or reboot
 
 if reboot:
-    log('Variables rebuilt - rebooting')
+    logger.info('Variables rebuilt - rebooting')
     reset()
 
 import var.alert

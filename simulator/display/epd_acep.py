@@ -55,3 +55,7 @@ class EPD:
 
         pygame.display.flip()
         self._clock.tick(2)
+
+    def deghost(self, buf):
+        for i in range(len(buf)):
+            buf[i] = 0x77

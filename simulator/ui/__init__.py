@@ -1,4 +1,6 @@
-print('Loading module UI')
+from ulogging import getLogger
+logger = getLogger(__name__)
+
 from bitmap import fonts, bmp
 from config import sys, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_JUST_REPAINT, DISPLAY_DONT_REFRESH
 from display import Vect, Bitmap, BLACK, WHITE, GREEN, BLUE, RED, YELLOW, ORANGE, ALPHA

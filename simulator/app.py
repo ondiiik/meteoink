@@ -1,15 +1,15 @@
-print('Loading module SYSTEM')
-from log import log, dump_exception
+from ulogging import getLogger, dump_exception
+logger = getLogger(__name__)
+
+from jumpers import jumpers
 from net import Connection
 from var import write, display
 from var import alert as alert_var
 from config import alert, vbat, temp, ui as ui_cfg, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_GREETINGS
-print('Loading module HW')
-from machine import deepsleep, reset, reset_cause, DEEPSLEEP, WDT
+from machine import deepsleep, reset, WDT
 from battery import battery
 from buzzer import play
 from esp32 import raw_temperature
-from jumpers import jumpers
 from led import Led
 from display import Canvas
 from forecast import Forecast
@@ -20,11 +20,6 @@ def run(sha):
     try:
         # Init all peripheries
         app = App()
-
-        # Beep when we are rebooted (only when this is not wake up
-        # from deep sleep)
-        if not DEEPSLEEP == reset_cause():
-            play((2093, 30))
 
         # It can happen that we want only to move meteostation somewhere
         # and don't want to let it wake up during transport. In this case
@@ -38,7 +33,7 @@ def run(sha):
         # It may happen that user wants to attach with HTTP for update of firmware
         # or configuration. In this case we can not rely on existing WiFi connection
         # and we rather go to hot-spot mode.
-        elif jumpers.hotspot:
+        elif app.net.is_hotspot:
             app.hotspot()
 
         # And finally - meteostation display - basic functionality ;-)
@@ -65,13 +60,17 @@ def run(sha):
 
     except Exception as e:
         dump_exception('FATAL - RECOVERY REQUIRED !!!', e)
+
+        if alert.error_beep:
+            play((200, 500), (100, 500))
+
         app.sleep(forecast, 5)
 
 
 class App:
     def __init__(self):
         # First of all we have to initialize watchdog if requested
-        log('Initializing watchdog ...')
+        logger.info('Initializing watchdog ...')
         self.wdt = WDT(timeout=120000)
 
         # Reads internal temperature just after wake-up to reduce
@@ -125,7 +124,7 @@ class App:
             ui = MeteoUi(self.canvas, None, None)
             ui.repaint_lowbat(self.volt)
 
-            log('Low battery !!!')
+            logger.info('Low battery !!!')
             self.sleep(15)
 
         # Once we have canvas established (large object needs
@@ -135,17 +134,20 @@ class App:
 
         try:
             self.net = Connection()
-            log('Connected to network')
+            logger.info('Connected to network')
         except Exception as e:
             self.net = None
             dump_exception('Network connection error', e)
 
+            if alert.error_beep:
+                play((200, 500), (100, 500))
+
     def greetings(self):
         ui = MeteoUi(self.canvas, None, self.net)
-        ui.repaint_welcome(self.led)
+        ui.repaint_welcome()
 
         write('display', (DISPLAY_REQUIRES_FULL_REFRESH,))
-        log('Going to deep sleep ...')
+        logger.info('Going to deep sleep ...')
         deepsleep()
 
     def hotspot(self):
@@ -153,10 +155,10 @@ class App:
         self.led.mode(Led.DOWNLOAD)
 
         ui = MeteoUi(self.canvas, None, self.net, self.led)
-        ui.repaint_config(self.led, self.volt)
+        ui.repaint_config(self.volt)
         self.led.mode(Led.DOWNLOAD)
 
-        print('Loading module WEB')
+        logger.info('Loading module WEB')
         from web import WebServer
         server = WebServer(self.net, self.wdt)
 
@@ -176,7 +178,7 @@ class App:
 
     def repaint(self, forecast):
         ui = MeteoUi(self.canvas, forecast, self.net, self.led)
-        ui.repaint_forecast(self.led, self.volt)
+        ui.repaint_forecast(self.volt)
 
     def allerts(self, forecast):
         if not alert.temp_balanced:
@@ -198,7 +200,7 @@ class App:
 
     def sleep(self, forecast=None, minutes=0):
         if self.net is None:
-            log('No WiFi connection, retry in 5 minutes ...')
+            logger.info('No WiFi connection, retry in 5 minutes ...')
             deepsleep(300000)
 
         if 0 == minutes:
@@ -214,5 +216,5 @@ class App:
             if h in range(b, e):
                 minutes *= 2
 
-        log('Going to deep sleep for {} minutes ...'.format(minutes))
+        logger.info('Going to deep sleep for {} minutes ...'.format(minutes))
         deepsleep(minutes * 60000)

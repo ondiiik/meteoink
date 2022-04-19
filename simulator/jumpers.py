@@ -1,38 +1,24 @@
-from machine import Pin
-from config import pins, connection, location, ui
+from ulogging import getLogger
+logger = getLogger(__name__)
+
+from machine import Pin, reset_cause, DEEPSLEEP
+from setup import pins
+from buzzer import play
 
 
-class Jumpers:
-    class PinDummy:
-        @staticmethod
-        def value():
-            return 1
-
-    def __init__(self):
-        self._hp = self._init_pin(pins.HOTSPOT_BUTTON)
-        self._al = self._init_pin(pins.ALLERT_BUTTON)
-        self._sl = self._init_pin(pins.SLEEP_BUTTON)
-
-    def _init_pin(self, pin):
-        if 0 > pin:
-            return self.PinDummy()
-        else:
-            return Pin(pin, Pin.IN, Pin.PULL_UP)
-
-    @property
-    def hotspot(self):
-        return 0 == self._hp.value() or \
-            0 == len(connection) or \
-            0 == len(location) or \
-            '' == ui.apikey
-
-    @property
-    def alert(self):
-        return 0 == self._al.value()
-
-    @property
-    def sleep(self):
-        return 0 == self._sl.value()
+def _pin_value(pin):
+    if 0 > pin:
+        return False
+    else:
+        p = Pin(pin, Pin.IN, Pin.PULL_UP)
+        return not p.value()
 
 
-jumpers = Jumpers()
+class jumpers:
+    hotspot = _pin_value(pins.HOTSPOT_BUTTON)
+    alert = _pin_value(pins.ALLERT_BUTTON)
+    sleep = _pin_value(pins.SLEEP_BUTTON)
+
+
+if not DEEPSLEEP == reset_cause():
+    play((2093, 30))

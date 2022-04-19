@@ -1,10 +1,12 @@
+from ulogging import getLogger
+logger = getLogger(__name__)
+
 from jumpers import jumpers
 from network import WLAN, STA_IF, AP_IF
-from config import connection, hotspot
+from config import connection, location, ui, hotspot
 from utime import sleep
 import urequests
 from uerrno import ECONNRESET
-from log import log
 
 
 CONN_RETRY_CNT = const(6)
@@ -33,7 +35,7 @@ class Connection:
         self._ifc.active(False)
 
         # Start requested variant of connection
-        if jumpers.hotspot:
+        if jumpers.hotspot or 0 == len(connection) or 0 == len(location) or '' == ui.apikey:
             self._hotspot()
         else:
             self._attach()
@@ -78,7 +80,7 @@ class Connection:
 
         for i in range(8):
             if self._ifc.isconnected():
-                log("Connected: " + str(self.ifconfig))
+                logger.info("Connected: " + str(self.ifconfig))
                 self.is_hotspot = False
                 return
 
@@ -96,14 +98,14 @@ class Connection:
             sleep(1)
 
         self.is_hotspot = True
-        log("Running hotspot: " + str(self.ifconfig))
+        logger.info("Running hotspot: " + str(self.ifconfig))
 
     @property
     def ifconfig(self):
         return self._ifc.ifconfig()
 
     def http_get_json(self, url):
-        log("HTTP GET: " + url)
+        logger.info("HTTP GET: " + url)
 
         for retry in range(CONN_RETRY_CNT):
             try:
@@ -111,7 +113,7 @@ class Connection:
                 collect()
                 return
             except OSError as e:
-                log('ECONNRESET -> retry')
+                logger.warning('ECONNRESET -> retry')
                 if e.errno == ECONNRESET:
                     continue
 

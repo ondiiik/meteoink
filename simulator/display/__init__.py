@@ -1,6 +1,8 @@
-print('Loading module DISPLAY')
+from ulogging import getLogger
+logger = getLogger(__name__)
+
 from framebuf import FrameBuffer, GS4_HMSB
-from config import pins
+from setup import pins
 from micropython import const
 from struct import unpack
 import micropython
@@ -80,7 +82,7 @@ class Frame(FrameBuffer):
 class Canvas:
     @micropython.native
     def __init__(self):
-        print("Building EPD:")
+        logger.info("Building EPD:")
 
         spi = SPI(1)
         spi.init(baudrate=2000000,
@@ -93,18 +95,18 @@ class Canvas:
         dc = Pin(pins.DC)
         rst = Pin(pins.RST)
         busy = Pin(pins.BUSY)
-        print("\tSPI - [ OK ]")
+        logger.info("\tSPI - [ OK ]")
 
         self.epd = epaper.EPD(spi, cs, dc, rst, busy)
         self.dim = Vect(self.epd.height, self.epd.width)
         self._r = self.epd.height - 1
         self.ofs = Vect(0, 0)
-        print("\tEPD - [ OK ]")
+        logger.info("\tEPD - [ OK ]")
 
         self.buf = bytearray((self.epd.width * self.epd.height + 1) // 2)
         self.fb = FrameBuffer(self.buf, self.epd.width, self.epd.height, GS4_HMSB)
         self.clear()
-        print("\tFrame buffer - [ OK ]")
+        logger.info("\tFrame buffer - [ OK ]")
 
     @micropython.native
     def clear(self):
@@ -115,7 +117,11 @@ class Canvas:
         self.fb.fill(c)
 
     @micropython.native
-    def flush(self):
+    def flush(self, deghost=False):
+        if deghost:
+            logger.info('De-ghosting ...')
+            self.epd.deghost(self.buf[:])
+        logger.info('Flushing ...')
         self.epd.display_frame(self.buf)
 
     @micropython.native

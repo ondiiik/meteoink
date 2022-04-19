@@ -1,3 +1,6 @@
+from ulogging import getLogger
+logger = getLogger(__name__)
+
 from . import Server
 from buzzer import play
 from micropython import const
@@ -12,7 +15,7 @@ class WebServer(Server):
         self.last = ''
 
     def process(self):
-        print('*** PAGE ***', self.page)
+        logger.info('*** PAGE ***', self.page)
 
         if (self.page == '') or (self.last == self.page):
             self.page = 'index'
@@ -20,7 +23,7 @@ class WebServer(Server):
         try:
             page = __import__('web.{}'.format(self.page), None, None, ('page',), 0).page
         except ImportError:
-            print('!!! Page {} not found !!!'.format(self.page))
+            logger.info('!!! Page {} not found !!!'.format(self.page))
             return
 
         if not self.last == self.page:

@@ -1,5 +1,9 @@
+from ulogging import getLogger
+logger = getLogger(__name__)
+
 from machine import Pin, PWM
-from config import pins, led
+from setup import pins
+from config import led
 
 
 class Led():

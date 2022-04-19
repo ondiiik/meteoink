@@ -1,5 +1,8 @@
+from ulogging import getLogger
+logger = getLogger(__name__)
+
 from machine import Pin, ADC
-from config import pins
+from setup import pins
 
 
 class Battery:

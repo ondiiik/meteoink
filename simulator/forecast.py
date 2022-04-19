@@ -1,13 +1,14 @@
-print('Loading module FORECAST')
+from ulogging import getLogger
+logger = getLogger(__name__)
+
 import dht
 from machine import Pin, deepsleep, RTC
 from micropython import const
 from collections import namedtuple
-from config import pins, sys, location, DISPLAY_JUST_REPAINT, VARIANT_2DAYS, DISPLAY_REFRESH_DIV, ui
+from setup import pins
+from config import sys, location, VARIANT_2DAYS, DISPLAY_REFRESH_DIV, ui
 from ltime import Time
-from var import display
 from buzzer import play
-from log import log
 
 
 # See https://openweathermap.org/weather-conditions
@@ -36,7 +37,7 @@ class Forecast:
     Status = namedtuple('Status',  ('sleep_time',))
 
     def __init__(self, connection, in_temp):
-        print("Reading forecast data")
+        logger.info("Reading forecast data")
         self._read1(connection, ui)
 
         if ui.variant == VARIANT_2DAYS:
@@ -64,13 +65,13 @@ class Forecast:
         # Parse todays forecast
         try:
             if not fcast['cod'] == 0:
-                log('Server commu8nication error - can not load forecast!')
+                logger.info('Server commu8nication error - can not load forecast!')
 
                 try:
-                    log('Server reported:')
-                    log('    ', fcast['message'])
-                    log('')
-                    log('Go into configuration mode to set server correctly')
+                    logger.info('Server reported:')
+                    logger.info('    ', fcast['message'])
+                    logger.info('')
+                    logger.info('Go into configuration mode to set server correctly')
                 except:
                     pass
 

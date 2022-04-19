@@ -1,4 +1,7 @@
-from config import pins
+from ulogging import getLogger
+logger = getLogger(__name__)
+
+from setup import pins
 from machine import Pin, PWM
 from utime import sleep_ms
 

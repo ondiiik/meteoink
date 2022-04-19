@@ -43,29 +43,41 @@ ACEP_TCON = const(0x60)
 ACEP_RESOLUTION = const(0x61)
 ACEP_PWS = const(0xE3)
 
+_cleanup = b''
+
 
 class EPD:
     @micropython.native
     def __init__(self, spi, cs, dc, rst, busy):
+        self.width = 600
+        self.height = 448
+
         self._spi = spi
         self._cs = cs
         self._dc = dc
         self._rst = rst
         self._busy = busy
+        self._resolution = pack('!HH', self.width, self.height)
 
         self._cs.init(self._cs.OUT,  value=1)
         self._dc.init(self._dc.OUT,  value=0)
         self._rst.init(self._rst.OUT, value=0)
         self._busy.init(self._busy.IN)
 
-        self.width = 600
-        self.height = 448
+        self._initialized = False
 
     @micropython.native
     def display_frame(self, buf):
         self._init()
         self._flush_frame(buf)
         self._sleep()
+
+    @micropython.native
+    def deghost(self, buf):
+        self._init()
+        for i in range(len(buf)):
+            buf[i] = 0x77
+        self._flush_frame(buf)
 
     @micropython.native
     def _cmd(self, command, data=None):
@@ -85,11 +97,14 @@ class EPD:
 
     @micropython.native
     def _flush_frame(self, buf):
+        self._cmd(ACEP_RESOLUTION, self._resolution)
         self._cmd(ACEP_DTM, buf)
         self._cmd(ACEP_POWER_ON)
         self._wait4ready()
         self._cmd(ACEP_DISPLAY_REFRESH)
         self._wait4ready()
+        self._cmd(ACEP_POWER_OFF)
+        sleep_ms(500)
 
     @micropython.native
     def _reset(self):
@@ -103,6 +118,9 @@ class EPD:
 
     @micropython.native
     def _init(self):
+        if self._initialized:
+            return
+
         self._reset()
         self._wait4ready()
 
@@ -115,7 +133,7 @@ class EPD:
         self._cmd(ACEP_TSE, b'\x00')
         self._cmd(ACEP_CDI, b'\x37')
         self._cmd(ACEP_TCON, b'\x22')
-        self._cmd(ACEP_RESOLUTION, pack('!HH', self.width, self.height))
+        self._cmd(ACEP_RESOLUTION, self._resolution)
         self._cmd(ACEP_PWS, b'\xAA')
         sleep_ms(100)
 

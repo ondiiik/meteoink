@@ -1,4 +1,6 @@
-print('Loading module CONFIG')
+from ulogging import getLogger
+logger = getLogger(__name__)
+
 from micropython import const
 from machine import reset
 
@@ -201,7 +203,7 @@ _cnt = {_cnt}
 
 
 def _rebuild(name, tp, *args):
-    print('Rebuildng config for', name)
+    logger.info('Rebuildng config for', name)
     i = tp(*args)
     i.flush()
     return True
@@ -258,5 +260,5 @@ except:
 
 
 if reload:
-    print('Configuration rebuilt - restart required')
+    logger.info('Configuration rebuilt - restart required')
     reset()

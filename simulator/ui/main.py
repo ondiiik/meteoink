@@ -1,6 +1,9 @@
+from ulogging import getLogger
+logger = getLogger(__name__)
+
 from . import Ui
 from display import Vect as V
-from micropython import const
+from machine import reset_cause, DEEPSLEEP
 
 
 class Epd(Ui):
@@ -10,7 +13,7 @@ class Epd(Ui):
         self.connection = connection
         self.led = led
 
-    def repaint_config(self, led, volt):
+    def repaint_config(self, volt):
         from config.spot import hotspot
         from ui.qr import UiQr
         from ui.url import UiUrl
@@ -33,23 +36,23 @@ class Epd(Ui):
             self.epd = epd
 
         def __enter__(self):
-            print(f'Drawing {self.name} ...')
+            logger.info(f'Drawing {self.name} ...')
             self.epd.led.mode(self.epd.led.DRAWING)
             self.epd.canvas.clear()
 
         def __exit__(self, *args):
-            print(f'Flushing {self.name} ...')
+            logger.info(f'Flushing {self.name} ...')
             self.epd.led.mode(self.epd.led.FLUSHING)
-            self.epd.canvas.flush()
+            self.epd.canvas.flush(reset_cause() != DEEPSLEEP)
 
 
 class Epd_ACEP(Epd):
-    def repaint_welcome(self, led):
+    def repaint_welcome(self):
         with self.Drawing('welcome', self):
             bitmap = self.bitmap(1, 'greetings')
             self.canvas.bitmap(V(0, 0), bitmap)
 
-    def repaint_forecast(self, led, volt):
+    def repaint_forecast(self, volt):
         with self.Drawing('weather', self):
             if self.connection is None:
                 # No forecast when there is no connection. Just draw no-wifi

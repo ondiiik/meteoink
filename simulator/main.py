@@ -1,9 +1,10 @@
-from log import dump_exception
+from ulogging import getLogger, dump_exception
+logger = getLogger('main')
 
 try:
-    print('Starting the application ...')
+    logger.info('Starting the application ...')
     from app import run
-    run(b'c9d63affe69e4dfe34dd3447b1f680998543d9b6')
+    run(b'f3ada71217abdce94c52063d815f663d6fd00071')
     
 except KeyboardInterrupt as e:
     dump_exception('Interrupted by keyboard ...', e)

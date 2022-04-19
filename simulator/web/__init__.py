@@ -1,8 +1,9 @@
+from ulogging import getLogger
+logger = getLogger(__name__)
+
 from buzzer import play
 from gc import collect
 from lang import trn
-from log import dump_exception
-from log import log
 from machine import deepsleep
 from micropython import const
 from uerrno import ECONNRESET, ENOTCONN, EAGAIN, ETIMEDOUT
@@ -32,7 +33,7 @@ class WebServer:
 
     def run(self):
         self.wdt.feed()
-        print('[WEB] ', 'Starting WEB server')
+        logger.info('[WEB] ', 'Starting WEB server')
         www_dir = '/web/www'
         server = MicroWebSrv(webPath=f'{www_dir}/', port=5555)
         server.MaxWebSocketRecvLen = 256
