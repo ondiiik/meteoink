@@ -3,9 +3,8 @@ logger = getLogger(__name__)
 
 from jumpers import jumpers
 from net import Connection
-from var import write
-from var import alert as alert_var
-from config import alert, vbat, temp, ui as ui_cfg, DISPLAY_REQUIRES_FULL_REFRESH
+from var import alert as alert_var, display as display_var
+from config import alert, vbat, temp, ui as ui_cfg
 from machine import deepsleep, reset, WDT
 from battery import battery
 from buzzer import play
@@ -13,7 +12,11 @@ from esp32 import raw_temperature
 from led import Led
 from display import Canvas
 from forecast import Forecast
+from ui import DISPLAY_REFRESH, DISPLAY_GREETINGS
 from ui.main import MeteoUi
+
+
+alert_var.ALREADY_TRIGGERED = 2  # DEVEL/DEBUG
 
 
 def run(sha):
@@ -25,10 +28,10 @@ def run(sha):
         # and don't want to let it wake up during transport. In this case
         # we can put it to greetings mode, where only picture is displayed
         # and station kept sleeping till reset button is pressed
-        # if DISPLAY_GREETINGS == display.DISPLAY_STATE or jumpers.sleep:
-        # # Read all initializes all peripheries
-        # play((800, 30), 500, (400, 30))
-        # app.greetings()
+        if DISPLAY_GREETINGS == display_var.DISPLAY_STATE or jumpers.sleep:
+            # Read all initializes all peripheries
+            play((800, 30), 500, (400, 30))
+            app.greetings()
 
         # It may happen that user wants to attach with HTTP for update of firmware
         # or configuration. In this case we can not rely on existing WiFi connection
@@ -103,7 +106,7 @@ class App:
 
             if alert.temp_balanced:
                 play((100, 50), (200, 50), (400, 50), (800, 50), (1600, 50), (3200, 50))
-                write('alert', (False,))
+                alert_var.ALREADY_TRIGGERED = False
             else:
                 play((3200, 50), (1600, 50), (800, 50), (400, 50), (200, 50), (100, 50))
 
@@ -143,10 +146,10 @@ class App:
                 play((200, 500), (100, 500))
 
     def greetings(self):
-        ui = MeteoUi(self.canvas, None, self.net)
+        ui = MeteoUi(self.canvas, None, self.net, self.led)
         ui.repaint_welcome()
 
-        write('display', (DISPLAY_REQUIRES_FULL_REFRESH,))
+        display_var.DISPLAY_STATE = DISPLAY_REFRESH
         logger.info('Going to deep sleep ...')
         deepsleep()
 
@@ -190,13 +193,13 @@ class App:
         h = forecast.time.get_date_time(forecast.weather.dt)[3]
 
         if h == 13:
-            write('alert', (False,))
+            alert_var.ALREADY_TRIGGERED = False
             return
 
         if not alert_var.ALREADY_TRIGGERED and forecast.home.temp > forecast.weather.temp:
             for i in range(3):
                 play((4000, 30), (6000, 30), (4000, 30), (6000, 30), (4000, 30), (6000, 30), (4000, 30), (6000, 30), 500)
-            write('alert', (True,))
+            alert_var.ALREADY_TRIGGERED = True
 
     def sleep(self, forecast=None, minutes=0):
         if self.net is None:

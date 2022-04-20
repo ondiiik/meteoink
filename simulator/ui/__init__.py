@@ -2,10 +2,14 @@ from ulogging import getLogger
 logger = getLogger(__name__)
 
 from bitmap import fonts, bmp
-from config import sys, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_JUST_REPAINT, DISPLAY_DONT_REFRESH
+from config import sys
 from display import Vect, Bitmap, BLACK, WHITE, GREEN, BLUE, RED, YELLOW, ORANGE, ALPHA
 
 from micropython import const
+
+DISPLAY_REFRESH = const(0)
+DISPLAY_GREETINGS = const(1)
+DISPLAY_DONT_REFRESH = const(2)
 
 
 class UiFrame:

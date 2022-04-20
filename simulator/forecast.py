@@ -6,7 +6,7 @@ from machine import Pin, deepsleep, RTC
 from micropython import const
 from collections import namedtuple
 from setup import pins
-from config import sys, location, VARIANT_2DAYS, DISPLAY_REFRESH_DIV, ui
+from config import sys, location, VARIANT_2DAYS, ui
 from ltime import Time
 from buzzer import play
 
@@ -25,6 +25,8 @@ id2icon = {200: '200', 201: '200', 202: '200', 210: '200', 211: '200', 212: '200
            803: '803',
            804: '804'}
 
+
+DISPLAY_REFRESH_DIV = const(3)
 
 WEATHER = const(1)
 TEMPERATURE = const(2)

@@ -45,7 +45,7 @@ def _convert(in_buf, lut):
         b = 0
         for i in range(4):
             b <<= 2
-            b |= lut[in_buf[i_s]]
+            b |= lut.get(in_buf[i_s], 0)
             i_s += 1
         out_buf[i_d] = b
     return out_buf

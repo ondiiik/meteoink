@@ -10,7 +10,6 @@ from uerrno import ECONNRESET, ENOTCONN, EAGAIN, ETIMEDOUT
 from uio import BytesIO
 from .microweb.microWebSrv import MicroWebSrv
 from utime import sleep_ms
-from var import write
 import socket
 
 

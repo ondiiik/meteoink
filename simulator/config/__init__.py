@@ -8,13 +8,6 @@ from machine import reset
 VARIANT_2DAYS = const(2)
 VARIANT_4DAYS = const(4)
 
-DISPLAY_GREETINGS = const(-1)
-DISPLAY_REQUIRES_FULL_REFRESH = const(0)
-DISPLAY_JUST_REPAINT = const(1)
-DISPLAY_DONT_REFRESH = const(2)
-
-DISPLAY_REFRESH_DIV = const(2)
-
 
 class Location:
     def __init__(self, name, lat, lon):
