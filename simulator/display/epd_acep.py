@@ -5,7 +5,6 @@ from framebuf import FrameBuffer, GS4_HMSB
 
 EPD_WIDTH = 600
 EPD_HEIGHT = 480
-SIMULATE_REDRAWING = False
 
 colors = ((43,  46,  62),
           (227, 227, 227),
@@ -18,7 +17,7 @@ colors = ((43,  46,  62),
 
 
 class EPD:
-    def __init__(self, spi, cs, dc, rst, busy):
+    def __init__(self):
         self.width = EPD_WIDTH
         self.height = EPD_HEIGHT
         self._factor = 1

@@ -1,3 +1,6 @@
+from ulogging import getLogger
+logger = getLogger(__name__)
+
 from ui import UiFrame, BLACK, Vect as V
 from micropython import const
 from config import ui as cfg

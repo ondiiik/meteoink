@@ -16,7 +16,7 @@ def _write_alert(args):
         cnt = 0
 
     cnt += 1
-    logger.info('Rebuild variables', f'alert ({cnt} times)')
+    logger.info(f'Rebuild variables alert ({cnt} times)')
     with open(f'var/alert.py', 'w') as f:
         f.write(f'ALREADY_TRIGGERED = {args[0]}\n_cnt = {cnt}\n')
 

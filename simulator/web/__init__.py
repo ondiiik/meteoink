@@ -33,7 +33,7 @@ class WebServer:
 
     def run(self):
         self.wdt.feed()
-        logger.info('[WEB] ', 'Starting WEB server')
+        logger.info('Starting WEB server')
         www_dir = '/web/www'
         server = MicroWebSrv(webPath=f'{www_dir}/', port=5555)
         server.MaxWebSocketRecvLen = 256

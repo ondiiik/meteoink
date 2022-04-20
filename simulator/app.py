@@ -3,9 +3,9 @@ logger = getLogger(__name__)
 
 from jumpers import jumpers
 from net import Connection
-from var import write, display
+from var import write
 from var import alert as alert_var
-from config import alert, vbat, temp, ui as ui_cfg, DISPLAY_REQUIRES_FULL_REFRESH, DISPLAY_GREETINGS
+from config import alert, vbat, temp, ui as ui_cfg, DISPLAY_REQUIRES_FULL_REFRESH
 from machine import deepsleep, reset, WDT
 from battery import battery
 from buzzer import play
@@ -25,15 +25,15 @@ def run(sha):
         # and don't want to let it wake up during transport. In this case
         # we can put it to greetings mode, where only picture is displayed
         # and station kept sleeping till reset button is pressed
-        if DISPLAY_GREETINGS == display.DISPLAY_STATE or jumpers.sleep:
-            # Read all initializes all peripheries
-            play((800, 30), 500, (400, 30))
-            app.greetings()
+        # if DISPLAY_GREETINGS == display.DISPLAY_STATE or jumpers.sleep:
+        # # Read all initializes all peripheries
+        # play((800, 30), 500, (400, 30))
+        # app.greetings()
 
         # It may happen that user wants to attach with HTTP for update of firmware
         # or configuration. In this case we can not rely on existing WiFi connection
         # and we rather go to hot-spot mode.
-        elif app.net.is_hotspot:
+        if app.net.is_hotspot:
             app.hotspot()
 
         # And finally - meteostation display - basic functionality ;-)

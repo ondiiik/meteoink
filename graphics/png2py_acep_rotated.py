@@ -31,8 +31,8 @@ import os
 import imageio
 import numpy
 from itertools import product
-
 from ctypes import c_uint8, LittleEndianStructure, Union
+from pathlib import Path
 
 
 class Flags_bits(LittleEndianStructure):
@@ -127,19 +127,18 @@ def convert(name, src_file_name, dst, scales=(None,)):
     dst.write('    },\n')
 
 
-src_dir = os.path.abspath('bitmap/png')
-dst_dir = os.path.abspath('../micropython/bitmap')
+src_dir = Path('bitmap/png/acep').resolve()
+dst_dir = Path('../micropython/bitmap/acep_rotated').resolve()
+dst_dir.mkdir(exist_ok=True)
 
+bitmap = dst_dir.joinpath('bmp.py')
+bitmap_tmp = dst_dir.joinpath('bmp.py_')
 
-try:
-    os.mkdir(dst_dir)
-except FileExistsError:
-    pass
+with bitmap_tmp.open('w') as dst:
+    dst.write('''from ulogging import getLogger
+logger = getLogger(__name__)
 
-bitmap_path = os.path.join(dst_dir, 'bmp.py')
-
-with open(bitmap_path + '_', 'w') as dst:
-    dst.write('bmp = {\n')
+bmp = {''')
 
     for src_name in os.listdir(src_dir):
         src = os.path.join(src_dir, src_name)
@@ -147,17 +146,22 @@ with open(bitmap_path + '_', 'w') as dst:
 
     dst.write('}\n')
 
-os.system(f'autopep8 "{bitmap_path}_" > {bitmap_path}')
-os.system(f'rm -f {bitmap_path}_')
+print(f'Running autopep on {str(bitmap)}')
+os.system(f'autopep8 "{str(bitmap_tmp)}" > {str(bitmap)}')
+os.system(f'rm -f {str(bitmap_tmp)}')
 
 
-src_dir = os.path.abspath('bitmap/font')
+src_dir = Path('bitmap/font')
 fsize = 0
 
-fonts_path = os.path.join(dst_dir, 'fonts.py')
+fonts_path = dst_dir.joinpath('fonts.py')
+fonts_path_tmp = dst_dir.joinpath('fonts.py_')
 
-with open(fonts_path + '_', 'w') as dst:
-    dst.write('fonts = {\n')
+with fonts_path_tmp.open('w') as dst:
+    dst.write('''from ulogging import getLogger
+logger = getLogger(__name__)
+
+fonts = {''')
 
     for src_name in sorted(os.listdir(src_dir), key=lambda n: int(n[:2], 16) * 256 + int(n[2:-4], 16)):
         fs = int(src_name[:2], 16)
@@ -175,5 +179,6 @@ with open(fonts_path + '_', 'w') as dst:
 
     dst.write('},\n}\n')
 
-os.system(f'autopep8 "{fonts_path}_" > {fonts_path}')
-os.system(f'rm -f {fonts_path}_')
+print(f'Running autopep on {str(fonts_path)}')
+os.system(f'autopep8 "{str(fonts_path_tmp)}" > {str(fonts_path)}')
+os.system(f'rm -f {str(fonts_path_tmp)}')

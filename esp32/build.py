@@ -103,6 +103,7 @@ copy('web/www')
 
 convert(find(''))
 convert(find('bitmap'))
+convert(find('bitmap/acep_rotated'))
 convert(find('config'))
 convert(find('display'))
 convert(find('lang'))

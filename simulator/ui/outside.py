@@ -1,3 +1,6 @@
+from ulogging import getLogger
+logger = getLogger(__name__)
+
 from ui import UiFrame, Vect as V
 from ui.wind import drawWind
 

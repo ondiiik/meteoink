@@ -1,6 +1,9 @@
 from ulogging import getLogger
 logger = getLogger(__name__)
 
+from ulogging import getLogger
+logger = getLogger(__name__)
+
 from . import Ui
 from display import Vect as V
 from machine import reset_cause, DEEPSLEEP

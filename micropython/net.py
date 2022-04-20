@@ -80,7 +80,7 @@ class Connection:
 
         for i in range(8):
             if self._ifc.isconnected():
-                logger.info("Connected: " + str(self.ifconfig))
+                logger.info(f'Connected: {str(self.ifconfig)}')
                 self.is_hotspot = False
                 return
 
@@ -98,14 +98,14 @@ class Connection:
             sleep(1)
 
         self.is_hotspot = True
-        logger.info("Running hotspot: " + str(self.ifconfig))
+        logger.info(f'Running hotspot: {str(self.ifconfig)}')
 
     @property
     def ifconfig(self):
         return self._ifc.ifconfig()
 
     def http_get_json(self, url):
-        logger.info("HTTP GET: " + url)
+        logger.info(f'HTTP GET: {url}')
 
         for retry in range(CONN_RETRY_CNT):
             try:

@@ -68,43 +68,7 @@ class Ui:
         return self.text(size, text, pos, color, corona, border)
 
     def text(self, size, text, pos, color=BLACK, corona=None, border=2):
-        if not corona is None:
-            for d in (Vect(1, 0) * border,
-                      Vect(0, 1) * border,
-                      Vect(1, 1) * border,
-                      Vect(1, -1) * border):
-                self.text(size, text, pos + d, corona)
-                self.text(size, text, pos - d, corona)
-
-        for char in text:
-            if ' ' == char:
-                pos.x += int(0.3 * size) + 1
-            else:
-                try:
-                    f = Bitmap(fonts.fonts[size][ord(char)][color])
-                except KeyError:
-                    s = fonts.fonts[size][ord(char)][0][2]
-                    l = len(s)
-                    a = bytearray(l)
-                    for i in range(l):
-                        b = s[i]
-                        if b & 0x0F != 0x07:
-                            b &= 0xF0
-                            b |= color
-                        if b & 0xF0 != 0x70:
-                            b &= 0x0F
-                            b |= color << 4
-                        a[i] = b
-
-                    s = fonts.fonts[size][ord(char)][0]
-                    b = s[0], s[1], a
-                    fonts.fonts[size][ord(char)][color] = b
-                    f = Bitmap(b)
-
-                self.canvas.bitmap(pos, f)
-                pos.x += f.dim.y + 1
-
-        return pos
+        return self.canvas.text(size, text, pos, color, corona, border)
 
     def textLength(self, size, text):
         l = 0

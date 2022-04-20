@@ -22,9 +22,14 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+from ulogging import getLogger
+logger = getLogger(__name__)
+
 from micropython import const
 from time import sleep_ms
 from struct import pack
+from machine import SPI, Pin
+from setup import pins
 
 
 ACEP_PANEL_SETTING = const(0x00)
@@ -48,15 +53,24 @@ _cleanup = b''
 
 class EPD:
     @micropython.native
-    def __init__(self, spi, cs, dc, rst, busy):
+    def __init__(self):
+        logger.info("Building display:")
         self.width = 600
         self.height = 448
 
-        self._spi = spi
-        self._cs = cs
-        self._dc = dc
-        self._rst = rst
-        self._busy = busy
+        self._spi = SPI(1)
+        self._spi.init(baudrate=2000000,
+                       polarity=0,
+                       phase=0,
+                       sck=Pin(pins.SCK),
+                       mosi=Pin(pins.MOSI),
+                       miso=Pin(pins.MISO))
+        logger.info("\tSPI - [ OK ]")
+
+        self._cs = Pin(pins.CS)
+        self._dc = Pin(pins.DC)
+        self._rst = Pin(pins.RST)
+        self._busy = Pin(pins.BUSY)
         self._resolution = pack('!HH', self.width, self.height)
 
         self._cs.init(self._cs.OUT,  value=1)

@@ -2,7 +2,7 @@ from ulogging import getLogger
 logger = getLogger(__name__)
 
 import re
-from display import Frame
+from display import Frame, BLACK, WHITE
 from micropython import const
 
 ERROR_CORRECT_L = const(1)
@@ -1184,11 +1184,12 @@ class QRCode:
 
         width = len(self.modules) + self.border * 2
         fb = Frame(width, width)
-        fb.fill(0)
+        fb.fill(WHITE)
         b = self.border
 
         for y, module in zip(range(b, len(self.modules) + b), self.modules):
             for x, p in zip(range(b, len(self.modules) + b), module):
-                fb.pixel(x, y, p)
+                fb.pixel(x, y, BLACK if p else WHITE)
+                # fb.pixel(x, y, WHITE if p else BLACK)
 
         return fb, width

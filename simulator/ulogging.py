@@ -20,7 +20,7 @@ _lchr = '  ', '  ', '..', '??', '!!', '##'
 class Logger:
     def __init__(self, name):
         name = f'[{name}]'
-        self._name = f'{name:<12} '
+        self._name = f'{name:<28}'
 
     def log(self, level, msg):
         if level >= _lvl:
