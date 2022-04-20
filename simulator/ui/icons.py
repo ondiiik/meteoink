@@ -6,22 +6,22 @@ from micropython import const
 
 
 class UiIcons(UiFrame):
-    def draw(self, ui):
+    def draw(self):
         # Pre-calculates some range values and draw icons bar
         rows_cnt = const(2)
-        forecast = ui.forecast.forecast
+        forecast = self.ui.forecast.forecast
         cnt = len(forecast)
         h_icons = self.dim.y // rows_cnt
         icon = {}
 
         for i in range(cnt):
-            xx = ui.canvas.dim.x * i // (cnt + 1)
-            id = forecast[i].icon
+            xx = self.canvas.dim.x * i // (cnt + 1)
+            fid = forecast[i].icon
 
             try:
-                bitmap = icon[id]
+                bitmap = icon[fid]
             except KeyError:
-                bitmap = ui.bitmap(4, id)
-                icon[id] = bitmap
+                bitmap = self.ui.bitmap(4, fid)
+                icon[fid] = bitmap
 
-            ui.canvas.bitmap(V(xx, i % rows_cnt * h_icons), bitmap)
+            self.canvas.bitmap(V(xx, i % rows_cnt * h_icons), bitmap)

@@ -6,8 +6,8 @@ from config import temp
 
 
 class UiInTemp(UiFrame):
-    def draw(self, ui):
-        t = ui.forecast.home.temp
+    def draw(self):
+        t = self.ui.forecast.home.temp
         hl = None
 
         if not None == t:
@@ -18,7 +18,7 @@ class UiInTemp(UiFrame):
         else:
             t = '--'
 
-        ui.text(50, t, V(21, -5), BLACK, hl, 3)
+        self.ui.text(50, t, V(21, -5), BLACK, hl, 3)
 
-        bitmap = ui.bitmap(1, 'in')
-        ui.canvas.bitmap(V(0, 30), bitmap)
+        bitmap = self.ui.bitmap(1, 'in')
+        self.canvas.bitmap(V(0, 30), bitmap)

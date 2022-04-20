@@ -7,12 +7,12 @@ from config import temp
 
 
 class UiTempGr(UiFrame):
-    def draw(self, ui):
+    def draw(self):
         # Pre-calculates some range values
         self.temp_min = 273.0
-        forecast = ui.forecast.forecast
+        forecast = self.ui.forecast.forecast
         cnt = len(forecast)
-        self.block = ui.canvas.dim.x / cnt
+        self.block = self.canvas.dim.x / cnt
         temp_max = -273.0
 
         for i1 in range(cnt):
@@ -26,12 +26,12 @@ class UiTempGr(UiFrame):
         self.k_temp = (self.chart_max - chart_min) / (temp_max - self.temp_min)
 
         # Draw charts
-        self.chart_draw(ui, 3, WHITE)
-        self.chart_draw(ui, 3, YELLOW, temp.outdoor_high, temp.outdoor_low)
-        self.chart_draw(ui, 1, BLACK)
+        self.chart_draw(3, WHITE)
+        self.chart_draw(3, YELLOW, temp.outdoor_high, temp.outdoor_low)
+        self.chart_draw(1, BLACK)
 
-    def chart_draw(self, ui, w, c, th=None, tl=None):
-        forecast = ui.forecast.forecast
+    def chart_draw(self, w, c, th=None, tl=None):
+        forecast = self.ui.forecast.forecast
         cnt = len(forecast)
 
         for i1 in range(cnt):
@@ -45,12 +45,12 @@ class UiTempGr(UiFrame):
                 if (th is None):
                     v1 = V(x1, self.chart_y(f1))
                     v2 = V(x2, self.chart_y(f2))
-                    ui.canvas.line(v1, v2, c, w)
+                    self.canvas.line(v1, v2, c, w)
 
                 if (th is None) or (f1 > th) or (f2 > th) or (f1 < tl) or (f2 < tl):
                     v1 = V(x1, self.chart_y(forecast[i1].temp))
                     v2 = V(x2, self.chart_y(forecast[i2].temp))
-                    ui.canvas.line(v1, v2, c, w * 2)
+                    self.canvas.line(v1, v2, c, w * 2)
 
     def chart_y(self, temp):
         return int(self.chart_max - (temp - self.temp_min) * self.k_temp)

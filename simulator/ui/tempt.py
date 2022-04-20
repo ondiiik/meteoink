@@ -6,16 +6,16 @@ from micropython import const
 
 
 class UiTempTxt(UiFrame):
-    def draw(self, ui):
+    def draw(self):
         # Pre-calculates some range values and draw icons bar
-        forecast = ui.forecast.forecast
+        forecast = self.ui.forecast.forecast
         cnt = len(forecast)
-        block = ui.canvas.dim.x / cnt
+        block = self.canvas.dim.x / cnt
         temp_max = -273.0
         temp_min = 273.0
 
         for i in range(cnt):
-            x1 = ui.canvas.dim.x * i // (cnt + 1)
+            x1 = self.canvas.dim.x * i // (cnt + 1)
             weather = forecast[i]
             temp_max = max(weather.temp, weather.feel, temp_max)
             temp_min = min(weather.temp, weather.feel, temp_min)
@@ -39,7 +39,7 @@ class UiTempTxt(UiFrame):
                 f = (forecast[i - 1], forecast[i], forecast[i + 1])
 
                 if (f[0].temp < f[1].temp) and (f[1].temp > f[2].temp):
-                    ui.text_center(16, '{:.0f}°C'.format(f[1].temp), V(x1, chart_y(f[1].temp) - 20), BLACK, WHITE)
+                    self.ui.text_center(16, '{:.0f}°C'.format(f[1].temp), V(x1, chart_y(f[1].temp) - 20), BLACK, WHITE)
 
                 if (f[0].temp > f[1].temp) and (f[1].temp < f[2].temp):
-                    ui.text_center(16, '{:.0f}°C'.format(f[1].temp), V(x1, chart_y(f[1].temp) + 4),  BLACK, WHITE)
+                    self.ui.text_center(16, '{:.0f}°C'.format(f[1].temp), V(x1, chart_y(f[1].temp) + 4),  BLACK, WHITE)

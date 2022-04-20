@@ -97,7 +97,7 @@ class Canvas:
         x, y = v()
         w, h = d()
         for y in range(y, y + h):
-            self._vtline(x, y, w, c)
+            self._htline(x, y, w, c)
 
     @micropython.native
     def fill_rect(self, v, d, c=BLACK):

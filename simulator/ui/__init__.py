@@ -9,7 +9,9 @@ from micropython import const
 
 
 class UiFrame:
-    def __init__(self, ofs, dim):
+    def __init__(self, ui, ofs, dim):
+        self.ui = ui
+        self.canvas = ui.canvas
         self.ofs = ofs
         self.dim = dim
 
@@ -41,10 +43,10 @@ class UiFrame:
     def height(self):
         return self.dim.y
 
-    def repaint(self, ui, *args):
-        ui.canvas.ofs += self.ofs
-        r = self.draw(ui, *args)
-        ui.canvas.ofs -= self.ofs
+    def repaint(self, *args):
+        self.canvas.ofs += self.ofs
+        r = self.draw(*args)
+        self.canvas.ofs -= self.ofs
         return r
 
 

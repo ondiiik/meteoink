@@ -104,8 +104,8 @@ def convert(name, src_file_name, dst, scales=(None,)):
 
         im = numpy.zeros((bheight, width), dtype=numpy.uint8)
 
-        for y, row in zip(range(height), png[::scale]):
-            for x, rgba in zip(range(width), row[::scale]):
+        for y, row in zip(range(height), png[scale // 2::scale]):
+            for x, rgba in zip(range(width), row[scale // 2::scale]):
                 color = rgb2color(rgba)[(x + y) % 2]
                 im[y][x] = color
 
