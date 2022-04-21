@@ -20,7 +20,7 @@ class EPD:
     def __init__(self):
         self.width = EPD_WIDTH
         self.height = EPD_HEIGHT
-        self._factor = 2
+        self._factor = 1
         self._frame = 6
 
         wsize = ((self._frame * 2 + self.width) * self._factor,
