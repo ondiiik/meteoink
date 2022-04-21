@@ -52,6 +52,10 @@ class Vect:
         return Vect(int(self.x) // v,
                     int(self.y) // v)
 
+    @micropython.native
+    def __repr__(self):
+        return f'Vect(x={self.x}, y={self.y})'
+
 
 class Bitmap:
     @micropython.native

@@ -4,7 +4,7 @@ from framebuf import FrameBuffer, GS4_HMSB
 
 
 EPD_WIDTH = 600
-EPD_HEIGHT = 480
+EPD_HEIGHT = 448
 
 colors = ((43,  46,  62),
           (227, 227, 227),

@@ -48,10 +48,10 @@ class UiFrame:
         return self.dim.y
 
     def repaint(self, *args):
+        # self.canvas.rect(self.ofs, self.dim, ORANGE)
         self.canvas.ofs += self.ofs
-        r = self.draw(*args)
+        self.draw(*args)
         self.canvas.ofs -= self.ofs
-        return r
 
 
 class Ui:
@@ -59,30 +59,18 @@ class Ui:
         self.canvas = canvas
         self.width = canvas.dim.x
         self.height = canvas.dim.y
+        self.text_len = self.canvas.text_len
+        self.text = self.canvas.text
 
     def bitmap(self, size, name):
         return Bitmap(bmp.bmp[name][size])
 
     def text_center(self, size, text, pos, color=BLACK, corona=None, border=2):
-        l = self.textLength(size, text)
+        l = self.text_len(size, text)
         pos.x -= l // 2
         return self.text(size, text, pos, color, corona, border)
 
     def text_right(self, size, text, pos, color=BLACK, corona=None, border=2):
-        l = self.textLength(size, text)
+        l = self.text_len(size, text)
         pos.x -= l
         return self.text(size, text, pos, color, corona, border)
-
-    def text(self, size, text, pos, color=BLACK, corona=None, border=2):
-        return self.canvas.text(size, text, pos, color, corona, border)
-
-    def textLength(self, size, text):
-        l = 0
-        for char in text:
-            if ' ' == char:
-                l += int(0.3 * size) + 1
-            else:
-                f = Bitmap(fonts.fonts[size][ord(char)][0])
-                l += f.dim.x + 1
-
-        return l

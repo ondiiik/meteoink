@@ -32,7 +32,7 @@ class Canvas:
         self.fb.fill(c)
 
     @micropython.native
-    def flush(self, deghost=False):
+    def flush(self, deghost=True):
         if deghost:
             logger.info('De-ghosting ...')
             self.epd.deghost(self.buf[:])

@@ -3,7 +3,6 @@ logger = getLogger(__name__)
 
 from . import Ui
 from display import Vect as V
-from machine import reset_cause, DEEPSLEEP
 
 
 class EpdBase(Ui):
@@ -43,4 +42,4 @@ class EpdBase(Ui):
         def __exit__(self, *args):
             logger.info(f'Flushing {self.name} ...')
             self.epd.led.mode(self.epd.led.FLUSHING)
-            self.epd.canvas.flush(reset_cause() != DEEPSLEEP)
+            self.epd.canvas.flush()
