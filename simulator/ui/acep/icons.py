@@ -1,7 +1,7 @@
 from ulogging import getLogger
 logger = getLogger(__name__)
 
-from . import UiFrame, Vect as V
+from .. import UiFrame, Vect as V
 from micropython import const
 
 

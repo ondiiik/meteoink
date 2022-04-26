@@ -2,6 +2,17 @@ from ulogging import getLogger
 logger = getLogger(__name__)
 
 from ..base import EpdBase, V
+from .calendar import UiCalendar
+from .icons import UiIcons
+from .inside import UiInside
+from .intemp import UiInTemp
+from .outside import UiOutside
+from .outtemp import UiOutTemp
+from .rain import UiRain
+from .tempg import UiTempGr
+from .tempt import UiTempTxt
+from .weather import UiWeather
+from .wind import UiWind
 
 
 class Epd(EpdBase):
@@ -21,18 +32,6 @@ class Epd(EpdBase):
                 # We have forecast, so lets draw it on screen. Don't draw
                 # always everything as forecast is changing not so often,
                 # but temperature is.
-                from .calendar import UiCalendar
-                from ..icons import UiIcons
-                from .inside import UiInside
-                from .intemp import UiInTemp
-                from .outside import UiOutside
-                from .outtemp import UiOutTemp
-                from .rain import UiRain
-                from ..tempg import UiTempGr
-                from ..tempt import UiTempTxt
-                from ..weather import UiWeather
-                from .wind import UiWind
-
                 weather = UiWeather(self, V(0, 0), V(100, 120))
                 out_temp = UiOutTemp(self, V(weather.right + 5, 0), V(160, weather.height // 2))
                 in_temp = UiInTemp(self, V(out_temp.left, out_temp.bellow), out_temp.dim)
@@ -69,10 +68,10 @@ class Epd(EpdBase):
 
     def repaint_config(self, volt):
         from config.spot import hotspot
-        from ..qr import UiQr
-        from ..url import UiUrl
+        from .qr import UiQr
+        from .url import UiUrl
         from .vbat import UiVBat
-        from ..wifi import UiWifi
+        from .wifi import UiWifi
 
         with self.Drawing('hotspot', self):
             url = f'http://{self.connection.ifconfig[0]}:5555'

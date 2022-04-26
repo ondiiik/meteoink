@@ -130,9 +130,8 @@ class App:
             logger.info('Low battery !!!')
             self.sleep(15)
 
-        # Once we have canvas established (large object needs
-        # to be created first to prevent from memory fragmentation),
-        # we can establish WiFi connection and connect to network.
+        # Now we can activate WiFi. This is done at the end as WiFi
+        # heavily increase consumption of chip.
         self.led.mode(Led.DOWNLOAD)
 
         try:
