@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="26.246666mm"
+   height="26.246666mm"
+   viewBox="0 0 26.246666 26.246666"
+   version="1.1"
+   id="svg2512"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="800n.svg"
+   inkscape:export-filename="/home/ondiiik/Development/micropython/meteo/meteo_py/graphics/bitmap/png/acep/800n.png"
+   inkscape:export-xdpi="116.13"
+   inkscape:export-ydpi="116.13"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview2514"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="4.4094972"
+     inkscape:cx="-11.339161"
+     inkscape:cy="65.653744"
+     inkscape:window-width="1868"
+     inkscape:window-height="1016"
+     inkscape:window-x="52"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g2566" />
+  <defs
+     id="defs2509" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-93.457237,-126.38181)">
+    <g
+       id="g2566"
+       transform="translate(0.14455069,0.1020236)">
+      <path
+         style="fill:#ffff7f;fill-opacity:1;stroke-width:0.282222"
+         d="m 106.31643,146.34683 c -1.0912,-0.18811 -1.64821,-0.49669 -2.57082,-1.42425 -1.60896,-1.61758 -2.10393,-2.69289 -2.10393,-4.57077 0,-1.61943 0.41979,-2.75031 1.46878,-3.95676 0.753,-0.86602 1.07122,-0.66377 1.07122,0.68082 0,0.58586 0.0883,1.15354 0.19632,1.26152 0.10797,0.10797 0.22806,0.41258 0.26685,0.67691 0.0388,0.26433 0.20445,0.52524 0.36813,0.57979 0.16367,0.0546 0.29759,0.22776 0.29759,0.38489 0,0.85806 2.65542,3.27878 3.77728,3.44344 0.24184,0.0355 0.52806,0.15288 0.63603,0.26085 0.10798,0.10797 0.5879,0.19826 1.0665,0.20064 1.37605,0.007 1.69278,0.35495 0.94377,1.03727 -1.46484,1.3344 -3.23891,1.80124 -5.41772,1.42565 z"
+         id="path2570" />
+      <path
+         style="fill:#7f7fff;fill-opacity:1;stroke-width:0.282222"
+         d="m 104.60501,147.60317 c -2.81287,-1.32526 -4.3768,-3.54993 -4.58996,-6.52917 -0.194213,-2.71432 0.45948,-4.5389 2.25151,-6.28438 1.41465,-1.37792 2.58619,-1.92296 3.07743,-1.43172 0.15088,0.15087 0.34965,1.21472 0.44172,2.36411 0.1796,2.24202 0.48649,3.06454 1.66678,4.46723 1.2353,1.46807 2.77027,2.09359 5.19586,2.11737 2.06408,0.0202 2.11878,0.039 2.20198,0.75557 0.11569,0.99644 -1.42495,2.97347 -3.14658,4.03788 -1.1471,0.7092 -1.69346,0.8487 -3.65914,0.93433 -1.82752,0.0796 -2.54677,-0.0106 -3.4396,-0.43122 z m 5.78556,-1.73388 c 0.38806,-0.2018 0.99266,-0.62845 1.34358,-0.94811 0.74745,-0.6809 0.43262,-1.03041 -0.93436,-1.03727 -0.47343,-0.002 -1.01318,-0.15672 -1.19944,-0.34299 -0.18627,-0.18627 -0.33867,-0.2453 -0.33867,-0.13118 0,0.21509 -0.92873,-0.21854 -1.64437,-0.76777 -1.00138,-0.76852 -2.30674,-2.22227 -2.30674,-2.56896 0,-0.20884 -0.13392,-0.42436 -0.29759,-0.47892 -0.16368,-0.0546 -0.32933,-0.31546 -0.36813,-0.57979 -0.0388,-0.26433 -0.15888,-0.56894 -0.26685,-0.67691 -0.10798,-0.10798 -0.19632,-0.67566 -0.19632,-1.26152 0,-1.3256 -0.31544,-1.54599 -1.05485,-0.73703 -1.01309,1.10838 -1.48515,2.38303 -1.48515,4.0102 0,1.91042 0.6348,3.26914 2.20498,4.71949 1.67004,1.5426 4.46067,1.88408 6.54391,0.80076 z"
+         id="path2568"
+         inkscape:export-filename="/home/ondiiik/Development/micropython/meteo/meteo_py/graphics/bitmap/png/acep/800n.png"
+         inkscape:export-xdpi="116.13"
+         inkscape:export-ydpi="116.13" />
+    </g>
+  </g>
+</svg>

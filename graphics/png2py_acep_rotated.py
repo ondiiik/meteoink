@@ -29,7 +29,7 @@
 import sys
 import os
 import imageio
-import numpy
+import numpy as np
 from itertools import product
 from ctypes import c_uint8, LittleEndianStructure, Union
 from pathlib import Path
@@ -56,22 +56,41 @@ class Color:
     TRANSPARENT = 7
 
 
+from itertools import combinations
+usable_colors = Color.BLACK, Color.WHITE, Color.GREEN, Color.BLUE, Color.RED, Color.YELLOW, Color.ORANGE
+color_combinations = [(c, c) for c in usable_colors]
+color_combinations += (Color.WHITE, Color.BLACK), (Color.WHITE, Color.BLUE), (Color.WHITE, Color.YELLOW), (Color.GREEN, Color.BLUE), (Color.RED, Color.BLUE)
+color_combinations += list(combinations(usable_colors, 2))
+
+usable_colors_map = {Color.BLACK: np.array((0, 0, 0)),
+                     Color.WHITE: np.array((255, 255, 255)),
+                     Color.GREEN: np.array((0, 255, 0)),
+                     Color.BLUE: np.array((0, 0, 255)),
+                     Color.RED: np.array((255, 0, 0)),
+                     Color.YELLOW: np.array((255, 255, 0)),
+                     Color.ORANGE: np.array((255, 127, 0))}
+
+colr_sets = {(c1, c2): ((usable_colors_map[c1] + usable_colors_map[c2]) / 2).astype(np.uint8) for c1, c2 in color_combinations}
+
+
 def rgb2color(rgba):
     if (rgba[3] < 128):
-        return (Color.TRANSPARENT, Color.TRANSPARENT)
+        return Color.TRANSPARENT, Color.TRANSPARENT
 
-    if (rgba[0] != rgba[2]):
-        if rgba[2] > 127:
-            return (Color.YELLOW, Color.WHITE)
-        if rgba[0] < 85:
-            return (Color.YELLOW, Color.BLACK)
-        return (Color.YELLOW, Color.YELLOW)
+    rgba = np.array(rgba[:3])
+    mag_max = 1024
+    detected = Color.TRANSPARENT, Color.TRANSPARENT
 
-    if rgba[0] > 170:
-        return (Color.WHITE, Color.WHITE)
-    if rgba[0] < 85:
-        return (Color.BLACK, Color.BLACK)
-    return (Color.WHITE, Color.BLACK)
+    for colors, rgb in colr_sets.items():
+        vect = rgba - rgb
+        mag = np.linalg.norm(vect)
+        if mag < mag_max:
+            mag_max = mag
+            detected = colors
+            if mag < 1:
+                break
+
+    return detected
 
 
 def convert(name, src_file_name, dst, scales=(None,)):
@@ -102,7 +121,7 @@ def convert(name, src_file_name, dst, scales=(None,)):
         pix = Flags()
         pix.asbyte = 0
 
-        im = numpy.zeros((bheight, width), dtype=numpy.uint8)
+        im = np.zeros((bheight, width), dtype=np.uint8)
 
         for y, row in zip(range(height), png[scale // 2::scale]):
             for x, rgba in zip(range(width), row[scale // 2::scale]):
@@ -141,6 +160,8 @@ logger = getLogger(__name__)
 bmp = {''')
 
     for src_name in os.listdir(src_dir):
+        if not src_name.endswith('.png'):
+            continue
         src = os.path.join(src_dir, src_name)
         convert(src_name[:-4], src, dst, (1, 4, 5))
 
