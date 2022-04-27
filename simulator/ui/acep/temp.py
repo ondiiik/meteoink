@@ -22,10 +22,10 @@ class UiTemp(UiFrame):
             t = f'{t:.1f} °C'
 
         if self.inside:
-            l = self.ui.text_len(50, t)
+            l = self.ui.text_len(60, t)
             x = self.width - l - 5
-            self.ui.text(50, t, V(x, -5), color)
+            self.ui.text(60, t, V(x, -5), color)
             bitmap = self.ui.bitmap(1, 'in')
             self.canvas.bitmap(V(x - 30, 30), bitmap)
         else:
-            self.ui.text(50, t, V(5, -5), color)
+            self.ui.text(60, t, V(5, -5), color)

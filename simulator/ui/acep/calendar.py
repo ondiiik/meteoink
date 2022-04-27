@@ -52,7 +52,7 @@ class UiCalendar(UiFrame):
                     self.canvas.trect(V(xx, 1), V(dblock, 26), GREEN)
 
             # Draw separators
-            sep_space = self.dim.y + ((-15 + h_space) if show_days else (-10 + h_space))
+            sep_space = self.dim.y + ((-20 + h_space) if show_days else (-10 + h_space))
             if 0 == hour:
                 if (dt[6] == 5) or (dt[6] == 0):
                     self.canvas.vline(V(xx + 1, 0), sep_space, BLACK)
@@ -62,7 +62,7 @@ class UiCalendar(UiFrame):
             if show_days:
                 # Draw hours text
                 if hour % 6 == 0:
-                    self.ui.text_center(10, str(hour), V(xx, self.dim.y // 2 + h_space + 6))
+                    self.ui.text_center(16, str(hour), V(xx, self.dim.y // 2 + h_space))
 
                 # Draw day of week text
                 if (hour + 12) % 24 == 0:

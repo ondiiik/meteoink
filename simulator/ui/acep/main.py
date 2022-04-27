@@ -33,12 +33,12 @@ class Epd(EpdBase):
                 # always everything as forecast is changing not so often,
                 # but temperature is.
                 weather = UiWeather(self, V(0, 0), V(130, 120))
-                out_temp = UiOutTemp(self, V(weather.left, weather.bellow), V(160, 50))
+                out_temp = UiOutTemp(self, V(weather.left, weather.bellow), V(self.width // 2, 60))
                 in_temp = UiInTemp(self, V(out_temp.right, out_temp.above), V(self.width - out_temp.width, out_temp.height))
-                outside = UiOutside(self, V(weather.right, 0), V(170, weather.height))
+                outside = UiOutside(self, V(weather.right, 0), V(180, weather.height))
                 inside = UiInside(self, V(outside.right, 0), V(self.width - outside.right, weather.height))
-                calendar_head = UiCalendar(self, V(0, out_temp.bellow), V(self.width, 42))
-                icons = UiIcons(self, V(0, calendar_head.bellow + 6), V(self.width, 72))
+                calendar_head = UiCalendar(self, V(0, out_temp.bellow), V(self.width, 46))
+                icons = UiIcons(self, V(0, calendar_head.bellow + 4), V(self.width, 72))
                 calendar_tail = UiCalendar(self, V(0, icons.bellow), V(self.width, self.height - icons.bellow - 30))
                 graph_temp = UiTempGr(self, *calendar_tail.same)
                 text_temp = UiTempTxt(self, *calendar_tail.same)

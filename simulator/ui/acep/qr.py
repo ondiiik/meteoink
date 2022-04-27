@@ -17,6 +17,6 @@ class UiQr(UiFrame):
 
         l = matrix[1] * 3
         if above:
-            self.ui.text_center(10, lbl, V(l // 2, -12))
+            self.ui.text_center(16, lbl, V(l // 2, -12))
         else:
-            self.ui.text_center(10, lbl, V(l // 2, l))
+            self.ui.text_center(16, lbl, V(l // 2, l))

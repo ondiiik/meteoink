@@ -30,6 +30,7 @@ import freetype
 import imageio
 import numpy
 from itertools import product
+from pathlib import Path
 
 
 class Bitmap(object):
@@ -242,30 +243,30 @@ class Font(object):
 if __name__ == '__main__':
     import os
 
-    try:
-        os.mkdir('bitmap/font')
-    except:
-        pass
+    dst_loc_path = Path('bitmap', 'font')
+    dst_loc_path.mkdir(exist_ok=True)
 
-    for font_size in (50, 25, 16, 10):
-        # Read font
-        fnt = Font('/usr/share/fonts/truetype/ubuntu/Ubuntu-B.ttf', font_size)
+    for variant, font_sizes in ('acep', (60, 35, 16)), ('bwy', (50, 25, 16, 10)):
+        dst_variant_path = dst_loc_path.joinpath(variant)
+        dst_variant_path.mkdir(exist_ok=True)
 
-        # Find highest character height
-        chars = 'aábcčdďeéěfghiíjklmnňoópqrřsštťuúůvwxyýzžAÁBCČDĎEÉĚFGHIÍJKLMNOÓPQRŘSŠTŤUÚŮVWXYÝZŽ0123456789`~!@#$%^&*()_+-[]{};\:"|,./<>?°' + "'"
-        _, max_heigth, baseline = fnt.text_dimensions(chars)
+        for font_size in font_sizes:
+            # Read font
+            fnt = Font('/usr/share/fonts/truetype/ubuntu/Ubuntu-B.ttf', font_size)
 
-        for chr in chars:
-            glyph = fnt.glyph_for_character(chr)
-            im = numpy.zeros((max_heigth, glyph.width, 4), dtype=numpy.uint8)
-            idx = 0
-            for y, x in product(range(glyph.height), range(glyph.width)):
-                im[y + max_heigth - glyph.ascent - baseline][x][3] = 255 if not glyph.bitmap.pixels[idx] == 0 else 0
-                idx += 1
+            # Find highest character height
+            chars = 'aábcčdďeéěfghiíjklmnňoópqrřsštťuúůvwxyýzžAÁBCČDĎEÉĚFGHIÍJKLMNOÓPQRŘSŠTŤUÚŮVWXYÝZŽ0123456789`~!@#$%^&*()_+-[]{};\:"|,./<>?°' + "'"
+            _, max_heigth, baseline = fnt.text_dimensions(chars)
 
-            # for color in range(7):
-            #file_name = f'bitmap/font/{color:X}{font_size:02X}{ord(chr):X}.png'
-            file_name = f'bitmap/font/{font_size:02X}{ord(chr):X}.png'
-            # print(f"'{chr}':{color} --> '{file_name}'")
-            print(f"'{chr}' --> '{file_name}'")
-            imageio.imwrite(file_name, im, format='PNG')
+            for chr in chars:
+                glyph = fnt.glyph_for_character(chr)
+                im = numpy.zeros((max_heigth, glyph.width, 4), dtype=numpy.uint8)
+                idx = 0
+                for y, x in product(range(glyph.height), range(glyph.width)):
+                    im[y + max_heigth - glyph.ascent - baseline][x][3] = 255 if not glyph.bitmap.pixels[idx] == 0 else 0
+                    idx += 1
+
+                # for color in range(7):
+                dst_path = dst_variant_path.joinpath(f'{font_size:02X}{ord(chr):X}.png')
+                print(f"{variant}:{font_size:<4} '{chr}' --> '{dst_path}'")
+                imageio.imwrite(dst_path, im, format='PNG')

@@ -44,4 +44,4 @@ class UiRain(UiFrame):
                 f0 = forecast[i - 1]
                 f1 = forecast[i + 1]
                 if (max(f0.rain, f0.snow) < p) and (p > max(f1.rain, f1.snow)):
-                    self.ui.text_center(10, '%.1f' % p, V(xx, self.dim.y - 2), BLACK, WHITE)
+                    self.ui.text_center(16, '%.1f' % p, V(xx, self.dim.y - 2), BLACK, WHITE)

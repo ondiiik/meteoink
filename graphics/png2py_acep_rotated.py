@@ -74,8 +74,11 @@ colr_sets = {(c1, c2): ((usable_colors_map[c1] + usable_colors_map[c2]) / 2).ast
 
 
 def rgb2color(rgba):
-    if (rgba[3] < 128):
-        return Color.TRANSPARENT, Color.TRANSPARENT
+    try:
+        if (rgba[3] < 128):
+            return Color.TRANSPARENT, Color.TRANSPARENT
+    except:
+        pass  # No transparency
 
     rgba = np.array(rgba[:3])
     mag_max = 1024
@@ -172,7 +175,7 @@ os.system(f'autopep8 "{str(bitmap_tmp)}" > {str(bitmap)}')
 os.system(f'rm -f {str(bitmap_tmp)}')
 
 
-src_dir = Path('bitmap/font')
+src_dir = Path('bitmap/font/acep')
 fsize = 0
 
 fonts_path = dst_dir.joinpath('fonts.py')

@@ -151,7 +151,7 @@ os.system(f'autopep8 "{str(bitmap_tmp)}" > {str(bitmap)}')
 os.system(f'rm -f {str(bitmap_tmp)}')
 
 
-src_dir = Path('bitmap/font')
+src_dir = Path('bitmap/font/bwy')
 fsize = 0
 
 fonts_path = dst_dir.joinpath('fonts.py')
