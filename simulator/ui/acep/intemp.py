@@ -6,4 +6,4 @@ from .temp import UiTemp
 
 class UiInTemp(UiTemp):
     def __init__(self, ui, ofs, dim):
-        super().__init__(ui, ofs, dim, False)
+        super().__init__(ui, ofs, dim, True)

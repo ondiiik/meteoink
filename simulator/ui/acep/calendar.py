@@ -44,18 +44,20 @@ class UiCalendar(UiFrame):
             dt = self.ui.forecast.time.get_date_time(weather.dt)
             hour = dt[3] - dh
 
-            # Draw separators
+            # Draw weekends
             if show_days and ((dt[6] == 5) or (dt[6] == 6)):
                 if 0 == i:
                     self.canvas.trect(V(int(xx - dt[3] // hpi * hpi * block / hpi), 1), V(dblock, 26), GREEN)
                 if 0 == hour:
                     self.canvas.trect(V(xx, 1), V(dblock, 26), GREEN)
 
+            # Draw separators
+            sep_space = self.dim.y + ((-15 + h_space) if show_days else (-10 + h_space))
             if 0 == hour:
                 if (dt[6] == 5) or (dt[6] == 0):
-                    self.canvas.vline(V(xx + 1, 0), self.dim.y - 10 + h_space, BLACK)
+                    self.canvas.vline(V(xx + 1, 0), sep_space, BLACK)
 
-                self.canvas.vline(V(xx, 0), self.dim.y - 10 + h_space, BLACK)
+                self.canvas.vline(V(xx, 0), sep_space, BLACK)
 
             if show_days:
                 # Draw hours text

@@ -32,13 +32,13 @@ class Epd(EpdBase):
                 # We have forecast, so lets draw it on screen. Don't draw
                 # always everything as forecast is changing not so often,
                 # but temperature is.
-                weather = UiWeather(self, V(0, 0), V(100, 120))
-                out_temp = UiOutTemp(self, V(weather.right + 5, 0), V(160, weather.height // 2))
-                in_temp = UiInTemp(self, V(out_temp.left, out_temp.bellow), out_temp.dim)
-                outside = UiOutside(self, V(out_temp.right + 15, 0), V(self.width - out_temp.right - 6, out_temp.height))
-                inside = UiInside(self, V(in_temp.right + 5, outside.bellow), outside.dim)
-                calendar_head = UiCalendar(self, V(0, weather.bellow), V(self.width, 32))
-                icons = UiIcons(self, V(0, calendar_head.bellow + 6), V(self.width, 55))
+                weather = UiWeather(self, V(0, 0), V(130, 120))
+                out_temp = UiOutTemp(self, V(weather.left, weather.bellow), V(160, 50))
+                in_temp = UiInTemp(self, V(out_temp.right, out_temp.above), V(self.width - out_temp.width, out_temp.height))
+                outside = UiOutside(self, V(weather.right, 0), V(170, weather.height))
+                inside = UiInside(self, V(outside.right, 0), V(self.width - outside.right, weather.height))
+                calendar_head = UiCalendar(self, V(0, out_temp.bellow), V(self.width, 42))
+                icons = UiIcons(self, V(0, calendar_head.bellow + 6), V(self.width, 72))
                 calendar_tail = UiCalendar(self, V(0, icons.bellow), V(self.width, self.height - icons.bellow - 30))
                 graph_temp = UiTempGr(self, *calendar_tail.same)
                 text_temp = UiTempTxt(self, *calendar_tail.same)
