@@ -2,11 +2,17 @@ from ulogging import getLogger
 logger = getLogger(__name__)
 
 import micropython
+from micropython import const
 from framebuf import FrameBuffer, GS4_HMSB
 
-from .base import Vect, Bitmap, WHITE, BLACK, ALPHA
+from .base import Vect, Bitmap, WHITE, BLACK, ALPHA, bmt
 from .epd import EPD
-from bitmap import fonts
+from bitmap import FONTS
+
+
+_CORONA_SIZE = const(3)
+_CORONA_SPC = const(_CORONA_SIZE + 2)
+_corofs = Vect(_CORONA_SIZE, _CORONA_SIZE)
 
 
 class Canvas:
@@ -106,53 +112,40 @@ class Canvas:
         self.fb.fill_rect(v.y, self._r - v.x - d.x, d.y, d.x, c)
 
     @micropython.native
-    def text(self, size, text, pos, color=BLACK, corona=None, border=2):
-        if not corona is None:
-            for d in (Vect(1, 0) * border,
-                      Vect(0, 1) * border,
-                      Vect(1, 1) * border,
-                      Vect(1, -1) * border):
-                self.text(size, text, pos + d, corona)
-                self.text(size, text, pos - d, corona)
+    def text(self, size, text, pos, color=BLACK, corona=None):
+        if color is None:
+            variant, color, corona = 1, corona, None
+        else:
+            if corona is not None:
+                self.text(size, text, pos.copy(), None, corona)
+            variant = 0
+
+        pos = pos.copy() - _corofs
 
         for char in text:
             if ' ' == char:
                 pos.x += int(0.3 * size) + 1
             else:
                 try:
-                    f = Bitmap(fonts.fonts[size][ord(char)][color])
+                    f = FONTS[size][variant][color][ord(char)]
                 except KeyError:
-                    s = fonts.fonts[size][ord(char)][0][2]
-                    l = len(s)
-                    a = bytearray(l)
-                    for i in range(l):
-                        b = s[i]
-                        if b & 0x0F != 0x07:
-                            b &= 0xF0
-                            b |= color
-                        if b & 0xF0 != 0x70:
-                            b &= 0x0F
-                            b |= color << 4
-                        a[i] = b
+                    f = bmt(FONTS, char, variant, size, color)
 
-                    s = fonts.fonts[size][ord(char)][0]
-                    b = s[0], s[1], a
-                    fonts.fonts[size][ord(char)][color] = b
-                    f = Bitmap(b)
-
+                f = Bitmap(f)
                 self.bitmap(pos, f)
-                pos.x += f.dim.y + 1
+                pos.x += f.dim.y - _CORONA_SPC
 
         return pos
 
+    @micropython.native
     def text_len(self, size, text):
         l = 0
         for char in text:
             if ' ' == char:
                 l += int(0.3 * size) + 1
             else:
-                f = Bitmap(fonts.fonts[size][ord(char)][0])
-                l += f.dim.y + 1
+                f = Bitmap(FONTS[size][0][0][ord(char)], True)
+                l += f.dim.y - _CORONA_SPC
 
         return l
 

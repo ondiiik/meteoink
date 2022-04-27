@@ -242,6 +242,12 @@ class Font(object):
 
 if __name__ == '__main__':
     import os
+    import cmath
+
+    corona_size = 3
+    corona_offsets = [(round(corona_size + cmath.rect(corona_size, numpy.deg2rad(i)).real), round(corona_size + cmath.rect(corona_size, numpy.deg2rad(i)).imag)) for i in range(0, 360, 15)]
+    corona_color = numpy.array([255, 255, 255, 255])
+    font_color = numpy.array([0, 0, 0, 255])
 
     dst_loc_path = Path('bitmap', 'font')
     dst_loc_path.mkdir(exist_ok=True)
@@ -260,13 +266,30 @@ if __name__ == '__main__':
 
             for chr in chars:
                 glyph = fnt.glyph_for_character(chr)
-                im = numpy.zeros((max_heigth, glyph.width, 4), dtype=numpy.uint8)
+
+                def glyph_iterate(x, y):
+                    return product(range(x, glyph.height + x), range(y, glyph.width + y))
+
+                im = numpy.zeros((max_heigth + 2 * corona_size, glyph.width + 2 * corona_size, 4), dtype=numpy.uint8)
+
+                for offsets in corona_offsets:
+                    idx = 0
+                    for y, x in glyph_iterate(*offsets):
+                        if glyph.bitmap.pixels[idx] != 0:
+                            im[y + max_heigth - glyph.ascent - baseline][x] = corona_color
+                        idx += 1
+
+                dst_path = dst_variant_path.joinpath(f'1{font_size:02X}{ord(chr):X}.png')
+                print(f"{variant}:{font_size:<4} '{chr}' --> '{dst_path}'")
+                imageio.imwrite(dst_path, im, format='PNG')
+
+                im = numpy.zeros((max_heigth + 2 * corona_size, glyph.width + 2 * corona_size, 4), dtype=numpy.uint8)
                 idx = 0
-                for y, x in product(range(glyph.height), range(glyph.width)):
-                    im[y + max_heigth - glyph.ascent - baseline][x][3] = 255 if not glyph.bitmap.pixels[idx] == 0 else 0
+                for y, x in glyph_iterate(corona_size, corona_size):
+                    if glyph.bitmap.pixels[idx] != 0:
+                        im[y + max_heigth - glyph.ascent - baseline][x] = font_color
                     idx += 1
 
-                # for color in range(7):
-                dst_path = dst_variant_path.joinpath(f'{font_size:02X}{ord(chr):X}.png')
+                dst_path = dst_variant_path.joinpath(f'0{font_size:02X}{ord(chr):X}.png')
                 print(f"{variant}:{font_size:<4} '{chr}' --> '{dst_path}'")
                 imageio.imwrite(dst_path, im, format='PNG')

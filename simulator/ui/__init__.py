@@ -1,7 +1,7 @@
 from ulogging import getLogger
 logger = getLogger(__name__)
 
-from bitmap import fonts, bmp
+from bitmap import FONTS, BMP
 from config import sys
 from display import Vect, Bitmap, BLACK, WHITE, GREEN, BLUE, RED, YELLOW, ORANGE, ALPHA
 
@@ -63,14 +63,14 @@ class Ui:
         self.text = self.canvas.text
 
     def bitmap(self, size, name):
-        return Bitmap(bmp.bmp[name][size])
+        return Bitmap(BMP[name][size])
 
-    def text_center(self, size, text, pos, color=BLACK, corona=None, border=2):
+    def text_center(self, size, text, pos, color=BLACK, corona=None):
         l = self.text_len(size, text)
         pos.x -= l // 2
-        return self.text(size, text, pos, color, corona, border)
+        return self.text(size, text, pos, color, corona)
 
-    def text_right(self, size, text, pos, color=BLACK, corona=None, border=2):
+    def text_right(self, size, text, pos, color=BLACK, corona=None):
         l = self.text_len(size, text)
         pos.x -= l
-        return self.text(size, text, pos, color, corona, border)
+        return self.text(size, text, pos, color, corona)

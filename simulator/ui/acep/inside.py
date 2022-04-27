@@ -10,8 +10,8 @@ from config import location
 class UiInside(UiFrame):
     def draw(self, connection, volt):
         SPACING = const(18)
-        LOWERING = const(13)
         SYMDIST = const(46)
+        SYMDISTS = const(42)
 
         # Type humidity
         if None == self.ui.forecast.home.rh:
@@ -22,11 +22,11 @@ class UiInside(UiFrame):
             c = GREEN if v in range(45, 60) else BLUE if v in range(40, 65) else RED
             t = f'{self.ui.forecast.home.rh:.0f}'
 
-        self.ui.text_right(35, t, V(self.width - 2 - SYMDIST, self.height - 35), c)
-        self.ui.text_right(16, '%RH',  V(self.width - 2, self.height - 24))
+        self.ui.text_right(35, t, V(self.width - SYMDIST, self.height - 35), c)
+        self.ui.text(16, '%RH',  V(self.width - SYMDISTS, self.height - 24))
 
         # Display battery state
-        batt = UiVBat(self.ui, V(self.width - 32, 0), V(24, 30))
+        batt = UiVBat(self.ui, V(self.width - 40, 0), V(24, 36))
         batt.repaint(volt)
 
         # Type weather details

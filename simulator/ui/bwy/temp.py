@@ -21,8 +21,8 @@ class UiTemp(UiFrame):
                 color = YELLOW
             t = f'{t:.1f}'
 
-        self.ui.text(50, t, V(21, -5), BLACK, color, 3)
-        self.ui.text(50, '°C', V(self.width - 46, -5), BLACK, color, 3)
+        self.ui.text(50, t, V(21, -5), BLACK, color)
+        self.ui.text(50, '°C', V(self.width - 46, -5), BLACK, color)
 
         bitmap = self.ui.bitmap(1, 'out' if self.outside else 'in')
         self.canvas.bitmap(V(0, 30), bitmap)

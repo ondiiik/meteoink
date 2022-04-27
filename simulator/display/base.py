@@ -19,6 +19,10 @@ class Vect:
         self.x = x
         self.y = y
 
+    @micropython.native
+    def copy(self):
+        return type(self)(self.x, self.y)
+
     @property
     @micropython.viper
     def square(self) -> int:
@@ -74,3 +78,25 @@ class Frame(FrameBuffer):
     def __init__(self, width, height):
         self.buf = bytearray((width * height + 1) // 2)
         super().__init__(self.buf, width, height, GS4_HMSB)
+
+
+@micropython.native
+def bmt(fonts, char, variant, size, color):
+    s = fonts[size][variant][variant][ord(char)][2]
+    l = len(s)
+    a = bytearray(l)
+    for i in range(l):
+        b = s[i]
+        if b & 0x0F != 0x07:
+            b &= 0xF0
+            b |= color
+        if b & 0xF0 != 0x70:
+            b &= 0x0F
+            b |= color << 4
+        a[i] = b
+
+    s = fonts[size][variant][variant][ord(char)]
+    b = s[0], s[1], a
+    c = fonts[size][variant].setdefault(color, dict())
+    c[ord(char)] = b
+    return b
