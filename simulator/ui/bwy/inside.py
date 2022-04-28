@@ -1,7 +1,7 @@
 from ulogging import getLogger
 logger = getLogger(__name__)
 
-from .. import UiFrame, Vect as V
+from .. import UiFrame, V, Z
 from .vbat import UiVBat
 from config import location
 
@@ -14,7 +14,7 @@ class UiInside(UiFrame):
         else:
             t = '{:.0f}'.format(self.ui.forecast.home.rh)
 
-        self.ui.text(25, t, V(0, 0))
+        self.ui.text(25, t, Z)
         self.ui.text(10, '%',  V(32, 11))
 
         # Type weather details

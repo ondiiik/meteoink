@@ -2,7 +2,7 @@ from ulogging import getLogger
 logger = getLogger(__name__)
 
 from micropython import const
-from .. import UiFrame, Vect as V, ORANGE, RED, GREEN, YELLOW
+from .. import UiFrame, V, ORANGE, RED, GREEN, YELLOW
 
 
 class UiVBat(UiFrame):

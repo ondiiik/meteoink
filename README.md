@@ -6,7 +6,7 @@
 ## What Meteoink is
 
 Meteoink is home meteostation based on [4.2 inch dual color E-Ink display](https://www.waveshare.com/4.2inch-e-paper-module-c.htm),
-[TTGO-T8-ESP32](https://github.com/LilyGO/TTGO-T8-ESP32) and [micropython 1.17](https://micropython.org/). Meteostation
+[TTGO-T8-ESP32](https://github.com/LilyGO/TTGO-T8-ESP32) and [micropython 1.18](https://micropython.org/). Meteostation
 is connected to your home WiFi and uses data from [OpenWeatherMap](https://openweathermap.org/) project for obtaining
 weather forecast. It also uses [DHT22](https://github.com/semestrinis/Arduino/wiki/DHT22-temperature-humidity-sensor)
 sensor for measuring indoor temperature and humidity. Whole system is powered from one
@@ -43,7 +43,7 @@ To make software running on ESP32, you have to install Micropython first on it. 
 according to [this tutorial](https://micropython.org/download/esp32spiram/), or simply use
 [thonny IDE](https://randomnerdtutorials.com/getting-started-thonny-micropython-python-ide-esp32-esp8266/) to do
 this job for you. Currently the metostation is tested with
-[Micropython v. 1.17](https://micropython.org/resources/firmware/esp32spiram-20210902-v1.17.bin).
+[Micropython v. 1.18](https://micropython.org/resources/firmware/esp32spiram-20220117-v1.18.bin).
 
 
 ## Make littlefs
@@ -54,7 +54,7 @@ through this port.
 
     >>> import sys
     >>> sys.implementation
-    (name='micropython', version=(1, 17, 0))
+    (name='micropython', version=(1, 18, 0))
 
 As meteostation may time after time writes something on internal flash, then for flash healthy is better to use
 `littlefs` instead of `FAT`. This can be done according to

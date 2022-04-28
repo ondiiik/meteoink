@@ -2,7 +2,7 @@ from ulogging import getLogger
 from display.base import YELLOW
 logger = getLogger(__name__)
 
-from .. import UiFrame, Vect as V, BLACK, WHITE
+from .. import UiFrame, V, BLACK, WHITE
 
 
 class UiRain(UiFrame):

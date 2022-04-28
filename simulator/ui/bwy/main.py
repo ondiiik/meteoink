@@ -1,7 +1,7 @@
 from ulogging import getLogger
 logger = getLogger(__name__)
 
-from ..base import EpdBase, V
+from ..base import EpdBase, V, Z
 from .calendar import UiCalendar
 from .icons import UiIcons
 from .inside import UiInside
@@ -19,7 +19,7 @@ class Epd(EpdBase):
     def repaint_welcome(self):
         with self.Drawing('welcome', self):
             bitmap = self.bitmap(1, 'greetings')
-            self.canvas.bitmap(V(0, 0), bitmap)
+            self.canvas.bitmap(Z, bitmap)
 
     def repaint_forecast(self, volt):
         with self.Drawing('weather', self):
@@ -32,7 +32,7 @@ class Epd(EpdBase):
                 # We have forecast, so lets draw it on screen. Don't draw
                 # always everything as forecast is changing not so often,
                 # but temperature is.
-                weather = UiWeather(self, V(0, 0), V(100, 100))
+                weather = UiWeather(self, Z, V(100, 100))
                 out_temp = UiOutTemp(self, V(weather.right + 5, 0), V(160, weather.height // 2))
                 in_temp = UiInTemp(self, V(weather.right + 5, out_temp.bellow), out_temp.dim)
                 outside = UiOutside(self, V(out_temp.right + 5, 0), V(self.width - out_temp.right - 6, out_temp.height))
@@ -77,8 +77,8 @@ class Epd(EpdBase):
             url = f'http://{self.connection.ifconfig[0]}:5555'
             wifi = f'WIFI:T:WPA;S:{hotspot.ssid};P:{hotspot.passwd};;'
 
-            UiQr(self, V(0, 0), V(0, 0)).repaint(wifi, 'WiFi', False)
-            UiQr(self, V(self.width - 122, self.height - 122), V(0, 0)).repaint(url, 'Config URL', True)
+            UiQr(self, Z, Z).repaint(wifi, 'WiFi', False)
+            UiQr(self, V(self.width - 122, self.height - 122), Z).repaint(url, 'Config URL', True)
             UiUrl(self, V(0, self.canvas.dim.y // 2), V(self.canvas.dim.x - 132, self.canvas.dim.y // 2)).repaint(url)
             UiWifi(self, V(200, 0), V(self.canvas.dim.x - 132, self.canvas.dim.y // 2)).repaint(hotspot)
             UiVBat(self, V(self.canvas.dim.x // 2 - 10, self.canvas.dim.y // 2),  V(20, 10)).repaint(volt)

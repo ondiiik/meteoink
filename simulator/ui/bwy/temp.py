@@ -1,7 +1,7 @@
 from ulogging import getLogger
 logger = getLogger(__name__)
 
-from .. import UiFrame, Vect as V, BLACK, YELLOW, WHITE
+from .. import UiFrame, V, BLACK, YELLOW, WHITE
 from config import temp
 
 

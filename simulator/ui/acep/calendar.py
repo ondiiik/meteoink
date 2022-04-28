@@ -1,7 +1,7 @@
 from ulogging import getLogger
 logger = getLogger(__name__)
 
-from .. import UiFrame, Vect as V, BLACK, GREEN
+from .. import UiFrame, V, Z, BLACK, GREEN
 from micropython import const
 from config import ui as cfg
 from config import VARIANT_2DAYS
@@ -26,7 +26,7 @@ class UiCalendar(UiFrame):
 
         # Draw upper horizontal lines
         if show_days:
-            self.canvas.hline(V(0, 0), self.dim.x - 1)
+            self.canvas.hline(Z, self.dim.x - 1)
 
         # Find time related to next day
         week_day = self.ui.forecast.time.get_date_time(forecast[0].dt)[6]

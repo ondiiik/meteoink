@@ -1,7 +1,7 @@
 from ulogging import getLogger
 logger = getLogger(__name__)
 
-from ..base import EpdBase, V
+from ..base import EpdBase, V, Z
 from .calendar import UiCalendar
 from .icons import UiIcons
 from .inside import UiInside
@@ -19,7 +19,7 @@ class Epd(EpdBase):
     def repaint_welcome(self):
         with self.Drawing('welcome', self):
             bitmap = self.bitmap(1, 'greetings')
-            self.canvas.bitmap(V(0, 0), bitmap)
+            self.canvas.bitmap(Z, bitmap)
 
     def repaint_forecast(self, volt):
         with self.Drawing('weather', self):
@@ -32,14 +32,14 @@ class Epd(EpdBase):
                 # We have forecast, so lets draw it on screen. Don't draw
                 # always everything as forecast is changing not so often,
                 # but temperature is.
-                weather = UiWeather(self, V(0, 0), V(130, 120))
+                weather = UiWeather(self, Z, V(130, 120))
                 out_temp = UiOutTemp(self, V(weather.left, weather.bellow), V(self.width // 2, 60))
                 in_temp = UiInTemp(self, V(out_temp.right, out_temp.above), V(self.width - out_temp.width, out_temp.height))
-                outside = UiOutside(self, V(weather.right, 0), V(180, weather.height))
+                outside = UiOutside(self, V(weather.right, 0), V(210, weather.height))
                 inside = UiInside(self, V(outside.right, 0), V(self.width - outside.right, weather.height))
                 calendar_head = UiCalendar(self, V(0, out_temp.bellow), V(self.width, 46))
                 icons = UiIcons(self, V(0, calendar_head.bellow + 4), V(self.width, 72))
-                calendar_tail = UiCalendar(self, V(0, icons.bellow), V(self.width, self.height - icons.bellow - 30))
+                calendar_tail = UiCalendar(self, V(0, icons.bellow), V(self.width, self.height - icons.bellow - 50))
                 graph_temp = UiTempGr(self, *calendar_tail.same)
                 text_temp = UiTempTxt(self, *calendar_tail.same)
                 graph_rain = UiRain(self, *calendar_tail.same)
@@ -49,8 +49,8 @@ class Epd(EpdBase):
                 calendar_tail.repaint(False)
                 graph_temp.repaint()
                 text_temp.repaint()
-                graph_rain.repaint()
                 wind.repaint()
+                graph_rain.repaint()
                 icons.repaint()
                 weather.repaint()
                 outside.repaint()
@@ -77,8 +77,8 @@ class Epd(EpdBase):
             url = f'http://{self.connection.ifconfig[0]}:5555'
             wifi = f'WIFI:T:WPA;S:{hotspot.ssid};P:{hotspot.passwd};;'
 
-            UiQr(self, V(0, 0), V(0, 0)).repaint(wifi, 'WiFi', False)
-            UiQr(self, V(self.width - 122, self.height - 122), V(0, 0)).repaint(url, 'Config URL', True)
+            UiQr(self, Z, Z).repaint(wifi, 'WiFi', False)
+            UiQr(self, V(self.width - 140, self.height - 140), Z).repaint(url, 'Config URL', True)
             UiUrl(self, V(0, self.canvas.dim.y // 2), V(self.canvas.dim.x - 132, self.canvas.dim.y // 2)).repaint(url)
             UiWifi(self, V(200, 0), V(self.canvas.dim.x - 132, self.canvas.dim.y // 2)).repaint(hotspot)
-            UiVBat(self, V(self.canvas.dim.x // 2 - 10, self.canvas.dim.y // 2),  V(20, 10)).repaint(volt)
+            UiVBat(self, V(self.canvas.dim.x // 2 - 10, self.canvas.dim.y // 2),  V(20, 32)).repaint(volt)

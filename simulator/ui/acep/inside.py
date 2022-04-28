@@ -2,28 +2,19 @@ from ulogging import getLogger
 logger = getLogger(__name__)
 
 from micropython import const
-from .. import UiFrame, Vect as V, BLUE, RED, GREEN, BLACK
+from .. import UiFrame, V, BLUE
 from .vbat import UiVBat
+from .rh import UiRh
 from config import location
 
 
 class UiInside(UiFrame):
     def draw(self, connection, volt):
         SPACING = const(18)
-        SYMDIST = const(46)
-        SYMDISTS = const(42)
 
         # Type humidity
-        if None == self.ui.forecast.home.rh:
-            c = BLACK
-            t = '--'
-        else:
-            v = round(self.ui.forecast.home.rh)
-            c = GREEN if v in range(45, 60) else BLUE if v in range(40, 65) else RED
-            t = f'{self.ui.forecast.home.rh:.0f}'
-
-        self.ui.text_right(35, t, V(self.width - SYMDIST, self.height - 35), c)
-        self.ui.text(16, '%RH',  V(self.width - SYMDISTS, self.height - 24))
+        rh = UiRh(self.ui, V(0, self.height - 35), V(self.width, 35))
+        rh.repaint(self.ui.forecast.home.rh)
 
         # Display battery state
         batt = UiVBat(self.ui, V(self.width - 40, 0), V(24, 36))

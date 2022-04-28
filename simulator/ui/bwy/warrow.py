@@ -1,7 +1,7 @@
 from ulogging import getLogger
 logger = getLogger(__name__)
 
-from .. import Vect as V, UiFrame, BLACK, WHITE, YELLOW
+from .. import V, UiFrame, BLACK, WHITE, YELLOW
 from cmath import rect, pi
 
 

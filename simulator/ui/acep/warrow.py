@@ -1,24 +1,24 @@
 from ulogging import getLogger
 logger = getLogger(__name__)
 
-from .. import Vect as V, UiFrame, BLACK, WHITE, YELLOW
+from .. import V, UiFrame, BLACK, WHITE, RED, ORANGE, GREEN, BLUE, YELLOW, ALPHA
 from cmath import rect, pi
 
 
 class UiWArrow(UiFrame):
-    def draw_wind(self, pos, weather, scale=16, arrow=False):
+    def draw(self, weather, scale=16, arrow=False):
         speed = weather.speed
         direction = weather.dir
 
         def rescale(v):
             return v * scale // 16
 
-        pos = pos + V(0, rescale(30))
+        pos = self.dim // 2
 
         if speed < 2.5:
-            self.canvas.fill_rect(V(rescale(-2), rescale(-2)) + pos,
-                                  V(rescale(4), rescale(4)),
-                                  BLACK)
+            self.canvas.fill_rect(V(rescale(-3), rescale(-3)) + pos,
+                                  V(rescale(6), rescale(6)),
+                                  GREEN)
             return
 
         r = rescale(30)
@@ -26,19 +26,14 @@ class UiWArrow(UiFrame):
         d = rect(r, (direction - 90) * pi / 180)
 
         d2 = o - d
+        h = RED if speed > 10 else ORANGE if speed > 8 else YELLOW if speed > 7 else ALPHA
+        c = BLACK if speed > 7 else BLUE if speed > 4 else GREEN
+        w = 6 if speed > 16 else 3
 
-        if speed > 10:
-            c = YELLOW
-        else:
-            c = WHITE
+        if ALPHA != h:
+            self._draw_arrow(speed, direction, d2, o, r, h, w)
 
-        if speed > 16:
-            w = 6
-        else:
-            w = 3
-
-        self._draw_arrow(speed, direction, d2, o, r, c, w)
-        self._draw_arrow(speed, direction, d2, o, r, BLACK, 1)
+        self._draw_arrow(speed, direction, d2, o, r, c, 1)
 
         if not arrow:
             d1 = o - 0.4 * d

@@ -1,7 +1,7 @@
 from ulogging import getLogger
 logger = getLogger(__name__)
 
-from .. import Vect as V
+from .. import V
 from .warrow import UiWArrow
 
 

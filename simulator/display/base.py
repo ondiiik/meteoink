@@ -52,13 +52,21 @@ class Vect:
                     int(self.y) * v)
 
     @micropython.viper
-    def __div__(self, v: int):
+    def __floordiv__(self, v: int):
         return Vect(int(self.x) // v,
                     int(self.y) // v)
+
+    # @micropython.viper
+    # def __div__(self, v: int):
+    #     return Vect(int(self.x) // v,
+    #                 int(self.y) // v)
 
     @micropython.native
     def __repr__(self):
         return f'Vect(x={self.x}, y={self.y})'
+
+
+Zero = Vect(0, 0)
 
 
 class Bitmap:
@@ -76,7 +84,7 @@ class Bitmap:
 class Frame(FrameBuffer):
     @micropython.native
     def __init__(self, width, height):
-        self.buf = bytearray((width * height + 1) // 2)
+        self.buf = bytearray(((width + 1) // 2 * 2 * height) // 2)
         super().__init__(self.buf, width, height, GS4_HMSB)
 
 

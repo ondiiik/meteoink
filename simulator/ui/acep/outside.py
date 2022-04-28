@@ -2,38 +2,39 @@ from ulogging import getLogger
 logger = getLogger(__name__)
 
 from micropython import const
-from .. import Vect as V, RED, GREEN, BLUE
+from .. import V, UiFrame
 from .warrow import UiWArrow
+from .rh import UiRh
+from .ws import UiWs
+from .rv import UiRv
 
 
-class UiOutside(UiWArrow):
+class UiOutside(UiFrame):
     def draw(self):
-        SPACING = const(28)
-        LOWERING = const(13)
-        SYMDIST = const(52)
-        SYMDISTS = const(56)
+        VALWIDTH = const(110)
+        spacing = self.height // 3 + 1
+        valsize = V(VALWIDTH, spacing)
 
         # Draw wind
         weather = self.ui.forecast.weather
-        self.draw_wind(V(self.width - 56, 12), weather)
+        u = UiWArrow(self.ui, V(VALWIDTH, 0), V(self.width - VALWIDTH, self.height))
+        u.repaint(weather)
 
         # Type wind speed
         v = weather.speed
         y = -5
-
-        c = GREEN if v < 3 else BLUE if v < 12 else RED
-        self.ui.text_right(35, f'{v:.1f}', V(SYMDIST, y), c)
-        self.ui.text(16, 'm/s', V(SYMDISTS, y + LOWERING))
+        u = UiWs(self.ui, V(0, y), valsize)
+        u.repaint(v)
 
         # Type humidity
-        y += SPACING
-        self.ui.text_right(35, f'{v:.0f}', V(SYMDIST, y))
-        self.ui.text(16, '%', V(SYMDISTS, y + LOWERING))
+        y += spacing
+        v = weather.rh
+        u = UiRh(self.ui, V(0, y), valsize)
+        u.repaint(v)
 
         # Type also rain intensity
         v = weather.rain
         if v > 0:
-            c = GREEN if v < 1 else BLUE if v < 6 else RED
-            y += SPACING
-            self.ui.text_right(35, f'{v:.1f}', V(SYMDIST, y), c)
-            self.ui.text(16, 'mm/h', V(SYMDISTS, y + LOWERING))
+            y += spacing
+            u = UiRv(self.ui, V(0, y), valsize)
+            u.repaint(v)

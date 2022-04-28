@@ -1,7 +1,7 @@
 from ulogging import getLogger
 logger = getLogger(__name__)
 
-from .. import UiFrame, Vect as V, BLACK, RED
+from .. import UiFrame, V, BLACK, RED
 from config import temp
 
 
@@ -19,13 +19,20 @@ class UiTemp(UiFrame):
         else:
             if not self.inside and t >= temp.outdoor_high:
                 color = RED
-            t = f'{t:.1f} °C'
+            t = f'{t:.1f}'
 
+        s = '°C'
         if self.inside:
-            l = self.ui.text_len(60, t)
+            l = self.ui.text_len(35, s)
             x = self.width - l - 5
+            self.ui.text(35, s, V(x, 8))
+
+            l = self.ui.text_len(60, t)
+            x -= (l + 5)
             self.ui.text(60, t, V(x, -5), color)
+
             bitmap = self.ui.bitmap(1, 'in')
-            self.canvas.bitmap(V(x - 30, 30), bitmap)
+            self.canvas.bitmap(V(x - 25, 30), bitmap)
         else:
-            self.ui.text(60, t, V(5, -5), color)
+            p = self.ui.text(60, t, V(5, -5), color)
+            self.ui.text(35, s, p + V(6, 16))

@@ -1,7 +1,7 @@
 from ulogging import getLogger
 logger = getLogger(__name__)
 
-from .. import UiFrame, Vect as V
+from .. import UiFrame, V
 from battery import battery
 
 
@@ -11,5 +11,3 @@ class UiUrl(UiFrame):
         self.ui.connection.ifconfig
         self.ui.text(16, 'Confugurator URL:', V(15, 50))
         self.ui.text(16, url,                 V(45, 65))
-
-        self.ui.text(16, 'VBAT {:.2f} V'.format(battery.voltage), V(0, self.dim.y - 10))
