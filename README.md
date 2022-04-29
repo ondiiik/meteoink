@@ -5,7 +5,8 @@
 
 ## What Meteoink is
 
-Meteoink is home meteostation based on [4.2 inch dual color E-Ink display](https://www.waveshare.com/4.2inch-e-paper-module-c.htm),
+Meteoink is home meteostation based on [4.2 inch dual color E-Ink display](https://www.waveshare.com/4.2inch-e-paper-module-c.htm) (BWY variant)
+or [5.65 inch 7 colors E-Ink display](https://www.waveshare.com/5.65inch-e-paper-module-f.htm) (ACEP variant),
 [TTGO-T8-ESP32](https://github.com/LilyGO/TTGO-T8-ESP32) and [micropython 1.18](https://micropython.org/). Meteostation
 is connected to your home WiFi and uses data from [OpenWeatherMap](https://openweathermap.org/) project for obtaining
 weather forecast. It also uses [DHT22](https://github.com/semestrinis/Arduino/wiki/DHT22-temperature-humidity-sensor)
@@ -70,12 +71,13 @@ As meteostation may time after time writes something on internal flash, then for
 
 The last step is to upload all python code into created file sytem. This code is located in repository folder
 [esp32/micropython](https://github.com/ondiiik/meteoink/tree/master/esp32/micropython). There are precompiled python
-files stored used to speed up startup of software and for better usage of RAM (compiler is not heavily involved).
-All files from this folder shall be copied into board. For this purpose REPL based file access engine such as
-[ampy](https://techtutorialsx.com/2017/06/04/esp32-esp8266-micropython-uploading-files-to-the-file-system/) or
-[thonny IDE](https://randomnerdtutorials.com/getting-started-thonny-micropython-python-ide-esp32-esp8266/)
-can be used for writing files into file system. Just keep in mind that you shall be disconnected from console
-otherwise this tools will not work properly.
+files according to used variant of display. There is [esp32/micropython/bwy](https://github.com/ondiiik/meteoink/tree/master/esp32/micropython/bwy)
+folder for 4.2 inch Black/White/Yellow display, or [esp32/micropython/acep](https://github.com/ondiiik/meteoink/tree/master/esp32/micropython/acep)
+folder for 5.65 7-color ACEP display. Code is precompiled to speed up startup of software (shorter time when CPU consuming juice from battery),
+and for better usage of RAM (compiler is not heavily involved). All files from selected folder shall be copied into board.
+For this purpose REPL based file access engine such as [ampy](https://techtutorialsx.com/2017/06/04/esp32-esp8266-micropython-uploading-files-to-the-file-system/) or
+[thonny IDE](https://randomnerdtutorials.com/getting-started-thonny-micropython-python-ide-esp32-esp8266/) can be used for writing files into file system.
+Just keep in mind that you shall be disconnected from console otherwise this tools will not work properly.
 
 
 ## Configuration - first run
