@@ -3,7 +3,7 @@ logger = getLogger(__name__)
 
 from .. import UiFrame, V, BLACK, WHITE, YELLOW
 from micropython import const
-from config import temp
+from db import temp
 
 
 class UiTempGr(UiFrame):
@@ -26,7 +26,7 @@ class UiTempGr(UiFrame):
 
         # Draw charts
         self.chart_draw(3, WHITE)
-        self.chart_draw(3, YELLOW, temp.outdoor_high, temp.outdoor_low)
+        self.chart_draw(3, YELLOW, temp.OUTDOOR_HIGH, temp.OUTDOOR_LOW)
         self.chart_draw(1, BLACK)
 
     def chart_draw(self, w, c, th=None, tl=None):

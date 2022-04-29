@@ -1,7 +1,7 @@
 from buzzer import play
 from machine import reset
 from ui import DISPLAY_GREETINGS
-from var import display
+from db import display
 import web
 
 

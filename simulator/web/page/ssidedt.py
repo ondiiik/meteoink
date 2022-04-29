@@ -1,4 +1,4 @@
-from config import hotspot
+from db import spot
 from lang import trn
 import web
 
@@ -8,4 +8,4 @@ def www(page, args):
     page.heading(2, trn('Hotspot SSID'))
 
     with page.form('ssidset') as form:
-        form.input('SSID', 'id', hotspot.ssid)
+        form.input('SSID', 'id', spot.SSID)

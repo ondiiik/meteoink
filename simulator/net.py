@@ -5,7 +5,7 @@ from jumpers import jumpers
 from micropython import const
 from uerrno import ECONNRESET
 import urequests
-from config import connection, location, ui
+from db import location, connection, ui
 
 
 CONN_RETRY_CNT = const(6)
@@ -19,10 +19,10 @@ class Wifi:
 
 class Connection:
     def __init__(self):
-        self.is_hotspot = (jumpers.hotspot or 0 == len(connection) or 0 == len(location) or '' == ui.apikey)
+        self.is_hotspot = (jumpers.hotspot or not connection.CONNECTIONS or not location.LOCATIONS or not ui.APIKEY)
 
         if not self.is_hotspot:
-            self.config = connection[0]
+            self.config = connection.CONNECTIONS[0]
 
         self.nets = [Wifi('mynet1', b'aaaaaa'), Wifi('mynet2', b'bbbbbb')]
 

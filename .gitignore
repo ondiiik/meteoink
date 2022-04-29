@@ -13,8 +13,18 @@
 /simulator/hotspot.txt
 /simulator/onecall.json
 /simulator/reset_cause.txt
-/simulator/var/_alert.py
-/simulator/var/_display.py
+/simulator/db/_alert.py
+/simulator/db/_beep.py
+/simulator/db/_connection.py
+/simulator/db/_display.py
+/simulator/db/_led.py
+/simulator/db/_location.py
+/simulator/db/_spot.py
+/simulator/db/_sys.py
+/simulator/db/_temp.py
+/simulator/db/_time.py
+/simulator/db/_vbat.py
+/simulator/db/_ui.py
 /simulator/var/owmp.py
 
 # Byte-compiled / optimized / DLL files

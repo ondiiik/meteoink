@@ -3,7 +3,7 @@ logger = getLogger(__name__)
 
 from jumpers import jumpers
 from network import WLAN, STA_IF, AP_IF
-from config import connection, location, ui, hotspot
+from db import connection, location, spot, ui
 from utime import sleep
 import urequests
 from uerrno import ECONNRESET
@@ -35,7 +35,7 @@ class Connection:
         self._ifc.active(False)
 
         # Start requested variant of connection
-        if jumpers.hotspot or 0 == len(connection) or 0 == len(location) or '' == ui.apikey:
+        if jumpers.hotspot or not connection.CONNECTIONS or not location.LOCATIONS or not ui.APIKEY:
             self._hotspot()
         else:
             self._attach()
@@ -51,7 +51,7 @@ class Connection:
         network = None
 
         for n in self.nets:
-            for c in connection:
+            for c in connection.CONNECTIONS:
                 if n.bssid == c.bssid:
                     network = c
                     break
@@ -62,7 +62,7 @@ class Connection:
         # Repeat the same for SSID if BSSID was not found
         if network is None:
             for n in self.nets:
-                for c in connection:
+                for c in connection.CONNECTIONS:
                     if n.ssid == c.ssid:
                         network = c
                         break
@@ -92,7 +92,7 @@ class Connection:
         # Create hotspot to be able to attach by FTP and configure meteostation
         self._ifc = WLAN(AP_IF)
         self._ifc.active(True)
-        self._ifc.config(essid=hotspot.ssid, password=hotspot.passwd, authmode=3)
+        self._ifc.config(essid=spot.SSID, password=spot.PASSWD, authmode=3)
 
         while self._ifc.active() == False:
             sleep(1)

@@ -1,4 +1,4 @@
-from config import location
+from db import location
 from lang import trn
 import web
 
@@ -15,5 +15,5 @@ def www(page, args):
         form.spacer()
 
         with page.select(trn('Location'), 'location') as select:
-            for i in range(len(location)):
-                select.option(i, location[i].name)
+            for i in range(len(location.LOCATIONS)):
+                select.option(i, location.LOCATIONS[i].name)

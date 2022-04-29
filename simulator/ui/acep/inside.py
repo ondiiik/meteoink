@@ -5,7 +5,7 @@ from micropython import const
 from .. import UiFrame, V, BLUE
 from .vbat import UiVBat
 from .rh import UiRh
-from config import location
+from db import location
 
 
 class UiInside(UiFrame):
@@ -23,7 +23,7 @@ class UiInside(UiFrame):
         # Type weather details
         y = batt.bellow + 4
         x = self.dim.x - 2
-        self.ui.text_right(16, location[connection.config.location].name, V(x, y), BLUE)
+        self.ui.text_right(16, location.LOCATIONS[connection.config.location].name, V(x, y), BLUE)
         y += SPACING
         dt = self.ui.forecast.time.get_date_time(self.ui.forecast.weather.dt)
         self.ui.text_right(16, f'{dt[2]:d}.{dt[1]:d}.{dt[0]:d} {dt[3]:d}:{dt[4]:02d}', V(x, y))

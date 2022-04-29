@@ -3,8 +3,7 @@ logger = getLogger(__name__)
 
 from jumpers import jumpers
 from net import Connection
-from var import alert as alert_var, display as display_var
-from config import alert, vbat, temp, ui as ui_cfg
+from db import alert, display, beep, temp, vbat, ui
 from machine import deepsleep, reset, WDT
 from battery import battery
 from buzzer import play
@@ -16,9 +15,6 @@ from ui import DISPLAY_REFRESH, DISPLAY_GREETINGS
 from ui.main import MeteoUi
 
 
-alert_var.ALREADY_TRIGGERED = 2  # DEVEL/DEBUG
-
-
 def run(sha):
     try:
         # Init all peripheries
@@ -28,7 +24,7 @@ def run(sha):
         # and don't want to let it wake up during transport. In this case
         # we can put it to greetings mode, where only picture is displayed
         # and station kept sleeping till reset button is pressed
-        if DISPLAY_GREETINGS == display_var.DISPLAY_STATE or jumpers.sleep:
+        if DISPLAY_GREETINGS == display.DISPLAY_STATE or jumpers.sleep:
             # Read all initializes all peripheries
             play((800, 30), 500, (400, 30))
             app.greetings()
@@ -64,7 +60,7 @@ def run(sha):
     except Exception as e:
         dump_exception('FATAL - RECOVERY REQUIRED !!!', e)
 
-        if alert.error_beep:
+        if beep.ERROR_BEEP:
             play((200, 500), (100, 500))
 
         app.sleep(forecast, 5)
@@ -97,20 +93,19 @@ class App:
         # Disable LED when battery voltage is too low
         self.volt = battery.voltage
 
-        if (self.volt < vbat.low_voltage):
+        if (self.volt < vbat.LOW_VOLTAGE):
             self.led.disable()
 
         # We shall checks if there is requested to toggle temperature alarm
         if jumpers.alert:
-            alert.temp_balanced = not alert.temp_balanced
+            beep.TEMP_BALANCED = not beep.TEMP_BALANCED
 
-            if alert.temp_balanced:
+            if beep.TEMP_BALANCED:
                 play((100, 50), (200, 50), (400, 50), (800, 50), (1600, 50), (3200, 50))
-                alert_var.ALREADY_TRIGGERED = False
+                alert.ALREADY_TRIGGERED = False
             else:
                 play((3200, 50), (1600, 50), (800, 50), (400, 50), (200, 50), (100, 50))
 
-            alert.flush()
             deepsleep(1)
 
         # As we uses E-Ink display, the most comfortable way
@@ -121,7 +116,7 @@ class App:
 
         # When battery voltage is too low, just draw low battery
         # error on screen and go to deep sleep.
-        if (self.volt < vbat.low_voltage):
+        if (self.volt < vbat.LOW_VOLTAGE):
             self.led.mode(Led.ALERT)
 
             ui = MeteoUi(self.canvas, None, None)
@@ -141,14 +136,14 @@ class App:
             self.net = None
             dump_exception('Network connection error', e)
 
-            if alert.error_beep:
+            if beep.ERROR_BEEP:
                 play((200, 500), (100, 500))
 
     def greetings(self):
         ui = MeteoUi(self.canvas, None, self.net, self.led)
         ui.repaint_welcome()
 
-        display_var.DISPLAY_STATE = DISPLAY_REFRESH
+        display.DISPLAY_STATE = DISPLAY_REFRESH
         logger.info('Going to deep sleep ...')
         deepsleep()
 
@@ -183,22 +178,22 @@ class App:
         ui.repaint_forecast(self.volt)
 
     def allerts(self, forecast):
-        if not alert.temp_balanced:
+        if not beep.TEMP_BALANCED:
             return
 
-        if temp.indoor_high > forecast.home.temp:
+        if temp.INDOOR_HIGH > forecast.home.temp:
             return
 
         h = forecast.time.get_date_time(forecast.weather.dt)[3]
 
         if h == 13:
-            alert_var.ALREADY_TRIGGERED = False
+            alert.ALREADY_TRIGGERED = False
             return
 
-        if not alert_var.ALREADY_TRIGGERED and forecast.home.temp > forecast.weather.temp:
+        if not alert.ALREADY_TRIGGERED and forecast.home.temp > forecast.weather.temp:
             for i in range(3):
                 play((4000, 30), (6000, 30), (4000, 30), (6000, 30), (4000, 30), (6000, 30), (4000, 30), (6000, 30), 500)
-            alert_var.ALREADY_TRIGGERED = True
+            alert.ALREADY_TRIGGERED = True
 
     def sleep(self, forecast=None, minutes=0):
         if self.net is None:
@@ -206,9 +201,9 @@ class App:
             deepsleep(300000)
 
         if 0 == minutes:
-            minutes = ui_cfg.refresh
+            minutes = ui.REFRESH
             h = 12 if forecast is None else forecast.time.get_date_time(forecast.weather.dt)[3]
-            b, e = ui_cfg.dbl
+            b, e = ui.DBL
 
             if b > e:
                 if h < e:

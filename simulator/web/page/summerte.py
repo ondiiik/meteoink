@@ -1,11 +1,8 @@
-from config import time
+from db import time
 import web
 
 
 @web.action_handler(__name__)
 def www(page, args):
-    if time.winter:
-        time.winter = 0
-        time.flush()
-
+    time.WINTER = False
     web.index(page)

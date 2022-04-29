@@ -1,11 +1,8 @@
-from config import alert
+from db import beep
 import web
 
 
 @web.action_handler(__name__)
 def www(page, args):
-    if alert.error_beep:
-        alert.error_beep = False
-        alert.flush()
-
+    beep.ERROR_BEEP = 0
     web.index(page)

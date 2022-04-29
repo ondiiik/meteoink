@@ -71,7 +71,7 @@ class Epd(EpdBase):
             UiVBat(self, v, d).repaint(volt)
 
     def repaint_config(self, volt):
-        from config.spot import hotspot
+        from db import spot
         from .qr import UiQr
         from .url import UiUrl
         from .vbat import UiVBat
@@ -79,10 +79,10 @@ class Epd(EpdBase):
 
         with self.Drawing('hotspot', self):
             url = f'http://{self.connection.ifconfig[0]}:5555'
-            wifi = f'WIFI:T:WPA;S:{hotspot.ssid};P:{hotspot.passwd};;'
+            wifi = f'WIFI:T:WPA;S:{spot.SSID};P:{spot.PASSWD};;'
 
             UiQr(self, Z, Z).repaint(wifi, 'WiFi', False)
             UiQr(self, V(self.width - 140, self.height - 140), Z).repaint(url, 'Config URL', True)
             UiUrl(self, V(0, self.canvas.height // 2), V(self.canvas.width - 132, self.canvas.height // 2)).repaint(url)
-            UiWifi(self, V(200, 0), V(self.canvas.width - 132, self.canvas.height // 2)).repaint(hotspot)
+            UiWifi(self, V(200, 0), V(self.canvas.width - 132, self.canvas.height // 2)).repaint(spot)
             UiVBat(self, V(self.canvas.width // 2 - 10, self.canvas.height // 2),  V(20, 32)).repaint(volt)

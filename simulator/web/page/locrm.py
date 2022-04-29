@@ -1,19 +1,21 @@
-from config import location, Location, connection
+from db import location, connection
 import web
 
 
 @web.action_handler(__name__)
 def www(page, args):
     name = args['name']
+    locations = location.LOCATIONS
+    connections = connection.CONNECTIONS
 
-    for i in range(len(location)):
-        if location[i].name == name:
-            for j in range(len(connection)):
-                if connection[j].location == i:
-                    connection[j].location = 0
+    for i in range(len(locations)):
+        if locations[i].name == name:
+            for j in range(len(connections)):
+                if connections[j].location == i:
+                    connections[j].location = 0
 
-            location.remove(location[i])
-            Location.flush()
+            locations.remove(locations[i])
+            location.LOCATIONS = locations
             break
 
     web.index(page)

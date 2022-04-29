@@ -1,10 +1,8 @@
-from config import ui
+from db import ui
 import web
 
 
 @web.action_handler(__name__)
 def www(page, args):
-    ui.variant = int(args['v'])
-    ui.flush()
-
+    ui.VARIANT = int(args['v'])
     web.index(page)

@@ -1,4 +1,4 @@
-from config import hotspot
+from db import spot
 from lang import trn
 import web
 
@@ -8,4 +8,4 @@ def www(page, args):
     page.heading(2, trn('Set hotspot password'))
 
     with page.form('passset') as form:
-        form.input(trn('Password'), 'p', hotspot.passwd)
+        form.input(trn('Password'), 'p', spot.PASSWD)

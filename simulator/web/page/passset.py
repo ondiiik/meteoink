@@ -1,11 +1,9 @@
-from config import hotspot
+from db import spot
 import web
 
 
 @web.action_handler(__name__)
 def www(page, args):
     p = args['p']
-    hotspot.passwd = p
-    hotspot.flush()
-
+    spot.PASSWD = p
     web.index(page)

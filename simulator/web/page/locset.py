@@ -1,4 +1,4 @@
-from config import location
+from db import location
 import web
 
 
@@ -6,9 +6,10 @@ import web
 def www(page, args):
     i = int(args['idx'])
     gps = [float(ll[:-1] if ll[-1] in ('N', 'E') else ll) for ll in args['gps'].split(',')]
-    location[i].name = args['name']
-    location[i].lat = gps[0]
-    location[i].lon = gps[1]
-    location[i].flush()
+    location = location.LOCATIONS[i]
+    location.name = args['name']
+    location.lat = gps[0]
+    location.lon = gps[1]
+    location.flush()
 
     web.index(page)

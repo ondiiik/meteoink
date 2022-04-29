@@ -1,9 +1,9 @@
 from ulogging import getLogger
 logger = getLogger(__name__)
 
-from config import ui
+from db import ui
 
-if 'CZ' == ui.language:
+if 'CZ' == ui.LANGUAGE:
     from .lang_cz import *
 else:
     from .lang_en import *

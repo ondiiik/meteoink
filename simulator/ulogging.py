@@ -10,9 +10,6 @@ INFO = const(2)
 DEBUG = const(1)
 NOTSET = const(0)
 
-VERBOSE_LOG = const(0)
-EXCEPTION_DUMP = const(0)
-
 _lvl = NOTSET
 _lchr = '  ', '  ', '..', '??', '!!', '##'
 
@@ -23,6 +20,8 @@ class Logger:
         self._name = f'{name:<28}'
 
     def log(self, level, msg):
+        global _print
+
         if level >= _lvl:
             _print(_lchr[level], self._name, msg)
 
@@ -48,7 +47,9 @@ def getLogger(name):
     return logger
 
 
-if VERBOSE_LOG:
+from db import sys
+
+if sys.VERBOSE_LOG:
     try:
         _log = open('sys.log', 'a')
     except:
@@ -61,10 +62,10 @@ def dump_exception(msg, e):
     print(msg)
     print_exception(e)
 
-    if EXCEPTION_DUMP > 0:
+    if sys.EXCEPTION_DUMP > 0:
         pos = _log.tell()
 
-        if pos < EXCEPTION_DUMP:
+        if pos < sys.EXCEPTION_DUMP:
             dt = RTC().datetime()
             _log.write(f'\n{dt[2]}.{dt[1]}.{dt[0]} {dt[4]}:{dt[5]:02} :: ')
             _log.write(msg)
@@ -73,23 +74,23 @@ def dump_exception(msg, e):
             _log.flush()
 
 
-if VERBOSE_LOG:
-    def _print(*args):
-        print(*args)
+def _print(*args):
+    print(*args)
 
-        pos = _log.tell()
+    pos = _log.tell()
 
-        if pos < EXCEPTION_DUMP:
-            dt = RTC().datetime()
-            _log.write(f'{dt[2]}.{dt[1]}.{dt[0]} {dt[4]}:{dt[5]:02} ::')
+    if pos < sys.EXCEPTION_DUMP:
+        dt = RTC().datetime()
+        _log.write(f'{dt[2]}.{dt[1]}.{dt[0]} {dt[4]}:{dt[5]:02} ::')
 
-            for s in args:
-                _log.write(str(s))
+        for s in args:
+            _log.write(str(s))
 
-            _log.write('\n')
-            _log.flush()
-else:
+        _log.write('\n')
+        _log.flush()
+
+
+if not sys.VERBOSE_LOG:
     _print = print
-
 
 _print(f'Loading module {__name__}')

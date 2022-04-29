@@ -3,7 +3,7 @@ logger = getLogger(__name__)
 
 from machine import Pin, PWM
 from setup import pins
-from config import led
+from db import led
 
 
 class Led():

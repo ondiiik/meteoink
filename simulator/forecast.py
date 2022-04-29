@@ -6,7 +6,8 @@ from machine import Pin, deepsleep, RTC
 from micropython import const
 from collections import namedtuple
 from setup import pins
-from config import sys, location, VARIANT_2DAYS, ui
+from db import ui
+from db import sys, location
 from ltime import Time
 from buzzer import play
 
@@ -40,28 +41,28 @@ class Forecast:
 
     def __init__(self, connection, in_temp):
         logger.info("Reading forecast data")
-        self._read1(connection, ui)
+        self._read1(connection)
 
-        if ui.variant == VARIANT_2DAYS:
-            self._read2_short(connection, ui)
+        if ui.VARIANT == 2:
+            self._read2_short(connection)
         else:
-            self._read2_long(connection, ui, 96)
+            self._read2_long(connection, 96)
 
         self._get_dht(in_temp)
-        self._get_status(ui)
+        self._get_status()
 
     @staticmethod
     def _mk_id(id, rain):
         return id if id != 500 or rain < 2 else 520
 
-    def _read1(self, connection, ui):
+    def _read1(self, connection):
         # Download hourly weather forecast for today
         url = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}'
-        fcast = connection.http_get_json(url.format(location[connection.config.location].lat,
-                                                    location[connection.config.location].lon,
-                                                    ui.apikey,
-                                                    ui.units,
-                                                    ui.language,
+        fcast = connection.http_get_json(url.format(location.LOCATIONS[connection.config.location].lat,
+                                                    location.LOCATIONS[connection.config.location].lon,
+                                                    ui.APIKEY,
+                                                    ui.UNITS,
+                                                    ui.LANGUAGE,
                                                     'minutely,hourly,daily'))
 
         # Parse todays forecast
@@ -124,13 +125,13 @@ class Forecast:
         dt = self.time.get_date_time(self.weather.dt)
         rtc.init((dt[0], dt[1], dt[2], 0, dt[3], dt[4], dt[5], 0))
 
-    def _read2_short(self, connection, ui):
+    def _read2_short(self, connection):
         # Download hourly weather forecast for today
         url = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}'
-        fcast = connection.http_get_json(url.format(location[connection.config.location].lat,
-                                                    location[connection.config.location].lon,
-                                                    ui.apikey,
-                                                    ui.units,
+        fcast = connection.http_get_json(url.format(location.LOCATIONS[connection.config.location].lat,
+                                                    location.LOCATIONS[connection.config.location].lon,
+                                                    ui.APIKEY,
+                                                    ui.UNITS,
                                                     'EN',
                                                     'current,minutely,daily'))
         connection.disconnect()
@@ -166,13 +167,13 @@ class Forecast:
                                                   current['wind_deg'],
                                                   current['clouds']))
 
-    def _read2_long(self, connection, ui, hours):
+    def _read2_long(self, connection, hours):
         # Download hourly weather forecast for 5 days
         url = "http://api.openweathermap.org/data/2.5/forecast?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&cnt={}"
-        fcast = connection.http_get_json(url.format(location[connection.config.location].lat,
-                                                    location[connection.config.location].lon,
-                                                    ui.apikey,
-                                                    ui.units,
+        fcast = connection.http_get_json(url.format(location.LOCATIONS[connection.config.location].lat,
+                                                    location.LOCATIONS[connection.config.location].lon,
+                                                    ui.APIKEY,
+                                                    ui.UNITS,
                                                     'EN',
                                                     (hours + 2) // 3))
         connection.disconnect()
@@ -211,7 +212,7 @@ class Forecast:
                                                   wind['deg'],
                                                   clouds))
 
-    def _get_status(self, ui):
+    def _get_status(self):
         dt = self.time.get_date_time(self.weather.dt)
 
         if (dt[3] < 6):

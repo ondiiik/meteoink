@@ -1,11 +1,8 @@
-from config import alert
+from db import beep
 import web
 
 
 @web.action_handler(__name__)
 def www(page, args):
-    if not alert.temp_balanced:
-        alert.temp_balanced = True
-        alert.flush()
-
+    beep.TEMP_BALANCED = 1
     web.index(page)

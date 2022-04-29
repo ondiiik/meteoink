@@ -72,7 +72,7 @@ class EpdBase(Ui):
         self.forecast = forecast
         self.connection = connection
         self.led = led
-        self.block = self.canvas.width / len(forecast.forecast)
+        self.block = 1 if forecast is None else self.canvas.width / len(forecast.forecast)
 
     def forecast_tripples(self):
         forecast = self.forecast.forecast

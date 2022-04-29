@@ -1,10 +1,8 @@
-from config import vbat
+from db import vbat
 import web
 
 
 @web.action_handler(__name__)
 def www(page, args):
-    vbat.low_voltage = max(2.8, min(4.0, float(args['v'])))
-    vbat.flush()
-
+    vbat.LOW_VOLTAGE = max(2.8, min(4.0, float(args['v'])))
     web.index(page)

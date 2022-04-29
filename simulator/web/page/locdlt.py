@@ -1,4 +1,4 @@
-from config import location
+from db import location
 from lang import trn
 import web
 
@@ -6,7 +6,7 @@ import web
 @web.action_handler(__name__)
 def www(page, args):
     page.heading(2, trn('DELETE LOCATION') + ' ??!')
-    loc = location[int(args['idx'])]
+    loc = location.LOCATIONS[int(args['idx'])]
 
     with page.form('locrm') as form:
         form.label(trn('Name'),            'name', loc.name)

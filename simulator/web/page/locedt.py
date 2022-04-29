@@ -1,11 +1,11 @@
-from config import location
+from db import location
 from lang import trn
 import web
 
 
 @web.action_handler(__name__)
 def www(page, args):
-    loc = location[int(args['idx'])]
+    loc = location.LOCATIONS[int(args['idx'])]
     page.heading(2, trn('Edit location'))
     with page.form('locset') as form:
         form.variable('idx',  args['idx'])
