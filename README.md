@@ -120,3 +120,20 @@ displayed (it may take about one minute)
 
 If you want to get into setup WEB page again, then you have restart meteostation and immediately hold **config**
 button, till beep (it may take even half minute). Then QR codes appears on screen and configuration web server will be ready after next beep.
+
+
+## Others
+
+### Translations
+
+Currently supported languages are English and Czech, however any support for translation to another language is welcommed.
+If someone wants to add the new language, it can be done in folder [lang](https://github.com/ondiiik/meteoink/tree/master/simulator/lang).
+Translation is always a dictionary where the key is english sentense and the value is its translation.
+
+If some additional characters needs to be added, this shall be done in file [font2png.py](https://github.com/ondiiik/meteoink/blob/master/graphics/font2png.py).
+There is a line just like following containing supported characters:
+
+`chars = 'aábcčdďeéěfghiíjklmnňoópqrřsštťuúůvwxyýzžAÁBCČDĎEÉĚFGHIÍJKLMNOÓPQRŘSŠTŤUÚŮVWXYÝZŽ0123456789'~!@#$%^&*()_+-[]{};\:"|,./<>?°' + "'"`
+
+You can add your missing characters here. Please add only characters which are used by meteostation as this will became to be part of bitmaps loaded
+into meteostation during startup. More characters means longer startup and shorter battery life per one charging cycle.
