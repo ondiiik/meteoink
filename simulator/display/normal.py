@@ -20,6 +20,8 @@ class Canvas:
     def __init__(self):
         logger.info("Building canvas")
         self.epd = EPD()
+        self.width = self.epd.width
+        self.height = self.epd.height
         self.dim = Vect(self.epd.width, self.epd.height)
         self.ofs = Vect(0, 0)
         logger.info("\tEPD - [ OK ]")

@@ -5,7 +5,7 @@ import micropython
 from micropython import const
 from framebuf import FrameBuffer, GS4_HMSB
 
-from .base import Vect, Bitmap, WHITE, BLACK, ALPHA, bmt
+from .base import Vect, Bitmap, WHITE, BLACK, ALPHA, bmt, Base
 from .epd import EPD
 from bitmap import FONTS
 
@@ -15,11 +15,13 @@ _CORONA_SPC = const(_CORONA_SIZE + 2)
 _corofs = Vect(_CORONA_SIZE, _CORONA_SIZE)
 
 
-class Canvas:
+class Canvas(Base):
     @micropython.native
     def __init__(self):
         logger.info("Building canvas")
         self.epd = EPD()
+        self.width = self.epd.height
+        self.height = self.epd.width
         self.dim = Vect(self.epd.height, self.epd.width)
         self._r = self.epd.height - 1
         self.ofs = Vect(0, 0)

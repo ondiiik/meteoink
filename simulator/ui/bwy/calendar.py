@@ -3,18 +3,16 @@ logger = getLogger(__name__)
 
 from .. import UiFrame, BLACK, V, Z
 from micropython import const
+from lang import day_of_week
 from config import ui as cfg
 from config import VARIANT_2DAYS
 
 
 class UiCalendar(UiFrame):
     def draw(self, show_days):
-        if show_days:
-            from lang import day_of_week
-
         forecast = self.ui.forecast.forecast
         cnt = len(forecast)
-        block = self.canvas.dim.x / cnt
+        block = self.ui.block
         h_space = const(4)
 
         if cfg.variant == VARIANT_2DAYS:

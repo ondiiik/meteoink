@@ -32,6 +32,7 @@ class Epd(EpdBase):
                 # We have forecast, so lets draw it on screen. Don't draw
                 # always everything as forecast is changing not so often,
                 # but temperature is.
+                logger.info('Drawing forecast ...')
                 weather = UiWeather(self, Z, V(100, 100))
                 out_temp = UiOutTemp(self, V(weather.right + 5, 0), V(160, weather.height // 2))
                 in_temp = UiInTemp(self, V(weather.right + 5, out_temp.bellow), out_temp.dim)
@@ -62,7 +63,7 @@ class Epd(EpdBase):
         with self.Drawing('lowbat', self):
             from .vbat import UiVBat
 
-            v = V(self.canvas.dim.x // 2 - 30, self.canvas.dim.y // 2)
+            v = V(self.canvas.width // 2 - 30, self.canvas.height // 2)
             d = V(60, 30)
             UiVBat(self, v, d).repaint(volt)
 
@@ -79,6 +80,6 @@ class Epd(EpdBase):
 
             UiQr(self, Z, Z).repaint(wifi, 'WiFi', False)
             UiQr(self, V(self.width - 122, self.height - 122), Z).repaint(url, 'Config URL', True)
-            UiUrl(self, V(0, self.canvas.dim.y // 2), V(self.canvas.dim.x - 132, self.canvas.dim.y // 2)).repaint(url)
-            UiWifi(self, V(200, 0), V(self.canvas.dim.x - 132, self.canvas.dim.y // 2)).repaint(hotspot)
-            UiVBat(self, V(self.canvas.dim.x // 2 - 10, self.canvas.dim.y // 2),  V(20, 10)).repaint(volt)
+            UiUrl(self, V(0, self.canvas.height // 2), V(self.canvas.width - 132, self.canvas.height // 2)).repaint(url)
+            UiWifi(self, V(200, 0), V(self.canvas.width - 132, self.canvas.height // 2)).repaint(hotspot)
+            UiVBat(self, V(self.canvas.width // 2 - 10, self.canvas.height // 2),  V(20, 10)).repaint(volt)

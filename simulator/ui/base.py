@@ -12,6 +12,8 @@ class UiFrame:
         self.ui = ui
         self.canvas = ui.canvas
         self.ofs = ofs
+        self.width = dim.x
+        self.height = dim.y
         self.dim = dim
 
     @property
@@ -24,7 +26,7 @@ class UiFrame:
 
     @property
     def bellow(self):
-        return self.dim.y + self.ofs.y
+        return self.height + self.ofs.y
 
     @property
     def left(self):
@@ -32,15 +34,7 @@ class UiFrame:
 
     @property
     def right(self):
-        return self.dim.x + self.ofs.x
-
-    @property
-    def width(self):
-        return self.dim.x
-
-    @property
-    def height(self):
-        return self.dim.y
+        return self.width + self.ofs.x
 
     def repaint(self, *args):
         # self.canvas.rect(self.ofs, self.dim, ORANGE)
@@ -78,6 +72,27 @@ class EpdBase(Ui):
         self.forecast = forecast
         self.connection = connection
         self.led = led
+        self.block = self.canvas.width / len(forecast.forecast)
+
+    def forecast_tripples(self):
+        forecast = self.forecast.forecast
+        block = self.block
+        x = block
+
+        for i in range(1, len(forecast) - 1):
+            yield int(x), forecast[i - 1], forecast[i], forecast[i + 1]
+            x += block
+
+    def forecast_blocks(self):
+        forecast = self.forecast.forecast
+        block = self.block
+        x1 = 0
+        x2 = block
+
+        for i1 in range(1, len(forecast)):
+            yield int(x1), forecast[i1 - 1], int(x2), forecast[i1]
+            x1 += block
+            x2 += block
 
     class Drawing:
         def __init__(self, name, epd):

@@ -34,7 +34,7 @@ ALL = const(3)
 
 
 class Forecast:
-    Weather = namedtuple('Weather', ('icon', 'dt', 'temp', 'feel', 'rh', 'rain', 'snow', 'speed', 'dir'))
+    Weather = namedtuple('Weather', ('icon', 'dt', 'temp', 'feel', 'rh', 'rain', 'rpb', 'snow', 'speed', 'dir', 'clouds'))
     Home = namedtuple('Home',    ('temp', 'rh'))
     Status = namedtuple('Status',  ('sleep_time',))
 
@@ -89,6 +89,8 @@ class Forecast:
         except KeyError:
             rain = 0.0
 
+        rpb = current.get('pop', 0) * 100
+
         try:
             snow = current['snow']['1h']
         except KeyError:
@@ -110,9 +112,11 @@ class Forecast:
                                         current['feels_like'],
                                         current['humidity'],
                                         rain,
+                                        rpb,
                                         snow,
                                         current['wind_speed'],
-                                        current['wind_deg'])
+                                        current['wind_deg'],
+                                        current['clouds'])
         self.time = Time(self.time_zone)
 
         # Set RTC clock according to forecast time
@@ -142,6 +146,8 @@ class Forecast:
             except KeyError:
                 rain = 0.0
 
+            rpb = current.get('pop', 0) * 100
+
             try:
                 snow = current['snow']['1h']
             except KeyError:
@@ -154,9 +160,11 @@ class Forecast:
                                                   current['feels_like'],
                                                   current['humidity'],
                                                   rain,
+                                                  rpb,
                                                   snow,
                                                   current['wind_speed'],
-                                                  current['wind_deg']))
+                                                  current['wind_deg'],
+                                                  current['clouds']))
 
     def _read2_long(self, connection, ui, hours):
         # Download hourly weather forecast for 5 days
@@ -176,11 +184,14 @@ class Forecast:
             main = current['main']
             weather = current['weather'][0]
             wind = current['wind']
+            clouds = current['clouds']['all']
 
             try:
                 rain = current['rain']['3h']
             except KeyError:
                 rain = 0.0
+
+            rpb = current.get('pop', 0) * 100
 
             try:
                 snow = current['snow']['3h']
@@ -188,16 +199,17 @@ class Forecast:
                 snow = 0.0
 
             id = 701 if current['visibility'] < 500 and weather['id'] in range(800, 802) else weather['id']
-
             self.forecast.append(Forecast.Weather('{}{}'.format(id2icon[self._mk_id(id, rain)], weather['icon'][-1]),
                                                   current['dt'],
                                                   main['temp'],
                                                   main['feels_like'],
                                                   main['humidity'],
                                                   rain,
+                                                  rpb,
                                                   snow,
                                                   wind['speed'],
-                                                  wind['deg']))
+                                                  wind['deg'],
+                                                  clouds))
 
     def _get_status(self, ui):
         dt = self.time.get_date_time(self.weather.dt)

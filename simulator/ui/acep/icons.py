@@ -15,7 +15,7 @@ class UiIcons(UiFrame):
         icon = {}
 
         for i in range(cnt):
-            xx = self.canvas.dim.x * i // (cnt + 1)
+            xx = self.canvas.width * i // (cnt + 1)
             fid = forecast[i].icon
 
             try:

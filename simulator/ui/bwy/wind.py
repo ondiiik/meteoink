@@ -11,6 +11,6 @@ class UiWind(UiWArrow):
         cnt = len(forecast)
 
         for i in reversed(range(cnt)):
-            x = self.canvas.dim.x * i // (cnt + 1) + 5
+            x = self.canvas.width * i // (cnt + 1) + 5
             y = (i % 2) * (self.dim.y // 3) + 4
             self.draw_wind(V(x, y), forecast[i], 4, True)

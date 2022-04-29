@@ -3,6 +3,7 @@ logger = getLogger(__name__)
 
 from ..base import EpdBase, V, Z
 from .calendar import UiCalendar
+from .clouds import UiClouds
 from .icons import UiIcons
 from .inside import UiInside
 from .intemp import UiInTemp
@@ -32,6 +33,7 @@ class Epd(EpdBase):
                 # We have forecast, so lets draw it on screen. Don't draw
                 # always everything as forecast is changing not so often,
                 # but temperature is.
+                logger.info('Drawing forecast ...')
                 weather = UiWeather(self, Z, V(130, 120))
                 out_temp = UiOutTemp(self, V(weather.left, weather.bellow), V(self.width // 2, 60))
                 in_temp = UiInTemp(self, V(out_temp.right, out_temp.above), V(self.width - out_temp.width, out_temp.height))
@@ -39,10 +41,11 @@ class Epd(EpdBase):
                 inside = UiInside(self, V(outside.right, 0), V(self.width - outside.right, weather.height))
                 calendar_head = UiCalendar(self, V(0, out_temp.bellow), V(self.width, 46))
                 icons = UiIcons(self, V(0, calendar_head.bellow + 4), V(self.width, 72))
-                calendar_tail = UiCalendar(self, V(0, icons.bellow), V(self.width, self.height - icons.bellow - 50))
-                graph_temp = UiTempGr(self, *calendar_tail.same)
-                text_temp = UiTempTxt(self, *calendar_tail.same)
-                graph_rain = UiRain(self, *calendar_tail.same)
+                calendar_tail = UiCalendar(self, V(0, icons.bellow + 4), V(self.width, self.height - icons.bellow - 50))
+                clouds = UiClouds(self, calendar_tail.ofs, V(self.width, 40))
+                graph_temp = UiTempGr(self, V(0, clouds.bellow + 4), V(self.width, calendar_tail.height - clouds.height))
+                text_temp = UiTempTxt(self, *graph_temp.same)
+                graph_rain = UiRain(self, *graph_temp.same)
                 wind = UiWind(self, V(0, calendar_tail.bellow), V(self.width, self.height - calendar_tail.bellow))
 
                 calendar_head.repaint(True)
@@ -51,6 +54,7 @@ class Epd(EpdBase):
                 text_temp.repaint()
                 wind.repaint()
                 graph_rain.repaint()
+                clouds.repaint()
                 icons.repaint()
                 weather.repaint()
                 outside.repaint()
@@ -62,7 +66,7 @@ class Epd(EpdBase):
         with self.Drawing('lowbat', self):
             from .vbat import UiVBat
 
-            v = V(self.canvas.dim.x // 2 - 30, self.canvas.dim.y // 2)
+            v = V(self.canvas.width // 2 - 30, self.canvas.height // 2)
             d = V(60, 30)
             UiVBat(self, v, d).repaint(volt)
 
@@ -79,6 +83,6 @@ class Epd(EpdBase):
 
             UiQr(self, Z, Z).repaint(wifi, 'WiFi', False)
             UiQr(self, V(self.width - 140, self.height - 140), Z).repaint(url, 'Config URL', True)
-            UiUrl(self, V(0, self.canvas.dim.y // 2), V(self.canvas.dim.x - 132, self.canvas.dim.y // 2)).repaint(url)
-            UiWifi(self, V(200, 0), V(self.canvas.dim.x - 132, self.canvas.dim.y // 2)).repaint(hotspot)
-            UiVBat(self, V(self.canvas.dim.x // 2 - 10, self.canvas.dim.y // 2),  V(20, 32)).repaint(volt)
+            UiUrl(self, V(0, self.canvas.height // 2), V(self.canvas.width - 132, self.canvas.height // 2)).repaint(url)
+            UiWifi(self, V(200, 0), V(self.canvas.width - 132, self.canvas.height // 2)).repaint(hotspot)
+            UiVBat(self, V(self.canvas.width // 2 - 10, self.canvas.height // 2),  V(20, 32)).repaint(volt)

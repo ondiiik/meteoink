@@ -12,7 +12,7 @@ class UiWind(UiFrame):
         s = V(self.height, self.height) // 2
 
         for i in reversed(range(cnt)):
-            x = self.canvas.dim.x * i // (cnt + 1) + 5
+            x = self.canvas.width * i // (cnt + 1) + 5
             y = (i % 2) * (self.dim.y // 3) + 10
             u = UiWArrow(self.ui, V(x, y), s)
             u.repaint(forecast[i], 6, True)

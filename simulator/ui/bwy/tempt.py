@@ -10,12 +10,10 @@ class UiTempTxt(UiFrame):
         # Pre-calculates some range values and draw icons bar
         forecast = self.ui.forecast.forecast
         cnt = len(forecast)
-        block = self.canvas.dim.x / cnt
         temp_max = -273.0
         temp_min = 273.0
 
         for i in range(cnt):
-            x1 = self.canvas.dim.x * i // (cnt + 1)
             weather = forecast[i]
             temp_max = max(weather.temp, weather.feel, temp_max)
             temp_min = min(weather.temp, weather.feel, temp_min)
@@ -29,17 +27,9 @@ class UiTempTxt(UiFrame):
         def chart_y(temp):
             return int(chart_max - (temp - temp_min) * k_temp)
 
-        for i in range(cnt):
-            cmax = cnt - 1
-            x1 = int(block * i)
+        for x, fl, f, fr in self.ui.forecast_tripples():
+            if (fl.temp < f.temp) and (f.temp > fr.temp):
+                self.ui.text_center(16, '{:.0f}°C'.format(f.temp), V(x, chart_y(f.temp) - 20), BLACK, WHITE)
 
-            # Calculate and type peaks
-            if (i > 0) and (i < cmax):
-                # Draw temperature text
-                f = (forecast[i - 1], forecast[i], forecast[i + 1])
-
-                if (f[0].temp < f[1].temp) and (f[1].temp > f[2].temp):
-                    self.ui.text_center(16, '{:.0f}°C'.format(f[1].temp), V(x1, chart_y(f[1].temp) - 20), BLACK, WHITE)
-
-                if (f[0].temp > f[1].temp) and (f[1].temp < f[2].temp):
-                    self.ui.text_center(16, '{:.0f}°C'.format(f[1].temp), V(x1, chart_y(f[1].temp) + 4),  BLACK, WHITE)
+            if (fl.temp > f.temp) and (f.temp < fr.temp):
+                self.ui.text_center(16, '{:.0f}°C'.format(f.temp), V(x, chart_y(f.temp) + 4),  BLACK, WHITE)
