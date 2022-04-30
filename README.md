@@ -1,5 +1,6 @@
 # Meteoink
 
+![EPD 5.65 ACEP inch meteostation](graphics/doc/meteostation_acep.jpeg "EPD 5.65 ACEP inch meteostation")
 ![EPD 4.2 inch meteostation](graphics/doc/meteostation.jpeg "EPD 4.2 inch meteostation")
 
 
@@ -20,22 +21,34 @@ charged through the USB on ESP board. Meteostation is usually operating half a y
 
 ![Meteostation wiring](graphics/doc/wiring.png "Meteostation wiring")
 
-Some pins can be moved to another position by changing config file [pins.py](https://github.com/ondiiik/meteoink/blob/master/simulator/config/pins.py)
+Some pins can be moved to another position by changing config file [pins.py](https://github.com/ondiiik/meteoink/tree/master/box).
+
 but keep in mind that not all pins are available for any operation (some are not capable of ADC, some are not capable of SPI, ...).
 Also battery is not displayed in wiring as it has its own connector so its connection is obvious.
 
 
 ## Box
 
+Files for 3D printed parts are stored [here]().
+
+Both variants of box are partialy screwed and partially glued as well as electronics. To stitch processor board or battery
+you can use acrylate 3M double side tape. DHT22 sensor is glued to chassis (grid for air access sahll be on the side pointing
+outside the box). When you glue it, apply glue very carefully as it shall not pass inside electronics
+(especially in the case of buttons or DHT sensor). When all electronics is inside, then chassis shall be either glued to frame
+(BWY variant) or screwed together (ACEP variant).
+
+### BWY (EPD 4.2)
+
 ![3D printed frame](graphics/doc/frame03.jpeg "3D printed frame")
 ![3D printed frame](graphics/doc/frame02.jpeg "3D printed frame")
 ![3D printed frame](graphics/doc/frame01.jpeg "3D printed frame")
 
-You can print one with balanced space for 18650 battery [here on Thingiverse](https://www.thingiverse.com/thing:5334645).
-DHT22 sensor is glued to chassis (grid for air access sahll be on the side pointing outside the box). When you glue it,
-apply glue very carefully as it shall not pass inside electronics. When all electronics is inside, then chassis
-shall be be glued to frame.
+### ACEP (EPD 5.65)
 
+![3D printed frame](graphics/doc/frame11.jpeg "3D printed frame")
+![3D printed frame](graphics/doc/frame12.jpeg "3D printed frame")
+![3D printed frame](graphics/doc/frame13.jpeg "3D printed frame")
+![3D printed frame](graphics/doc/frame14.jpeg "3D printed frame")
 
 
 ## Micropython

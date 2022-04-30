@@ -1,3 +1,5 @@
+print('Reading database ...')
+
 from machine import reset
 from .base import init
 from .structs import Location, Connection

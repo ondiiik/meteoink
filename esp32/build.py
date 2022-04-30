@@ -48,7 +48,7 @@ except BaseException as e:
             if cleanup:
                 self.command(f'rm -Rf {self.dwd}')
 
-            self.command(f'mkdir  {self.dwd}')
+            self.command(f'mkdir {self.dwd}')
 
             self.copy('boot.py')
             self.copy('main.py')
@@ -71,13 +71,13 @@ except BaseException as e:
             self.convert(self.find('web/page'))
 
             self.command(f'rm {Path(self.dwd, "boot.mpy")}')
+            self.command(f'rm {Path(self.dwd, "main.mpy")}')
             self.command(f'rm {Path(self.dwd, "display/epd_acep.mpy")}', 'bwy')
             self.command(f'rm {Path(self.dwd, "display/epd_bwy.mpy")}', 'acep')
             self.command(f'rm {Path(self.dwd, "setup/__init__.py")}')
             self.command(f'rm {Path(self.dwd, "setup/display.mpy")}')
             self.command(f'rm {Path(self.dwd, "setup/epd_acep.py")}')
             self.command(f'rm {Path(self.dwd, "setup/epd_bwy.py")}')
-            self.command(f'rm {Path(self.dwd, "setup/pins.mpy")}')
             self.command(f'rm {Path(self.dwd, "setup/pins.mpy")}')
             self.command(f'rm {Path(self.dwd, "setup/epd_acep.mpy")}', 'bwy')
             self.command(f'rm {Path(self.dwd, "setup/epd_bwy.mpy")}', 'acep')

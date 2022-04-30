@@ -33,7 +33,7 @@ class UiWArrow(UiFrame):
         if ALPHA != h:
             self._draw_arrow(speed, direction, d2, o, r, h, w)
 
-        self._draw_arrow(speed, direction, d2, o, r, c, 1)
+        self._draw_arrow(speed, direction, d2, o, r, c, 2)
 
         if not arrow:
             d1 = o - 0.4 * d
@@ -49,7 +49,7 @@ class UiWArrow(UiFrame):
                     e = rect(l,  (direction - 30) * pi / 180) + b
                     self.canvas.line(V(int(b.real), int(b.imag)), V(int(e.real), int(e.imag)), c, w)
 
-            w = rescale(2) + 1
+            w = rescale(2)
             drawWindSpeed(w + 1, WHITE)
             drawWindSpeed(w, BLACK)
 
