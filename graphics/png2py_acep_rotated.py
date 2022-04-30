@@ -168,10 +168,50 @@ def convert_char(name, src, fv):
     fv[name] = bheight, width, buff
 
 
+# =========================================================================================
+# Build wind icons
+# =========================================================================================
 src_dir = Path('bitmap/png/acep').resolve()
+wind_dir = Path('bitmap/wind/acep').resolve()
+wind_dir.mkdir(exist_ok=True)
+
+for level in range(6):
+    print(f'Wind icons level {level}')
+    src = src_dir.joinpath(f'svg/wa{level}.png')
+
+    for angle in range(0, 360, 15):
+        dst = wind_dir.joinpath(f'wa{level}{angle}.png')
+        os.system(f'convert "{src}" -background none -rotate {angle} "{dst}"')
+
 dst_dir = Path('../micropython/bitmap/acep_rotated').resolve()
 dst_dir.mkdir(exist_ok=True)
+wind = dst_dir.joinpath('wind.py')
 
+with wind.open('w') as dst:
+    dst.write('''from ulogging import getLogger
+logger = getLogger(__name__)
+
+WIND = ''')
+
+    wind = {}
+    srcs = os.listdir(wind_dir)
+    srcs.sort()
+    for src_name in srcs:
+        if not src_name.endswith('.png'):
+            continue
+        level = int(src_name[2:3])
+        level = wind.setdefault(level, dict())
+        angle = int(src_name[3:-4])
+        # angle = level.setdefault(angle, dict())
+        src = wind_dir.joinpath(src_name)
+        convert_bitmap(angle, src, level, (1, 4))
+
+    pprint(wind, dst, width=160)
+
+
+# =========================================================================================
+# Create bitmaps
+# =========================================================================================
 bitmap = dst_dir.joinpath('bmp.py')
 
 with bitmap.open('w') as dst:
@@ -186,12 +226,15 @@ BMP = ''')
     for src_name in srcs:
         if not src_name.endswith('.png'):
             continue
-        src = os.path.join(src_dir, src_name)
+        src = src_dir.joinpath(src_name)
         convert_bitmap(src_name[:-4], src, bmp, (1, 4, 5))
 
     pprint(bmp, dst, width=160)
 
 
+# =========================================================================================
+# Create fonts
+# =========================================================================================
 src_dir = Path('bitmap/font/acep')
 fonts_path = dst_dir.joinpath('fonts.py')
 

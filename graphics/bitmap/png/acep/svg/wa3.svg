@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="70.915222mm"
+   height="97.371933mm"
+   viewBox="0 0 70.915224 97.371928"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="wa3.svg"
+   inkscape:export-filename="/home/ondiiik/Development/micropython/meteo/meteo_py/graphics/bitmap/png/acep/svg/wa3.png"
+   inkscape:export-xdpi="18.259882"
+   inkscape:export-ydpi="18.259882"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="true"
+     inkscape:zoom="2.4348987"
+     inkscape:cx="109.65549"
+     inkscape:cy="182.5538"
+     inkscape:window-width="1868"
+     inkscape:window-height="1016"
+     inkscape:window-x="52"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid911"
+       originx="-28.042391"
+       originy="-91.543609" />
+  </sodipodi:namedview>
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-28.04239,-91.543625)">
+    <path
+       style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:18;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 63.5,100.54168 26.458338,79.375 -26.458338,-15.875 -26.458333,15.875 z"
+       id="path913-3"
+       inkscape:transform-center-x="-0.22421868"
+       inkscape:transform-center-y="5.1794864"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-filename="/home/ondiiik/Development/micropython/meteo/meteo_py/graphics/bitmap/png/acep/svg/warrow_b.png"
+       inkscape:export-xdpi="25.433968"
+       inkscape:export-ydpi="25.433968" />
+    <path
+       style="fill:#ff7f00;fill-opacity:1;stroke:#0002ff;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 63.500002,100.54167 26.458333,79.375 -26.458333,-15.875 -26.458333,15.875 z"
+       id="path913"
+       inkscape:transform-center-x="-0.22421868"
+       inkscape:transform-center-y="5.1794864"
+       sodipodi:nodetypes="ccccc"
+       inkscape:export-filename="/home/ondiiik/Development/micropython/meteo/meteo_py/graphics/bitmap/png/acep/svg/warrow_b.png"
+       inkscape:export-xdpi="25.433968"
+       inkscape:export-ydpi="25.433968" />
+  </g>
+</svg>

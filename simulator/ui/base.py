@@ -2,7 +2,7 @@ from ulogging import getLogger
 logger = getLogger(__name__)
 
 
-from bitmap import FONTS, BMP
+from bitmap import FONTS, BMP, WIND
 from display import Bitmap, BLACK, WHITE, GREEN, BLUE, RED, YELLOW, ORANGE, ALPHA
 from display import Vect as V, Zero as Z
 
@@ -54,6 +54,13 @@ class Ui:
 
     def bitmap(self, size, name):
         return Bitmap(BMP[name][size])
+
+    def wind(self, size, speed, angle):
+        angle = (angle + 187) // 15 * 15 % 360
+        for level, limit in zip(range(5), (3, 5, 8, 12, 16)):
+            if speed < limit:
+                return Bitmap(WIND[level][angle][size])
+        return Bitmap(WIND[5][angle][size])
 
     def text_center(self, size, text, pos, color=BLACK, corona=None):
         l = self.text_len(size, text)

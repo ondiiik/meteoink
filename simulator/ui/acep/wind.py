@@ -8,11 +8,12 @@ from .warrow import UiWArrow
 class UiWind(UiFrame):
     def draw(self):
         forecast = self.ui.forecast.forecast
-        cnt = len(forecast)
+        cnt = len(forecast) + 1
         s = V(self.height, self.height) // 2
+        d = self.dim.y // 5
 
-        for i in reversed(range(cnt)):
-            x = self.canvas.width * i // (cnt + 1) + 5
-            y = (i % 2) * (self.dim.y // 3) + 10
+        for i in reversed(range(cnt - 1)):
+            x = self.canvas.width * i // cnt + 5
+            y = (i % 2) * d + 18
             u = UiWArrow(self.ui, V(x, y), s)
-            u.repaint(forecast[i], 6, True)
+            u.repaint(forecast[i], 4, True)

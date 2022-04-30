@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="13.229166mm"
+   height="13.229166mm"
+   viewBox="0 0 13.229166 13.229165"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
+   sodipodi:docname="wa.svg"
+   inkscape:export-filename="/home/ondiiik/Development/micropython/meteo/meteo_py/graphics/bitmap/png/acep/svg/warrow_d.png"
+   inkscape:export-xdpi="16.955978"
+   inkscape:export-ydpi="16.955978"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="mm"
+     showgrid="true"
+     inkscape:zoom="2.4348987"
+     inkscape:cx="0.4106947"
+     inkscape:cy="55.238438"
+     inkscape:window-width="1868"
+     inkscape:window-height="1016"
+     inkscape:window-x="52"
+     inkscape:window-y="27"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid911"
+       originx="-56.885419"
+       originy="-93.927076" />
+  </sodipodi:namedview>
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-56.885418,-93.927101)">
+    <path
+       style="fill:#7fff7f;fill-opacity:1;stroke:#00ff00;stroke-width:10;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 63.500002,100.54167 c -2e-6,1e-5 0,0 0,0 z"
+       id="path913"
+       inkscape:transform-center-x="-0.22421868"
+       inkscape:transform-center-y="5.1794864"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/ondiiik/Development/micropython/meteo/meteo_py/graphics/bitmap/png/acep/svg/warrow_e.png"
+       inkscape:export-xdpi="14.21"
+       inkscape:export-ydpi="14.21" />
+  </g>
+</svg>
