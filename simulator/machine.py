@@ -36,15 +36,15 @@ class Pin:
         self.n = n
 
     def on(self):
-        #print('PIN {} ON'.format(self.n))
+        #print(f'PIN {self.n} ON')
         pass
 
     def off(self):
-        #print('PIN {} OFF'.format(self.n))
+        #print(f'PIN {self.n} OFF')
         pass
 
     def value(self):
-        print('PIN {} {}'.format(self.n, _pins[self.n]))
+        print(f'PIN {self.n} {_pins[self.n]}')
         return _pins[self.n]
 
 

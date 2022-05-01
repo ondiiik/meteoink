@@ -708,9 +708,7 @@ class QRData:
             if mode not in (MODE_NUMBER, MODE_ALPHA_NUM, MODE_8BIT_BYTE):
                 raise TypeError("Invalid mode (%s)" % mode)  # pragma: no cover
             if check_data and mode < optimal_mode(data):  # pragma: no cover
-                raise ValueError(
-                    "Provided data can not be represented in mode "
-                    "{0}".format(mode))
+                raise ValueError(f"Provided data can not be represented in mode {mode}")
 
         self.data = data
 

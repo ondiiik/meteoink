@@ -27,8 +27,8 @@ class UiCalendar(UiFrame):
         # Find time related to next day
         week_day = self.ui.forecast.time.get_date_time(forecast[0].dt)[6]
 
-        for i in forecast:
-            dt = self.ui.forecast.time.get_date_time(i.dt)
+        for i in range(len(forecast)):
+            dt = self.ui.forecast.time.get_date_time(forecast[i].dt)
             if not week_day == dt[6]:
                 dh = dt[3]
                 break
@@ -46,7 +46,7 @@ class UiCalendar(UiFrame):
                     self.canvas.trect(V(x, 1), V(dblock, 26), GREEN)
 
             # Draw separators
-            sep_space = self.dim.y + ((-20 + h_space) if show_days else (-10 + h_space))
+            sep_space = self.dim.y + h_space - (20 if show_days else 10)
             if 0 == hour:
                 if (dt[6] == 5) or (dt[6] == 0):
                     self.canvas.vline(V(x + 1, 0), sep_space, BLACK)
