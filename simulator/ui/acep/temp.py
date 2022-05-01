@@ -32,7 +32,7 @@ class UiTemp(UiFrame):
             self.ui.text(60, t, V(x, -5), color)
 
             bitmap = self.ui.bitmap(1, 'in')
-            self.canvas.bitmap(V(x - 25, 30), bitmap)
+            self.canvas.bitmap(V(x - 25, self.height - 24), bitmap)
         else:
             p = self.ui.text(60, t, V(5, -5), color)
             self.ui.text(35, s, p + V(6, 16))

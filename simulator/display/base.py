@@ -90,7 +90,7 @@ class Frame(FrameBuffer):
 
 class Base:
     @micropython.native
-    def vtrap(self, vl1, yu1, vl2, yu2, c=BLACK):
+    def vtrap(self, vl1, vl2, yu1,  yu2, c=BLACK):
         dx = vl2.x - vl1.x
 
         if dx > 0:
@@ -119,7 +119,7 @@ class Base:
             yu += ku
 
     @micropython.native
-    def vttrap(self, vl1, yu1, vl2, yu2, c=BLACK):
+    def vttrap(self, vl1, vl2, yu1, yu2, c=BLACK):
         dx = vl2.x - vl1.x
 
         if dx > 0:

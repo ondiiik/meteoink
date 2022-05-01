@@ -14,6 +14,6 @@ class UiWind(UiFrame):
 
         for i in reversed(range(cnt - 1)):
             x = self.canvas.width * i // cnt + 5
-            y = (i % 2) * d + 18
+            y = (i % 2) * d
             u = UiWArrow(self.ui, V(x, y), s)
-            u.repaint(forecast[i], 4, True)
+            u.repaint(forecast[i], 4)

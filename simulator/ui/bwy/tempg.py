@@ -9,15 +9,10 @@ from db import temp
 class UiTempGr(UiFrame):
     def draw(self):
         # Pre-calculates some range values
-        self.temp_min = 273.0
         forecast = self.ui.forecast.forecast
-        cnt = len(forecast)
-        temp_max = -273.0
-
-        for i1 in range(cnt):
-            weather = forecast[i1]
-            temp_max = max(weather.temp, weather.feel, temp_max)
-            self.temp_min = min(weather.temp, weather.feel, self.temp_min)
+        temps = [f.feel for f in forecast] + [f.temp for f in forecast]
+        temp_max = max(temps)
+        self.temp_min = min(temps)
 
         chart_space = const(30)
         chart_min = const(chart_space // 2)

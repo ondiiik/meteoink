@@ -6,8 +6,7 @@ from machine import Pin, deepsleep, RTC
 from micropython import const
 from collections import namedtuple
 from setup import pins
-from db import ui
-from db import sys, location
+from db import ui, sys, location
 from ltime import Time
 from buzzer import play
 
@@ -35,7 +34,7 @@ ALL = const(3)
 
 
 class Forecast:
-    Weather = namedtuple('Weather', ('icon', 'dt', 'temp', 'feel', 'rh', 'rain', 'rpb', 'snow', 'speed', 'dir', 'clouds'))
+    Weather = namedtuple('Weather', ('icon', 'dt', 'srt', 'sst', 'temp', 'feel', 'rh', 'rain', 'rpb', 'snow', 'speed', 'dir', 'clouds'))
     Home = namedtuple('Home',    ('temp', 'rh'))
     Status = namedtuple('Status',  ('sleep_time',))
 
@@ -109,12 +108,12 @@ class Forecast:
 
         self.weather = Forecast.Weather('{}{}'.format(id2icon[self._mk_id(weather['id'], rain)], weather['icon'][-1]),
                                         current['dt'],
+                                        current['sunrise'],
+                                        current['sunset'],
                                         current['temp'],
                                         current['feels_like'],
                                         current['humidity'],
-                                        rain,
-                                        rpb,
-                                        snow,
+                                        rain, rpb, snow,
                                         current['wind_speed'],
                                         current['wind_deg'],
                                         current['clouds'])
@@ -138,6 +137,9 @@ class Forecast:
 
         # Build 2 days forecast
         self.forecast = []
+        self.step = 3600
+        srt = self.weather.srt
+        sst = self.weather.sst
 
         for current in fcast['hourly']:
             weather = current['weather'][0]
@@ -154,15 +156,18 @@ class Forecast:
             except KeyError:
                 snow = 0.0
 
+            dt = current['dt']
+            if dt > sst:
+                srt += 86400
+                sst += 86400
+
             id = 701 if current['visibility'] < 500 and weather['id'] in range(800, 802) else weather['id']
             self.forecast.append(Forecast.Weather('{}{}'.format(id2icon[self._mk_id(id, rain)], weather['icon'][-1]),
-                                                  current['dt'],
+                                                  dt, srt, sst,
                                                   current['temp'],
                                                   current['feels_like'],
                                                   current['humidity'],
-                                                  rain,
-                                                  rpb,
-                                                  snow,
+                                                  rain, rpb, snow,
                                                   current['wind_speed'],
                                                   current['wind_deg'],
                                                   current['clouds']))
@@ -180,6 +185,9 @@ class Forecast:
 
         # Build 2 days forecast
         self.forecast = []
+        self.step = 10800
+        srt = self.weather.srt
+        sst = self.weather.sst
 
         for current in fcast['list']:
             main = current['main']
@@ -199,15 +207,18 @@ class Forecast:
             except KeyError:
                 snow = 0.0
 
+            dt = current['dt']
+            if dt > sst:
+                srt += 86400
+                sst += 86400
+
             id = 701 if current['visibility'] < 500 and weather['id'] in range(800, 802) else weather['id']
             self.forecast.append(Forecast.Weather('{}{}'.format(id2icon[self._mk_id(id, rain)], weather['icon'][-1]),
-                                                  current['dt'],
+                                                  dt, srt, sst,
                                                   main['temp'],
                                                   main['feels_like'],
                                                   main['humidity'],
-                                                  rain,
-                                                  rpb,
-                                                  snow,
+                                                  rain, rpb, snow,
                                                   wind['speed'],
                                                   wind['deg'],
                                                   clouds))

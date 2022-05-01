@@ -1,45 +1,55 @@
 from ulogging import getLogger
 logger = getLogger(__name__)
 
-from .. import UiFrame, V, BLACK, WHITE, RED
+from .. import UiFrame, V, BLACK, RED, GREEN, ORANGE, BLUE
 from micropython import const
 from db import temp
 
 
 class UiTempGr(UiFrame):
     def draw(self):
-        # Pre-calculates some range values
-        self.temp_min = 273.0
         forecast = self.ui.forecast.forecast
-        cnt = len(forecast)
-        temp_max = -273.0
+        stp = self.ui.forecast.step
+        temps = [f.feel for f in forecast] + [f.temp for f in forecast]
+        temp_max = max(temps)
+        self.temp_min = min(temps)
 
-        for i in range(cnt):
-            weather = forecast[i]
-            temp_max = max(weather.temp, weather.feel, temp_max)
-            self.temp_min = min(weather.temp, weather.feel, self.temp_min)
-
-        chart_space = const(30)
-        chart_min = const(chart_space // 2)
-        self.chart_max = self.dim.y - chart_space
+        CHART_SPACE = const(30)
+        chart_min = const(CHART_SPACE // 2)
+        self.chart_max = self.height - CHART_SPACE
         self.k_temp = (self.chart_max - chart_min) / (temp_max - self.temp_min)
 
-        # Draw charts
-        self.chart_draw(3, WHITE)
-        self.chart_draw(3, RED, temp.OUTDOOR_HIGH, temp.OUTDOOR_LOW)
-        self.chart_draw(1, BLACK)
+        def gen():
+            for x1, f1, x2, f2 in self.ui.forecast_blocks():
+                f = V(x1, self.chart_y(f1.feel)), V(x2, self.chart_y(f2.feel))
+                t = V(x1, self.chart_y(f1.temp)), V(x2, self.chart_y(f2.temp))
+                rl = f1.srt + stp
+                rh = f1.sst + stp
+                dl = (rl < f1.dt < rh) or (rl < f1.dt < rh)
 
-    def chart_draw(self, w, c, th=None, tl=None):
-        for x1, f1, x2, f2 in self.ui.forecast_blocks():
-            if (th is None):
-                v1 = V(x1, self.chart_y(f1.feel))
-                v2 = V(x2, self.chart_y(f2.feel))
-                self.canvas.line(v1, v2, c, w)
+                v = max(f1.feel, f2.feel, f1.temp, f2.temp)
+                if v > temp.OUTDOOR_HIGH:
+                    d = self.canvas.vtrap
+                    c = ORANGE if dl else RED
+                else:
+                    v = min(f1.feel, f2.feel, f1.temp, f2.temp)
+                    if v < temp.OUTDOOR_LOW:
+                        d = self.canvas.vttrap if dl else self.canvas.vtrap
+                        c = BLUE
+                    else:
+                        d = self.canvas.vttrap if dl else self.canvas.vtrap
+                        c = GREEN
 
-            if (th is None) or (f1.feel > th) or (f2.feel > th) or (f1.feel < tl) or (f2.feel < tl):
-                v1 = V(x1, self.chart_y(f1.temp))
-                v2 = V(x2, self.chart_y(f2.temp))
-                self.canvas.line(v1, v2, c, w * 2)
+                yield d, c, t, f
+
+        gen = list(gen())
+
+        for d, c, t, f in gen:
+            d(t[0], t[1], self.height, self.height, c)
+            self.canvas.line(t[0], t[1], c, 2)
+
+        for d, c, t, f in gen:
+            self.canvas.line(f[0], f[1], BLACK, 2)
 
     def chart_y(self, temp):
         return int(self.chart_max - (temp - self.temp_min) * self.k_temp)

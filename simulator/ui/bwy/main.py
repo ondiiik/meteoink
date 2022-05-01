@@ -49,7 +49,7 @@ class Epd(EpdBase):
                 calendar_head.repaint(True)
                 calendar_tail.repaint(False)
                 graph_temp.repaint()
-                text_temp.repaint()
+                text_temp.repaint(graph_temp)
                 graph_rain.repaint()
                 wind.repaint()
                 icons.repaint()

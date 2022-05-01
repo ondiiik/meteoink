@@ -10,4 +10,4 @@ class UiRh(UiValue):
         super().__init__(ui, ofs, dim, '%RH', '{:.0f}')
 
     def valcolor(self, v):
-        return RED if v < 40 else GREEN if v < 60 else BLUE
+        return RED if v < 35 else GREEN if v < 65 else BLUE

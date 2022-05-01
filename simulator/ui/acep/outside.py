@@ -11,7 +11,7 @@ from .rv import UiRv
 
 class UiOutside(UiFrame):
     def draw(self):
-        VALWIDTH = const(110)
+        VALWIDTH = const(90)
         spacing = self.height // 3 + 1
         valsize = V(VALWIDTH, spacing)
 
@@ -20,21 +20,21 @@ class UiOutside(UiFrame):
         u = UiWArrow(self.ui, V(VALWIDTH, 0), V(self.width - VALWIDTH, self.height))
         u.repaint(weather)
 
-        # Type wind speed
-        v = weather.speed
-        y = -5
-        u = UiWs(self.ui, V(0, y), valsize)
-        u.repaint(v)
-
         # Type humidity
-        y += spacing
+        y = self.height - spacing
         v = weather.rh
         u = UiRh(self.ui, V(0, y), valsize)
         u.repaint(v)
 
-        # Type also rain intensity
-        v = weather.rain
+        # Type also rain intensity (when raining)
+        y -= spacing
+        v = weather.rain or weather.snow
         if v > 0:
-            y += spacing
             u = UiRv(self.ui, V(0, y), valsize)
             u.repaint(v)
+
+        # Type wind speed
+        y -= spacing
+        v = weather.speed
+        u = UiWs(self.ui, V(0, y), valsize)
+        u.repaint(v)

@@ -1,38 +1,54 @@
 from ulogging import getLogger
 logger = getLogger(__name__)
 
-from .. import UiFrame, V, BLACK, WHITE, BLUE, GREEN
+from .. import UiFrame, V, BLACK, WHITE, BLUE, GREEN, YELLOW
 
 
 class UiRain(UiFrame):
     def draw(self):
-        # Pre-calculates some range values and draw icons bar
         block = self.ui.block
 
-        self.canvas.hline(V(0, self.dim.y - 1), self.dim.x - 1, BLACK)
-        coronv = V(6, 6)
-        corond = coronv + V(coronv.x, 0)
+        self.canvas.hline(V(0, self.height - 1), self.dim.x - 1, BLACK)
+        crv = V(3, 3)
+        crd = crv + V(crv.x, 0)
+        q = self.height // 4
+        q2 = q * 2
+        q3 = q * 3
 
-        for x, fl, f, fr in self.ui.forecast_tripples():
-            # Draw rain chart
-            p = max(f.rain, f.snow)
+        def gen():
+            for x, fl, f, fr in self.ui.forecast_tripples():
+                p = max(f.rain, f.snow)
 
-            if f.rain > 0 or f.snow > 0:
-                r = int(p * 12)
-                q = self.dim.y // 4
-                for h in (q, q * 2, q * 3):
-                    if r > h:
-                        r = h + (r - h) // 2
-                v = V(x - int(block // 2) + 1, self.dim.y - r - 1)
-                d = V(int(block) - 2, r)
+                if p:
+                    r = int(p * 12)
+                    for h in (q, q2, q3):
+                        if r > h:
+                            r = h + (r - h) // 2
+                    v, d = V(x - int(block // 2) + 1, self.height - r - 1), V(int(block) - 2, r)
+                else:
+                    v, d = None, None
 
-                self.canvas.trect(v - coronv, d + corond, BLUE)
-                if f.rain > 0:
+                if (max(fl.rain, fl.snow) < p) and (p > max(fr.rain, fr.snow)):
+                    t = f'{p:.1f}', V(x, self.height - 2)
+                else:
+                    t = None
+
+                yield v, d, t, f.rain
+
+        gen = list(gen())
+
+        for v, d, t, r in gen:
+            if v is not None:
+                self.canvas.trect(v - crv, d + crd, YELLOW)
+
+        for v, d, t, r in gen:
+            if v is not None:
+                if r:
                     self.canvas.fill_rect(v, d, BLUE)
                 else:
                     self.canvas.trect(v, d, GREEN)
                     self.canvas.rect(v, d, BLUE)
 
-            # Type rain text
-            if (max(fl.rain, fl.snow) < p) and (p > max(fr.rain, fr.snow)):
-                self.ui.text_center(16, '%.1f' % p, V(x, self.dim.y - 2), BLACK, WHITE)
+        for v, d, t, r in gen:
+            if t:
+                self.ui.text_center(16, t[0], t[1], BLACK, WHITE)

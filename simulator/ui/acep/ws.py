@@ -10,4 +10,4 @@ class UiWs(UiValue):
         super().__init__(ui, ofs, dim, 'm/s', '{:.1f}')
 
     def valcolor(self, v):
-        return GREEN if v < 3 else BLUE if v < 12 else RED
+        return GREEN if v < 4 else BLUE if v < 12 else RED

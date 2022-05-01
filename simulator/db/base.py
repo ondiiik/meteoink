@@ -9,7 +9,7 @@ def init(name, items):
         m = __import__(f'db._{name}', None, None, ['object'])
         modules[f'db.{name}'] = m.Data()
         return False
-    except BaseException as e:
+    except Exception as e:
         write(name, items())
         return True
 

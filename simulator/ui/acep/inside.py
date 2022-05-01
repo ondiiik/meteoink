@@ -11,9 +11,10 @@ from db import location
 class UiInside(UiFrame):
     def draw(self, connection, volt):
         SPACING = const(18)
+        spacing = self.height // 3 + 1
 
         # Type humidity
-        rh = UiRh(self.ui, V(0, self.height - 35), V(self.width, 35))
+        rh = UiRh(self.ui, V(0, self.height - spacing), V(self.width, spacing))
         rh.repaint(self.ui.forecast.home.rh)
 
         # Display battery state
