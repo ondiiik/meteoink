@@ -3,8 +3,8 @@
 
 <svg
    width="70.915222mm"
-   height="97.371933mm"
-   viewBox="0 0 70.915225 97.371928"
+   height="139.70639mm"
+   viewBox="0 0 70.915225 139.70638"
    version="1.1"
    id="svg5"
    inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
@@ -26,9 +26,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="2.4348987"
-     inkscape:cx="109.24479"
-     inkscape:cy="116.43195"
+     inkscape:zoom="0.60872468"
+     inkscape:cx="-188.91956"
+     inkscape:cy="334.30549"
      inkscape:window-width="1868"
      inkscape:window-height="1016"
      inkscape:window-x="52"
@@ -38,8 +38,8 @@
     <inkscape:grid
        type="xygrid"
        id="grid911"
-       originx="-28.042392"
-       originy="-91.543604" />
+       originx="-28.042393"
+       originy="-91.543594" />
   </sodipodi:namedview>
   <defs
      id="defs2" />
@@ -48,6 +48,10 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(-28.04239,-91.543625)">
+    <path
+       style="fill:none;stroke:#ffff00;stroke-width:18;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 63.499998,164.04169 v 58.20833"
+       id="path970-3" />
     <path
        style="fill:#ffffff;fill-opacity:1;stroke:#ffff00;stroke-width:18;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 63.5,100.54168 26.458331,79.375 -26.458331,-15.875 -26.458333,15.875 z"
@@ -62,5 +66,9 @@
        inkscape:transform-center-x="-0.22421868"
        inkscape:transform-center-y="5.1794864"
        sodipodi:nodetypes="ccccc" />
+    <path
+       style="fill:none;stroke:#ff0000;stroke-width:10;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 63.499998,164.04169 v 58.20833"
+       id="path970" />
   </g>
 </svg>

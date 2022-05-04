@@ -42,7 +42,7 @@ class Epd(EpdBase):
                 calendar_head = UiCalendar(self, V(0, out_temp.bellow), V(self.width, 46))
                 icons = UiIcons(self, V(0, calendar_head.bellow + 12), V(self.width, 72))
                 calendar_tail = UiCalendar(self, V(0, icons.bellow + 12), V(self.width, self.height - icons.bellow - 60))
-                clouds = UiClouds(self, V(0, calendar_tail.above + 8), V(self.width, 30))
+                clouds = UiClouds(self, V(0, calendar_tail.above + 8), V(self.width, 40))
                 graph_temp = UiTempGr(self, V(0, clouds.bellow + 12), V(self.width, calendar_tail.height - clouds.height - 24))
                 text_temp = UiTempTxt(self, *graph_temp.same)
                 graph_rain = UiRain(self, *graph_temp.same)

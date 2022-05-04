@@ -3,8 +3,8 @@
 
 <svg
    width="70.915222mm"
-   height="97.371933mm"
-   viewBox="0 0 70.915224 97.371928"
+   height="144.99806mm"
+   viewBox="0 0 70.915224 144.99805"
    version="1.1"
    id="svg5"
    inkscape:version="1.1.1 (3bf5ae0d25, 2021-09-20)"
@@ -26,9 +26,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="2.4348987"
-     inkscape:cx="109.65549"
-     inkscape:cy="182.5538"
+     inkscape:zoom="1.2174494"
+     inkscape:cx="32.855576"
+     inkscape:cy="299.39644"
      inkscape:window-width="1868"
      inkscape:window-height="1016"
      inkscape:window-x="52"
@@ -38,8 +38,8 @@
     <inkscape:grid
        type="xygrid"
        id="grid911"
-       originx="-28.042391"
-       originy="-91.543609" />
+       originx="-28.042389"
+       originy="-91.543601" />
   </sodipodi:namedview>
   <defs
      id="defs2" />
@@ -48,6 +48,10 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(-28.04239,-91.543625)">
+    <path
+       style="fill:none;stroke:#ffffff;stroke-width:18;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 63.499999,166.68752 v 60.85416"
+       id="path857-3" />
     <path
        style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:18;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 63.5,100.54168 26.458338,79.375 -26.458338,-15.875 -26.458333,15.875 z"
@@ -68,5 +72,9 @@
        inkscape:export-filename="/home/ondiiik/Development/micropython/meteo/meteo_py/graphics/bitmap/png/acep/svg/warrow_b.png"
        inkscape:export-xdpi="25.433968"
        inkscape:export-ydpi="25.433968" />
+    <path
+       style="fill:none;stroke:#0000fc;stroke-width:10;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 63.499998,166.68752 v 60.85416"
+       id="path857" />
   </g>
 </svg>

@@ -1,7 +1,7 @@
 from ulogging import getLogger
 logger = getLogger(__name__)
 
-from .. import UiFrame, V, BLACK, WHITE, BLUE, GREEN, YELLOW
+from .. import UiFrame, V, BLACK, WHITE, BLUE, GREEN, YELLOW, RED
 
 
 class UiRain(UiFrame):
@@ -20,7 +20,7 @@ class UiRain(UiFrame):
                 p = max(f.rain, f.snow)
 
                 if p:
-                    r = int(p * 12)
+                    r = int(p * 16)
                     for h in (q, q2, q3):
                         if r > h:
                             r = h + (r - h) // 2
@@ -44,9 +44,10 @@ class UiRain(UiFrame):
         for v, d, t, r in gen:
             if v is not None:
                 if r:
-                    self.canvas.fill_rect(v, d, BLUE)
+                    self.canvas.fill_rect(v, d, RED)
                 else:
-                    self.canvas.trect(v, d, GREEN)
+                    self.canvas.fill_rect(v, d, WHITE)
+                    self.canvas.trect(v, d, BLUE)
                     self.canvas.rect(v, d, BLUE)
 
         for v, d, t, r in gen:
