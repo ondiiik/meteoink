@@ -1,4 +1,4 @@
-class Db:
+class DbStruct:
     def __init__(self, *args, **kwargs):
         used = set()
 
@@ -22,9 +22,9 @@ class Db:
         return f'{name}({", ".join(items)})'
 
 
-class Location(Db):
+class Location(DbStruct):
     __slots__ = 'name', 'lat', 'lon'
 
 
-class Connection(Db):
+class Connection(DbStruct):
     __slots__ = 'location', 'ssid', 'passwd', 'bssid'

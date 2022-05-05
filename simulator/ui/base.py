@@ -57,10 +57,10 @@ class Ui:
 
     def wind(self, size, speed, angle):
         angle = (angle + 187) // 15 * 15 % 360
-        for level, limit in zip(range(5), (2, 4, 8, 12, 16)):
+        for level, limit in zip(range(4), (2, 4, 8, 15)):
             if speed < limit:
                 return Bitmap(WIND[level][angle][size])
-        return Bitmap(WIND[5][angle][size])
+        return Bitmap(WIND[4][angle][size])
 
     def text_center(self, size, text, pos, color=BLACK, corona=None):
         l = self.text_len(size, text)

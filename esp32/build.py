@@ -22,8 +22,26 @@ class Builder:
 
     def __call__(self, cleanup=False):
         try:
-            with open(Path(self.cwd, 'main.py'), 'w') as f:
-                f.write(f'''from ulogging import getLogger, dump_exception
+            self.build_cleanup(cleanup)
+            self.build_autogen()
+            self.build_copy()
+            self.build_compile()
+            self.build_reduce()
+            self.build_check()
+
+            #packfw((('', '*.py'), ('', '*.mpy'), ('db', '*.mpy'), ('ui', '*.mpy'), ('web', '*.mpy'), ('lang', '*.mpy')))
+        finally:
+            self.command(f'cd {root}')
+
+    def build_cleanup(self, cleanup):
+        if cleanup:
+            self.command(f'rm -Rf {self.dwd}')
+
+        self.command(f'mkdir {self.dwd}')
+
+    def build_autogen(self):
+        with open(Path(self.cwd, 'main.py'), 'w') as f:
+            f.write(f'''from ulogging import getLogger, dump_exception
 logger = getLogger('main')
 
 try:
@@ -39,64 +57,67 @@ except BaseException as e:
     machine.reset()
 ''')
 
-            with open(Path(self.cwd, 'setup', 'display.py'), 'w') as f:
-                f.write(f'''from .epd_{self.variant} import *
+        with open(Path(self.cwd, 'setup', 'display.py'), 'w') as f:
+            f.write(f'''from .epd_{self.variant} import *
 # from .epd_bwy import *
 # from .epd_acep import *
 ''')
 
-            if cleanup:
-                self.command(f'rm -Rf {self.dwd}')
+    def build_copy(self):
+        self.copy('boot.py')
+        self.copy('main.py')
+        self.copy('setup')
+        self.copy('web/www')
 
-            self.command(f'mkdir {self.dwd}')
+    def build_compile(self):
+        self.convert(self.find(''))
+        self.convert(self.find('bitmap'))
+        self.convert(self.find('bitmap/acep_rotated'), 'acep')
+        self.convert(self.find('bitmap/bwy'), 'bwy')
+        self.convert(self.find('db'))
+        self.convert(self.find('display'))
+        self.convert(self.find('lang'))
+        self.convert(self.find('setup'))
+        self.convert(self.find('ui'))
+        self.convert(self.find('ui/acep'), 'acep')
+        self.convert(self.find('ui/bwy'), 'bwy')
+        self.convert(self.find('web'))
+        self.convert(self.find('web/microweb'))
+        self.convert(self.find('web/page'))
 
-            self.copy('boot.py')
-            self.copy('main.py')
-            self.copy('setup')
-            self.copy('web/www')
+    def build_reduce(self):
+        self.command(f'rm {Path(self.dwd, "boot.mpy")}')
+        self.command(f'rm {Path(self.dwd, "main.mpy")}')
+        self.command(f'rm {Path(self.dwd, "display/epd_acep.mpy")}', 'bwy')
+        self.command(f'rm {Path(self.dwd, "display/epd_bwy.mpy")}', 'acep')
+        self.command(f'rm {Path(self.dwd, "setup/__init__.py")}')
+        self.command(f'rm {Path(self.dwd, "setup/display.mpy")}')
+        self.command(f'rm {Path(self.dwd, "setup/epd_acep.py")}')
+        self.command(f'rm {Path(self.dwd, "setup/epd_bwy.py")}')
+        self.command(f'rm {Path(self.dwd, "setup/pins.mpy")}')
+        self.command(f'rm {Path(self.dwd, "setup/epd_acep.mpy")}', 'bwy')
+        self.command(f'rm {Path(self.dwd, "setup/epd_bwy.mpy")}', 'acep')
+        self.command(f'rm {Path(self.dwd, "db/_alert.mpy")}')
+        self.command(f'rm {Path(self.dwd, "db/_beep.mpy")}')
+        self.command(f'rm {Path(self.dwd, "db/_connection.mpy")}')
+        self.command(f'rm {Path(self.dwd, "db/_display.mpy")}')
+        self.command(f'rm {Path(self.dwd, "db/_led.mpy")}')
+        self.command(f'rm {Path(self.dwd, "db/_location.mpy")}')
+        self.command(f'rm {Path(self.dwd, "db/_spot.mpy")}')
+        self.command(f'rm {Path(self.dwd, "db/_sys.mpy")}')
+        self.command(f'rm {Path(self.dwd, "db/_temp.mpy")}')
+        self.command(f'rm {Path(self.dwd, "db/_time.mpy")}')
+        self.command(f'rm {Path(self.dwd, "db/_ui.mpy")}')
+        self.command(f'rm {Path(self.dwd, "db/_vbat.mpy")}')
 
-            self.convert(self.find(''))
-            self.convert(self.find('bitmap'))
-            self.convert(self.find('bitmap/acep_rotated'), 'acep')
-            self.convert(self.find('bitmap/bwy'), 'bwy')
-            self.convert(self.find('db'))
-            self.convert(self.find('display'))
-            self.convert(self.find('lang'))
-            self.convert(self.find('setup'))
-            self.convert(self.find('ui'))
-            self.convert(self.find('ui/acep'), 'acep')
-            self.convert(self.find('ui/bwy'), 'bwy')
-            self.convert(self.find('web'))
-            self.convert(self.find('web/microweb'))
-            self.convert(self.find('web/page'))
+    def build_check(self):
+        l = list(self.dwd.rglob('*'))
 
-            self.command(f'rm {Path(self.dwd, "boot.mpy")}')
-            self.command(f'rm {Path(self.dwd, "main.mpy")}')
-            self.command(f'rm {Path(self.dwd, "display/epd_acep.mpy")}', 'bwy')
-            self.command(f'rm {Path(self.dwd, "display/epd_bwy.mpy")}', 'acep')
-            self.command(f'rm {Path(self.dwd, "setup/__init__.py")}')
-            self.command(f'rm {Path(self.dwd, "setup/display.mpy")}')
-            self.command(f'rm {Path(self.dwd, "setup/epd_acep.py")}')
-            self.command(f'rm {Path(self.dwd, "setup/epd_bwy.py")}')
-            self.command(f'rm {Path(self.dwd, "setup/pins.mpy")}')
-            self.command(f'rm {Path(self.dwd, "setup/epd_acep.mpy")}', 'bwy')
-            self.command(f'rm {Path(self.dwd, "setup/epd_bwy.mpy")}', 'acep')
-            self.command(f'rm {Path(self.dwd, "db/_alert.mpy")}')
-            self.command(f'rm {Path(self.dwd, "db/_beep.mpy")}')
-            self.command(f'rm {Path(self.dwd, "db/_connection.mpy")}')
-            self.command(f'rm {Path(self.dwd, "db/_display.mpy")}')
-            self.command(f'rm {Path(self.dwd, "db/_led.mpy")}')
-            self.command(f'rm {Path(self.dwd, "db/_location.mpy")}')
-            self.command(f'rm {Path(self.dwd, "db/_spot.mpy")}')
-            self.command(f'rm {Path(self.dwd, "db/_sys.mpy")}')
-            self.command(f'rm {Path(self.dwd, "db/_temp.mpy")}')
-            self.command(f'rm {Path(self.dwd, "db/_time.mpy")}')
-            self.command(f'rm {Path(self.dwd, "db/_ui.mpy")}')
-            self.command(f'rm {Path(self.dwd, "db/_vbat.mpy")}')
-
-            #packfw((('', '*.py'), ('', '*.mpy'), ('db', '*.mpy'), ('ui', '*.mpy'), ('web', '*.mpy'), ('lang', '*.mpy')))
-        finally:
-            self.command(f'cd {root}')
+        for item in self.dwd.rglob('*'):
+            if item.is_file():
+                # File exceeding this size make cause troubles with littlefs
+                if item.stat().st_size > 524288:
+                    print(f'\n[!!! WARNING !!!] TOO BIG FILE - {item} :: {item.stat().st_size}')
 
     def command(self, cmd, variant=None):
         if variant is not None and variant != self.variant:

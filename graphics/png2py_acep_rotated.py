@@ -175,7 +175,7 @@ src_dir = Path('bitmap/png/acep').resolve()
 wind_dir = Path('bitmap/wind/acep').resolve()
 wind_dir.mkdir(exist_ok=True)
 
-for level in range(6):
+for level in range(5):
     print(f'Wind icons level {level}')
     src = src_dir.joinpath(f'svg/wa{level}.png')
 
