@@ -20,7 +20,7 @@ need_reset |= init('spot', lambda: {'SSID': 'metoink_' + ''.join([choice(_chars)
 need_reset |= init('temp', lambda: {'INDOOR_HIGH': 26, 'OUTDOOR_HIGH': 27, 'OUTDOOR_LOW': -5})
 need_reset |= init('time', lambda: {'WINTER': False})
 need_reset |= init('vbat', lambda: {'LOW_VOLTAGE': 3.2, 'SHOW_VOLTAGE': False})
-need_reset |= init('ui', lambda: {'APIKEY': '', 'UNITS': 'metric', 'LANGUAGE': 'EN', 'VARIANT': 4, 'REFRESH': 20, 'DBL': (0, 7)})
+need_reset |= init('ui', lambda: {'APIKEY': '', 'UNITS': 'metric', 'LANGUAGE': 'EN', 'VARIANT': 4, 'REFRESH': 15, 'DBL': (0, 7)})
 
 if need_reset:
     reset()

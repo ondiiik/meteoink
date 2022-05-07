@@ -34,13 +34,14 @@ class UiCalendar(UiFrame):
                 break
 
         # Draw all items related to forecast
+        first = True
         for x, f in self.ui.forecast_singles():
             dt = self.ui.forecast.time.get_date_time(f.dt)
             hour = dt[3] - dh
 
             # Draw weekends
             if show_days and ((dt[6] == 5) or (dt[6] == 6)):
-                if 0 == i:
+                if first:
                     self.canvas.trect(V(int(x - dt[3] // hpi * hpi * block / hpi), 1), V(dblock, 26), GREEN)
                 if 0 == hour:
                     self.canvas.trect(V(x, 1), V(dblock, 26), GREEN)
@@ -61,3 +62,5 @@ class UiCalendar(UiFrame):
                 # Draw day of week text
                 if (hour + 12) % 24 == 0:
                     self.ui.text_center(16, day_of_week[dt[6]], V(x, h_space))
+
+            first = False
