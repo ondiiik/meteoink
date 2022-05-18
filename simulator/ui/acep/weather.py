@@ -5,7 +5,9 @@ from .. import UiFrame, V
 
 
 class UiWeather(UiFrame):
-    def draw(self):
+    def draw(self, connection, wdt):
+        connection.disconnect()
+        wdt.feed()
         weather = self.ui.forecast.weather
         bitmap = self.ui.bitmap(1, weather.icon)
         self.canvas.bitmap(V(5, 0), bitmap)

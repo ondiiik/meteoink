@@ -98,6 +98,7 @@ except BaseException as e:
         self.command(f'rm {Path(self.dwd, "setup/epd_acep.mpy")}', 'bwy')
         self.command(f'rm {Path(self.dwd, "setup/epd_bwy.mpy")}', 'acep')
         self.command(f'rm {Path(self.dwd, "db/_alert.mpy")}')
+        self.command(f'rm {Path(self.dwd, "db/_api.mpy")}')
         self.command(f'rm {Path(self.dwd, "db/_beep.mpy")}')
         self.command(f'rm {Path(self.dwd, "db/_connection.mpy")}')
         self.command(f'rm {Path(self.dwd, "db/_display.mpy")}')

@@ -49,7 +49,7 @@ def getLogger(name):
 
 from db import sys
 
-if sys.VERBOSE_LOG:
+if sys.VERBOSE_LOG or sys.EXCEPTION_DUMP:
     try:
         _log = open('sys.log', 'a')
     except:

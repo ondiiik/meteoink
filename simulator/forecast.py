@@ -6,7 +6,7 @@ from machine import Pin, deepsleep, RTC
 from micropython import const
 from collections import namedtuple
 from setup import pins
-from db import ui, sys, location
+from db import api, sys, location
 from ltime import Time
 from buzzer import play
 
@@ -42,7 +42,7 @@ class Forecast:
         logger.info("Reading forecast data")
         self._read1(connection)
 
-        if ui.VARIANT == 2:
+        if api.VARIANT == 2:
             self._read2_short(connection)
         else:
             self._read2_long(connection, 96)
@@ -59,9 +59,9 @@ class Forecast:
         url = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}'
         fcast = connection.http_get_json(url.format(location.LOCATIONS[connection.config.location].lat,
                                                     location.LOCATIONS[connection.config.location].lon,
-                                                    ui.APIKEY,
-                                                    ui.UNITS,
-                                                    ui.LANGUAGE,
+                                                    api.APIKEY,
+                                                    api.UNITS,
+                                                    api.LANGUAGE,
                                                     'minutely,hourly,daily'))
 
         # Parse todays forecast
@@ -129,11 +129,10 @@ class Forecast:
         url = 'http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}'
         fcast = connection.http_get_json(url.format(location.LOCATIONS[connection.config.location].lat,
                                                     location.LOCATIONS[connection.config.location].lon,
-                                                    ui.APIKEY,
-                                                    ui.UNITS,
+                                                    api.APIKEY,
+                                                    api.UNITS,
                                                     'EN',
                                                     'current,minutely,daily'))
-        connection.disconnect()
 
         # Build 2 days forecast
         self.forecast = []
@@ -177,11 +176,10 @@ class Forecast:
         url = "http://api.openweathermap.org/data/2.5/forecast?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&cnt={}"
         fcast = connection.http_get_json(url.format(location.LOCATIONS[connection.config.location].lat,
                                                     location.LOCATIONS[connection.config.location].lon,
-                                                    ui.APIKEY,
-                                                    ui.UNITS,
+                                                    api.APIKEY,
+                                                    api.UNITS,
                                                     'EN',
                                                     (hours + 2) // 3))
-        connection.disconnect()
 
         # Build 2 days forecast
         self.forecast = []

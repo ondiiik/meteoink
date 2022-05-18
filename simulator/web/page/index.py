@@ -1,4 +1,4 @@
-from db import beep, location, connection, spot, temp, vbat, ui, time
+from db import beep, location, connection, spot, temp, vbat, ui, time, api
 from battery import battery
 from lang import trn
 import web
@@ -57,10 +57,10 @@ def index(page):
         table.row((trn('Summer time'), '',           web.button_enable(not time.WINTER, 'summert')), web.SPACES)
         table.row((trn('Refresh time'), trn('{} min (doubled from {}:00 to {}:00)').format(ui.REFRESH, ui.DBL[0], ui.DBL[1]),
                    web.button(trn('Edit'), 'refredt')),      web.SPACES)
-        table.row((trn('Language'), ui.LANGUAGE,             web.button(trn('Edit'), 'langedt')),    web.SPACES)
-        table.row((trn('Units'),    ui.UNITS,           ''),                                         web.SPACES)
-        table.row((trn('Variant'),  trn('Two days' if ui.VARIANT == 2 else 'Four days'), web.button(trn('Edit'), 'variantedt')), web.SPACES)
-        table.row(('API key',       ui.APIKEY,               web.button(trn('Edit'), 'apiedt')),     web.SPACES)
+        table.row((trn('Language'), api.LANGUAGE,            web.button(trn('Edit'), 'langedt')),    web.SPACES)
+        table.row((trn('Units'),    api.UNITS,          ''),                                         web.SPACES)
+        table.row((trn('Variant'),  trn('Two days' if api.VARIANT == 2 else 'Four days'), web.button(trn('Edit'), 'variantedt')), web.SPACES)
+        table.row(('API key',       api.APIKEY,  web.button(trn('Edit'), 'apiedt')),     web.SPACES)
 
     page.heading(2, trn('Hotspot setup'))
     with page.table(None, 'frame="hsides"') as table:

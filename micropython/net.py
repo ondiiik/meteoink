@@ -3,7 +3,7 @@ logger = getLogger(__name__)
 
 from jumpers import jumpers
 from network import WLAN, STA_IF, AP_IF
-from db import connection, location, spot, ui
+from db import connection, location, spot, api
 from utime import sleep
 import urequests
 from uerrno import ECONNRESET
@@ -35,13 +35,14 @@ class Connection:
         self._ifc.active(False)
 
         # Start requested variant of connection
-        if jumpers.hotspot or not connection.CONNECTIONS or not location.LOCATIONS or not ui.APIKEY:
+        if jumpers.hotspot or not connection.CONNECTIONS or not location.LOCATIONS or not api.APIKEY:
             self._hotspot()
         else:
             self._attach()
 
     def _attach(self):
         # Activate WiFi interface
+        logger.info(f'Connecting to WiFi ...')
         self._ifc = WLAN(STA_IF)
 
         if not self._ifc.active(True):
@@ -120,6 +121,7 @@ class Connection:
                 raise e
 
     def disconnect(self):
+        logger.info(f'Disconnecting from WiFi ...')
         WLAN(STA_IF).active(False)
         WLAN(AP_IF).active(False)
         self._ifc = None

@@ -1,8 +1,8 @@
-from db import ui
+from db import api
 import web
 
 
 @web.action_handler(__name__)
 def www(page, args):
-    ui.VARIANT = int(args['v'])
+    api.VARIANT = int(args['v'])
     web.index(page)

@@ -23,6 +23,10 @@ class Vect:
     def copy(self):
         return type(self)(self.x, self.y)
 
+    @micropython.native
+    def swapped(self):
+        return type(self)(self.y, self.x)
+
     @property
     @micropython.viper
     def square(self) -> int:
@@ -56,10 +60,13 @@ class Vect:
         return Vect(int(self.x) // v,
                     int(self.y) // v)
 
-    # @micropython.viper
-    # def __div__(self, v: int):
-    #     return Vect(int(self.x) // v,
-    #                 int(self.y) // v)
+    @micropython.native
+    def __gt__(self, v):
+        return (self.x > v.x) and (self.y > v.y)
+
+    @micropython.native
+    def __lt__(self, v):
+        return (self.x < v.x) and (self.y < v.y)
 
     @micropython.native
     def __repr__(self):

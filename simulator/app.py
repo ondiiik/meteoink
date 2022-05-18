@@ -174,7 +174,7 @@ class App:
         return None if self.net is None else Forecast(self.net, self.temp)
 
     def repaint(self, forecast):
-        ui = MeteoUi(self.canvas, forecast, self.net, self.led)
+        ui = MeteoUi(self.canvas, forecast, self.net, self.led, self.wdt)
         ui.repaint_forecast(self.volt)
 
     def allerts(self, forecast):

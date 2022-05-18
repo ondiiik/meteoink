@@ -14,6 +14,7 @@
 /simulator/onecall.json
 /simulator/reset_cause.txt
 /simulator/db/_alert.py
+/simulator/db/_api.py
 /simulator/db/_beep.py
 /simulator/db/_connection.py
 /simulator/db/_display.py
@@ -26,6 +27,7 @@
 /simulator/db/_vbat.py
 /simulator/db/_ui.py
 /simulator/var/owmp.py
+/simulator/bitmap/acep_rotated/*.bin
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

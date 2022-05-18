@@ -1,6 +1,6 @@
 from ulogging import getLogger
 logger = getLogger(__name__)
-
+from db import ui
 from ..base import EpdBase, V, Z
 from .calendar import UiCalendar
 from .clouds import UiClouds
@@ -9,6 +9,7 @@ from .inside import UiInside
 from .intemp import UiInTemp
 from .outside import UiOutside
 from .outtemp import UiOutTemp
+from .radar import UiRadar
 from .rain import UiRain
 from .tempg import UiTempGr
 from .tempt import UiTempTxt
@@ -34,12 +35,20 @@ class Epd(EpdBase):
                 # always everything as forecast is changing not so often,
                 # but temperature is.
                 logger.info('Drawing forecast ...')
-                weather = UiWeather(self, Z, V(130, 120))
-                out_temp = UiOutTemp(self, V(weather.left, weather.bellow), V(self.width // 2, 60))
+
+                if ui.SHOW_RADAR:
+                    weather = UiRadar(self, Z, V(240, 180))
+                    outside = UiOutside(self, V(weather.right, 0), V(210, 120))
+                    inside = UiInside(self, V(weather.right, weather.bellow - 80), V(self.width - weather.right, 80))
+                    out_temp = UiOutTemp(self, V(weather.left, weather.bellow), V(weather.width, 60))
+                else:
+                    weather = UiWeather(self, Z, V(130, 120))
+                    outside = UiOutside(self, V(weather.right, 0), V(210, weather.height))
+                    inside = UiInside(self, V(outside.right, 0), V(self.width - outside.right, weather.height))
+                    out_temp = UiOutTemp(self, V(weather.left, weather.bellow), V(self.width // 2, 60))
+
                 in_temp = UiInTemp(self, V(out_temp.right, out_temp.above), V(self.width - out_temp.width, out_temp.height))
-                outside = UiOutside(self, V(weather.right, 0), V(210, weather.height))
-                inside = UiInside(self, V(outside.right, 0), V(self.width - outside.right, weather.height))
-                calendar_head = UiCalendar(self, V(0, out_temp.bellow), V(self.width, 46))
+                calendar_head = UiCalendar(self, V(0, in_temp.bellow), V(self.width, 46))
                 icons = UiIcons(self, V(0, calendar_head.bellow + 12), V(self.width, 72))
                 calendar_tail = UiCalendar(self, V(0, icons.bellow + 12), V(self.width, self.height - icons.bellow - 60))
                 clouds = UiClouds(self, V(0, calendar_tail.above + 8), V(self.width, 40))
@@ -56,9 +65,9 @@ class Epd(EpdBase):
                 graph_rain.repaint()
                 clouds.repaint()
                 icons.repaint()
-                weather.repaint()
+                weather.repaint(self.connection, self.wdt)
                 outside.repaint()
-                inside.repaint(self.connection, volt)
+                inside.repaint(self.connection, volt, ui.SHOW_RADAR)
                 out_temp.repaint()
                 in_temp.repaint()
 

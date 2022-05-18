@@ -11,13 +11,14 @@ from .rv import UiRv
 
 class UiOutside(UiFrame):
     def draw(self):
-        VALWIDTH = const(90)
+        VALWIDTH = const(100)
+        OVERLAP = const(30)
         spacing = self.height // 3 + 1
         valsize = V(VALWIDTH, spacing)
 
         # Draw wind
         weather = self.ui.forecast.weather
-        u = UiWArrow(self.ui, V(VALWIDTH, 0), V(self.width - VALWIDTH, self.height))
+        u = UiWArrow(self.ui, V(VALWIDTH - OVERLAP, 0), V(self.width - VALWIDTH + OVERLAP, self.height))
         u.repaint(weather)
 
         # Type humidity

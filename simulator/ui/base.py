@@ -74,12 +74,13 @@ class Ui:
 
 
 class EpdBase(Ui):
-    def __init__(self, canvas, forecast, connection, led):
+    def __init__(self, canvas, forecast, connection, led, wdt):
         super().__init__(canvas)
         self.forecast = forecast
         self.connection = connection
         self.led = led
         self.block = 1 if forecast is None else self.canvas.width / (len(forecast.forecast) - 1)
+        self.wdt = wdt
 
     def forecast_singles(self):
         forecast = self.forecast.forecast

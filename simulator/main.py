@@ -4,7 +4,7 @@ logger = getLogger('main')
 try:
     logger.info('Starting the application ...')
     from app import run
-    run(b'071656a9663cfe2b5119c00c1c31d8c77e0f2630')
+    run(b'99c4e19fba3848f0c870f40513468b42892f5792')
     
 except KeyboardInterrupt as e:
     dump_exception('Interrupted by keyboard ...', e)

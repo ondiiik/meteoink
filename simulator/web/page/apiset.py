@@ -1,8 +1,8 @@
-from db import ui
+from db import api
 import web
 
 
 @web.action_handler(__name__)
 def www(page, args):
-    ui.APIKEY = args['key']
+    api.APIKEY = args['key']
     web.index(page)
