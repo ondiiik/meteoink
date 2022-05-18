@@ -9,51 +9,13 @@ import gc
 from framebuf import FrameBuffer, GS4_HMSB
 from micropython import const
 from io import BytesIO
-from db import location, api
+from db import location, api, ui
 
 _pow2 = 1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576, 2097152, 4194304, 8388608
 _LEFT_OF = const(1)
 _RIGHT_OF = const(2)
 _ABOVE_OF = const(4)
 _BELLOW_OF = const(8)
-
-
-class Rgba2Color:
-    _rgb2c = {b'\x00\x00\x00': BLACK,
-              b'\xff\xff\xff': WHITE,
-              b'\x00\xff\x00': GREEN,
-              b'\x00\x00\xff': BLUE,
-              b'\xff\x00\x00': RED,
-              b'\xff\xff\x00': YELLOW,
-              b'\xff\x7f\x00': ORANGE}
-    _c2rgb = tuple(_rgb2c.keys())
-
-    @classmethod
-    def color(cls, rgba):
-        rgba = bytes(rgba[:3])
-
-        try:
-            return cls._rgb2c[rgba]
-        except KeyError:
-            c = ALPHA
-            k = 196608
-
-            for rgb, v in cls._rgb2c.items():
-                a = sum(map(cls._w, zip(rgba, rgb)))
-                if a < k:
-                    k = a
-                    c = v
-
-            return c
-
-    @classmethod
-    def rgba(cls, c):
-        return cls._c2rgb[c]
-
-    @staticmethod
-    def _w(n):
-        n = n[0] - n[1]
-        return n * n
 
 
 class RadarMap:
@@ -65,6 +27,9 @@ class RadarMap:
              (_RIGHT_OF | _BELLOW_OF, V(-1, -1)), \
              (_BELLOW_OF,             V(0,  -1)), \
              (_LEFT_OF | _BELLOW_OF,  V(1,  -1))
+    _swp_map0 = {True: BLUE, False: GREEN}
+    _swp_map1 = {True: WHITE, False: GREEN}
+    _swp_cld = {True: ALPHA, False: WHITE}
 
     def __init__(self, connection, wdt, dim, lat, lon, z):
         # Precalculate some useful values
@@ -80,12 +45,27 @@ class RadarMap:
             with open(path, 'rb') as f:
                 f.readinto(self.bitmap.buf)
         except:
-            self._load_file('https://stamen-tiles.a.ssl.fastly.net/toner/{}/{}/{}.png', self.map.x, self.map.y)
+            crit0 = self._swp_map0
+            crit1 = self._swp_map1
+            self._load_file('https://stamen-tiles.a.ssl.fastly.net/toner/{}/{}/{}.png',
+                            self.map.x,
+                            self.map.y,
+                            lambda a, n: crit1[a] if n[0] > 127 else crit0[a])
             with open(path, 'wb') as f:
                 f.write(self.bitmap.buf)
 
+        # Load clouds forecast
+        crit = self._swp_cld
+        self._load_file(f'https://tile.openweathermap.org/map/clouds_new/{{}}/{{}}/{{}}?appid={api.APIKEY}',
+                        self.map.x,
+                        self.map.y,
+                        lambda a, n: crit[a] if n[3] > 10 else ALPHA)
+
         # Load rain forecast
-        self._load_file(f'https://tile.openweathermap.org/map/precipitation_new/{{}}/{{}}/{{}}?appid={api.APIKEY}', self.map.x, self.map.y)
+        self._load_file(f'https://tile.openweathermap.org/map/precipitation_new/{{}}/{{}}/{{}}?appid={api.APIKEY}',
+                        self.map.x,
+                        self.map.y,
+                        lambda a, n: BLUE if n[3] > 10 else ALPHA)
 
         # Maps are download - no other connection required
         connection.disconnect()
@@ -95,7 +75,7 @@ class RadarMap:
         fb.fill_rect(self.dim2.y - 4, self.dim2.x - 4, 9, 9, YELLOW)
         fb.fill_rect(self.dim2.y - 2, self.dim2.x - 2, 5, 5, RED)
 
-    def _load_file(self, fmt, x, y, ofs=Z):
+    def _load_file(self, fmt, x, y, conv, ofs=Z):
         # Load requested tile
         self.wdt.feed()
         url = fmt.format(self.z, x, y)
@@ -118,6 +98,7 @@ class RadarMap:
             elif yy >= 256:
                 missing |= _BELLOW_OF
             else:
+                cv = bool(yy % 2)
                 row = memoryview(row)
                 xofs = self.dim2.x - self.origin.x + ofs.x
                 for i, xx in zip(range(0, len(row), 4), range(xofs, xofs + w)):
@@ -125,8 +106,11 @@ class RadarMap:
                         missing |= _LEFT_OF
                     elif xx >= 256:
                         missing |= _RIGHT_OF
-                    elif row[i + 3] > 0:
-                        fb.pixel(yy, ww - xx, Rgba2Color.color(row[i:i + 4]))
+                    else:
+                        cv = not cv
+                        c = conv(cv, row[i:i + 4])
+                        if c != ALPHA:
+                            fb.pixel(yy, ww - xx, c)
 
         # Load missing tiles
         if ofs != Z or 0 == missing:
@@ -137,7 +121,7 @@ class RadarMap:
             if (missing & mask) == mask:
                 p = pos + shift
                 o = shift * 256
-                self._load_file(fmt, p.x, p.y, o)
+                self._load_file(fmt, p.x, p.y, conv, o)
 
     @staticmethod
     def _deg2tile(lat, lon, z):
@@ -157,7 +141,7 @@ class UiRadar(UiFrame):
                         V(self.dim.x - 4, self.dim.y),
                         location.LOCATIONS[connection.config.location].lat,
                         location.LOCATIONS[connection.config.location].lon,
-                        6)
+                        ui.SHOW_RADAR)
 
         self.canvas.bitmap(Z, wmap.bitmap)
         self.canvas.vline(V(self.dim.x - 4, 0), self.dim.y)

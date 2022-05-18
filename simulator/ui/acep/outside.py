@@ -11,8 +11,8 @@ from .rv import UiRv
 
 class UiOutside(UiFrame):
     def draw(self):
-        VALWIDTH = const(100)
-        OVERLAP = const(30)
+        VALWIDTH = const(110)
+        OVERLAP = const(35)
         spacing = self.height // 3 + 1
         valsize = V(VALWIDTH, spacing)
 

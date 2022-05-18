@@ -21,7 +21,7 @@ need_reset |= init('temp', lambda: {'INDOOR_HIGH': 26, 'OUTDOOR_HIGH': 27, 'OUTD
 need_reset |= init('time', lambda: {'WINTER': False})
 need_reset |= init('vbat', lambda: {'LOW_VOLTAGE': 3.2, 'SHOW_VOLTAGE': False})
 need_reset |= init('api', lambda: {'APIKEY': '', 'UNITS': 'metric', 'LANGUAGE': 'EN', 'VARIANT': 4})
-need_reset |= init('ui', lambda: {'REFRESH': 15, 'DBL': (0, 7), 'SHOW_RADAR': True})
+need_reset |= init('ui', lambda: {'REFRESH': 15, 'DBL': (0, 7), 'SHOW_RADAR': 5})
 
 if need_reset:
     reset()

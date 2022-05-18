@@ -32,7 +32,7 @@ def run(sha):
         # It may happen that user wants to attach with HTTP for update of firmware
         # or configuration. In this case we can not rely on existing WiFi connection
         # and we rather go to hot-spot mode.
-        if app.net.is_hotspot:
+        if app.net and app.net.is_hotspot:
             app.hotspot()
 
         # And finally - meteostation display - basic functionality ;-)
@@ -63,7 +63,8 @@ def run(sha):
         if beep.ERROR_BEEP:
             play((200, 500), (100, 500))
 
-        app.sleep(forecast, 5)
+        print('Going to emergency deep sleep for 5 minutes ...')
+        deepsleep(5 * 60000)
 
 
 class App:
