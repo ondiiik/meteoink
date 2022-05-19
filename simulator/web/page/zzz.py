@@ -1,3 +1,6 @@
+from ulogging import getLogger
+logger = getLogger(__name__)
+
 from buzzer import play
 from machine import reset
 from ui import DISPLAY_GREETINGS

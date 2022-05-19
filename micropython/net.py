@@ -79,12 +79,13 @@ class Connection:
 
         self._ifc.connect(network.ssid, network.passwd, bssid=network.bssid)
 
-        for i in range(8):
+        for i in range(30):
             if self._ifc.isconnected():
                 logger.info(f'Connected: {str(self.ifconfig)}')
                 self.is_hotspot = False
                 return
 
+            logger.debug(f'Connecting ...')
             sleep(1)
 
         raise RuntimeError("Wifi connection refused")

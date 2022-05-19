@@ -24,13 +24,8 @@ class Epd(EpdBase):
             self.canvas.bitmap(Z, bitmap)
 
     def repaint_forecast(self, volt):
-        with self.Drawing('weather', self):
-            if self.connection is None:
-                # No forecast when there is no connection. Just draw no-wifi
-                # symbol into middle of screen and leave
-                bitmap = self.bitmap(1, 'nowifi')
-                self.canvas.bitmap(V(177, 0), bitmap)
-            else:
+        if self.connection is not None:
+            with self.Drawing('weather', self):
                 # We have forecast, so lets draw it on screen. Don't draw
                 # always everything as forecast is changing not so often,
                 # but temperature is.

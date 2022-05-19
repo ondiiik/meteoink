@@ -1,3 +1,6 @@
+from ulogging import getLogger
+logger = getLogger(__name__)
+
 from lang import trn
 import web
 

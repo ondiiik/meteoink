@@ -1,3 +1,6 @@
+from ulogging import getLogger
+logger = getLogger(__name__)
+
 from machine import reset
 from buzzer import play
 import web

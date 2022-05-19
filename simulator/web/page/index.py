@@ -1,3 +1,6 @@
+from ulogging import getLogger
+logger = getLogger(__name__)
+
 from db import beep, location, connection, spot, temp, vbat, ui, time, api
 from battery import battery
 from lang import trn

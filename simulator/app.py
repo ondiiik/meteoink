@@ -152,7 +152,7 @@ class App:
         play((2093, 30), 120, (2093, 30))
         self.led.mode(Led.DOWNLOAD)
 
-        ui = MeteoUi(self.canvas, None, self.net, self.led)
+        ui = MeteoUi(self.canvas, None, self.net, self.led, self.wdt)
         ui.repaint_config(self.volt)
         self.led.mode(Led.DOWNLOAD)
 

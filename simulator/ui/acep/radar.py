@@ -2,7 +2,7 @@ from ulogging import getLogger
 logger = getLogger(__name__)
 
 from .. import UiFrame, Bitmap, V, Z, BLACK, WHITE, GREEN, BLUE, RED, YELLOW, ORANGE, ALPHA
-import png
+from png import Reader
 import math
 import urequests
 import gc
@@ -51,21 +51,21 @@ class RadarMap:
                             self.map.x,
                             self.map.y,
                             lambda a, n: crit1[a] if n[0] > 127 else crit0[a])
-            with open(path, 'wb') as f:
-                f.write(self.bitmap.buf)
+            # with open(path, 'wb') as f:
+            #     f.write(self.bitmap.buf)
 
         # Load clouds forecast
         crit = self._swp_cld
         self._load_file(f'https://tile.openweathermap.org/map/clouds_new/{{}}/{{}}/{{}}?appid={api.APIKEY}',
                         self.map.x,
                         self.map.y,
-                        lambda a, n: crit[a] if n[3] > 10 else ALPHA)
+                        lambda a, n: crit[a] if n[3] > 64 else ALPHA)
 
         # Load rain forecast
         self._load_file(f'https://tile.openweathermap.org/map/precipitation_new/{{}}/{{}}/{{}}?appid={api.APIKEY}',
                         self.map.x,
                         self.map.y,
-                        lambda a, n: BLUE if n[3] > 10 else ALPHA)
+                        lambda a, n: BLUE if n[3] > 1 else ALPHA)
 
         # Maps are download - no other connection required
         connection.disconnect()
@@ -82,17 +82,15 @@ class RadarMap:
         logger.info(f'Loading {url} ...')
         imgstr = urequests.get(url)
         logger.info(f'Decoding PNG ...')
-        tile = png.Reader(file=BytesIO(imgstr.content)).read()
-        w, h, data = tile[0], tile[1], list(tile[2])
-        del tile
+        width, height, data, meta = Reader(imgstr.content).read()
         gc.collect()
 
-        logger.info(f'Drawing tile ...')
         missing = 0
         yofs = self.dim2.y - self.origin.y + ofs.y
         fb = self.bitmap.fb
         ww = self.dim.x
-        for row, yy in zip(data, range(yofs, yofs + h)):
+        logger.info(f'Drawing tile ...')
+        for row, yy in zip(data, range(yofs, yofs + height)):
             if 0 > yy:
                 missing |= _ABOVE_OF
             elif yy >= 256:
@@ -101,7 +99,7 @@ class RadarMap:
                 cv = bool(yy % 2)
                 row = memoryview(row)
                 xofs = self.dim2.x - self.origin.x + ofs.x
-                for i, xx in zip(range(0, len(row), 4), range(xofs, xofs + w)):
+                for i, xx in zip(range(0, len(row), 4), range(xofs, xofs + width)):
                     if 0 > xx:
                         missing |= _LEFT_OF
                     elif xx >= 256:
