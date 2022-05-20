@@ -450,8 +450,8 @@ class Reader:
             while True:
                 try:
                     type, data = self.chunk()
-                except ValueError as e:
-                    raise ChunkError(e.args[0])
+                except ValueError as font:
+                    raise ChunkError(font.args[0])
                 if type == b'IEND':
                     # http://www.w3.org/TR/PNG/#11IEND
                     break

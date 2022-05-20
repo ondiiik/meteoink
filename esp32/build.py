@@ -68,6 +68,9 @@ except BaseException as e:
         self.copy('main.py')
         self.copy('setup')
         self.copy('web/www')
+        self.copy('bitmap/acep_rotated/wind.bin')
+        self.copy('bitmap/acep_rotated/fonts.bin')
+        self.copy('bitmap/acep_rotated/bmp.bin')
 
     def build_compile(self):
         self.convert(self.find(''))
@@ -143,7 +146,7 @@ except BaseException as e:
     def copy(self, p):
         src = Path(self.cwd, p)
         dst = Path(self.dwd, p)
-        cmd = (f'rm -Rf {dst}', f'mkdir -p {dst} && rsync -avL --exclude="__pycache__" "{src}/." "{dst}/."' if src.is_dir() else f'cp "{src}" "{dst}"')
+        cmd = f'rm -Rf {dst}', f'mkdir -p {dst.parent}', 'rsync -avL --exclude="__pycache__" "{src}/." "{dst}/."' if src.is_dir() else f'cp "{src}" "{dst}"'
 
         for c in cmd:
             self.command(c)

@@ -23,7 +23,7 @@ class Canvas(Base):
         self.width = self.epd.height
         self.height = self.epd.width
         self.dim = Vect(self.epd.height, self.epd.width)
-        self._r = self.epd.height - 1
+        self._r = self.epd.height
         self.ofs = Vect(0, 0)
         logger.info("\tEPD - [ OK ]")
 

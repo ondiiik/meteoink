@@ -85,6 +85,13 @@ class Bitmap:
             return
 
         self.buf = bmp[2]
+
+        if isinstance(self.buf, int):
+            name = f'bitmap/acep_rotated/{bmp[3]}.bin'
+            with open(name, 'rb') as f:
+                f.seek(self.buf)
+                self.buf = bmp[2] = bytearray(f.read(bmp[0] * bmp[1] // 2))
+
         self.fb = FrameBuffer(self.buf, self.dim.x, self.dim.y, GS4_HMSB)
 
 
@@ -157,7 +164,15 @@ class Base:
 
 @micropython.native
 def bmt(fonts, char, variant, size, color):
-    s = fonts[size][variant][variant][ord(char)][2]
+    fb = fonts[size][variant][variant][ord(char)]
+    s = fb[2]
+
+    if isinstance(s, int):
+        name = f'bitmap/acep_rotated/{fb[3]}.bin'
+        with open(name, 'rb') as f:
+            f.seek(s)
+            s = fb[2] = bytearray(f.read(fb[0] * fb[1] // 2))
+
     l = len(s)
     a = bytearray(l)
     for i in range(l):
@@ -170,7 +185,7 @@ def bmt(fonts, char, variant, size, color):
             b |= color << 4
         a[i] = b
 
-    s = fonts[size][variant][variant][ord(char)]
+    s = fb
     b = s[0], s[1], a
     c = fonts[size][variant].setdefault(color, dict())
     c[ord(char)] = b

@@ -38,12 +38,12 @@ class Connection:
                 return urequests.get(url).json()
                 collect()
                 return
-            except OSError as e:
+            except OSError as font:
                 logger.info('ECONNRESET -> retry')
-                if e.errno == ECONNRESET:
+                if font.errno == ECONNRESET:
                     continue
 
-                raise e
+                raise font
 
     def disconnect(self):
         pass

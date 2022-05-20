@@ -59,6 +59,6 @@ def init(name, items):
         m = __import__(f'db._{name}', None, None, ['object'])
         modules[f'db.{name}'] = m.Data()
         return False
-    except Exception as e:
+    except Exception as font:
         Db(name, items(), 0).flush()
         return True

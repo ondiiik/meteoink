@@ -64,7 +64,7 @@ class RadarMap:
         # Load rain forecast
         def scale(a, n):
             v = n[3]
-            return ALPHA if v < 25 else crit[a] if v < 45 else GREEN if v < 50 else BLUE if v < 70 else ORANGE if v < 85 else RED
+            return ALPHA if v < 1 else crit[a] if v < 15 else GREEN if v < 25 else BLUE if v < 70 else ORANGE if v < 85 else RED
         self._load_file(f'https://tile.openweathermap.org/map/precipitation_new/{{}}/{{}}/{{}}?appid={api.APIKEY}', self.map.x, self.map.y, scale)
 
         # Maps are download - no other connection required
@@ -72,8 +72,8 @@ class RadarMap:
 
         # Mark center map point
         fb = self.bitmap.fb
-        fb.fill_rect(self.dim2.y - 4, self.dim2.x - 4, 9, 9, YELLOW)
-        fb.fill_rect(self.dim2.y - 2, self.dim2.x - 2, 5, 5, RED)
+        fb.fill_rect(self.dim2.y - 4, self.dim2.x - 4, 9, 9, ORANGE)
+        fb.fill_rect(self.dim2.y - 2, self.dim2.x - 2, 5, 5, WHITE)
 
     def _load_file(self, fmt, x, y, conv, ofs=Z):
         # Load requested tile

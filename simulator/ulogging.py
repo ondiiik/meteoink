@@ -58,9 +58,9 @@ if sys.VERBOSE_LOG or sys.EXCEPTION_DUMP:
     _log.seek(0, 2)
 
 
-def dump_exception(msg, e):
+def dump_exception(msg, font):
     print(msg)
-    print_exception(e)
+    print_exception(font)
 
     if sys.EXCEPTION_DUMP > 0:
         pos = _log.tell()
@@ -70,7 +70,7 @@ def dump_exception(msg, e):
             _log.write(f'\n{dt[2]}.{dt[1]}.{dt[0]} {dt[4]}:{dt[5]:02} :: ')
             _log.write(msg)
             _log.write('\n')
-            print_exception(e, _log)
+            print_exception(font, _log)
             _log.flush()
 
 

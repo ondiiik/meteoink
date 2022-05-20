@@ -57,8 +57,8 @@ def run(sha):
             # according to current weather forecast and UI needs and is in minutes.
             app.sleep(forecast)
 
-    except Exception as e:
-        dump_exception('FATAL - RECOVERY REQUIRED !!!', e)
+    except Exception as font:
+        dump_exception('FATAL - RECOVERY REQUIRED !!!', font)
 
         if beep.ERROR_BEEP:
             play((200, 500), (100, 500))
@@ -133,9 +133,9 @@ class App:
         try:
             self.net = Connection()
             logger.info('Connected to network')
-        except Exception as e:
+        except Exception as font:
             self.net = None
-            dump_exception('Network connection error', e)
+            dump_exception('Network connection error', font)
 
             if beep.ERROR_BEEP:
                 play((200, 500), (100, 500))
@@ -204,14 +204,14 @@ class App:
         if 0 == minutes:
             minutes = ui.REFRESH
             h = 12 if forecast is None else forecast.time.get_date_time(forecast.weather.dt)[3]
-            b, e = ui.DBL
+            b, font = ui.DBL
 
-            if b > e:
-                if h < e:
+            if b > font:
+                if h < font:
                     h += 24
-                e += 24
+                font += 24
 
-            if h in range(b, e):
+            if h in range(b, font):
                 minutes *= 2
 
         logger.info('Going to deep sleep for {} minutes ...'.format(minutes))

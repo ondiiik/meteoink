@@ -169,7 +169,7 @@ def convert_char(name, src, fv):
 
 
 # =========================================================================================
-# Build wind icons
+# Build wind_py icons
 # =========================================================================================
 src_dir = Path('bitmap/png/acep').resolve()
 wind_dir = Path('bitmap/wind/acep').resolve()
@@ -180,19 +180,21 @@ for level in range(5):
     src = src_dir.joinpath(f'svg/wa{level}.png')
 
     for angle in range(0, 360, 15):
-        dst = wind_dir.joinpath(f'wa{level}{angle}.png')
-        os.system(f'convert "{src}" -background none -rotate {angle} "{dst}"')
+        py = wind_dir.joinpath(f'wa{level}{angle}.png')
+        os.system(f'convert "{src}" -background none -rotate {angle} "{py}"')
 
 dst_dir = Path('../micropython/bitmap/acep_rotated').resolve()
 dst_dir.mkdir(exist_ok=True)
-wind = dst_dir.joinpath('wind.py')
+wind_py = dst_dir.joinpath('wind.py')
+wind_bin = dst_dir.joinpath('wind.bin')
 
-with wind.open('w') as dst:
-    dst.write('''from ulogging import getLogger
+with wind_py.open('w') as py, wind_bin.open('wb') as bin:
+    py.write('''from ulogging import getLogger
 logger = getLogger(__name__)
 
 WIND = ''')
 
+    # Build basic structure
     wind = {}
     srcs = os.listdir(wind_dir)
     srcs.sort()
@@ -206,20 +208,32 @@ WIND = ''')
         src = wind_dir.joinpath(src_name)
         convert_bitmap(angle, src, level, (1, 4))
 
-    pprint(wind, dst, width=160)
+    # Move binary data to binary file
+    idx = 0
+    for lvl in wind.values():
+        for angle in lvl.values():
+            for variant, value in angle.items():
+                data = value[2]
+                bin.write(data)
+                angle[variant] = [value[0], value[1], idx, 'wind']
+                idx += len(data)
+
+    pprint(wind, py, width=160)
 
 
 # =========================================================================================
 # Create bitmaps
 # =========================================================================================
-bitmap = dst_dir.joinpath('bmp.py')
+bitmap_py = dst_dir.joinpath('bmp.py')
+bitmap_bin = dst_dir.joinpath('bmp.bin')
 
-with bitmap.open('w') as dst:
-    dst.write('''from ulogging import getLogger
+with bitmap_py.open('w') as py, bitmap_bin.open('wb') as bin:
+    py.write('''from ulogging import getLogger
 logger = getLogger(__name__)
 
 BMP = ''')
 
+#   # Build basic structure
     bmp = {}
     srcs = os.listdir(src_dir)
     srcs.sort()
@@ -229,21 +243,32 @@ BMP = ''')
         src = src_dir.joinpath(src_name)
         convert_bitmap(src_name[:-4], src, bmp, (1, 4, 5))
 
-    pprint(bmp, dst, width=160)
+    # Move binary data to binary file
+    idx = 0
+    for size in bmp.values():
+        for variant, value in size.items():
+            data = value[2]
+            bin.write(data)
+            size[variant] = [value[0], value[1], idx, 'bmp']
+            idx += len(data)
+
+    pprint(bmp, py, width=160)
 
 
 # =========================================================================================
 # Create fonts
 # =========================================================================================
 src_dir = Path('bitmap/font/acep')
-fonts_path = dst_dir.joinpath('fonts.py')
+fonts_py = dst_dir.joinpath('fonts.py')
+fonts_bin = dst_dir.joinpath('fonts.bin')
 
-with fonts_path.open('w') as dst:
-    dst.write('''from ulogging import getLogger
+with fonts_py.open('w') as py, fonts_bin.open('wb') as bin:
+    py.write('''from ulogging import getLogger
 logger = getLogger(__name__)
 
 FONTS = ''')
 
+#   # Build basic structure
     dirs = os.listdir(src_dir)
     dirs.sort(key=lambda n: int(n[:1], 16) * 0x1000 + int(n[1:3], 16) * 0x100000 + int(n[3:-4], 16))
     fonts = {}
@@ -257,4 +282,18 @@ FONTS = ''')
         src = os.path.join(src_dir, src_name)
         convert_char(ch, src, fv)
 
-    pprint(fonts, dst, width=160)
+    # Move binary data to binary file
+    idx = 0
+    for size in fonts.values():
+        for q in size.values():
+            for w in size.values():
+                for font in w.values():
+                    for variant, value in font.items():
+                        data = value[2]
+                        if isinstance(data, int):
+                            continue
+                        bin.write(data)
+                        font[variant] = [value[0], value[1], idx, 'fonts']
+                        idx += len(data)
+
+    pprint(fonts, py, width=160)

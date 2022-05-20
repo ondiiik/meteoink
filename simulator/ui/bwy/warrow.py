@@ -48,8 +48,8 @@ class UiWArrow(UiFrame):
                     rr = r - rescale(7) * (i // 2) - rescale(5)
                     l = rescale(15 + 10 * (i % 2))
                     b = rect(rr, (weather.dir - 90) * pi / 180) + o
-                    e = rect(l,  (weather.dir - 30) * pi / 180) + b
-                    self.canvas.line(V(int(b.real), int(b.imag)), V(int(e.real), int(e.imag)), c, w)
+                    font = rect(l,  (weather.dir - 30) * pi / 180) + b
+                    self.canvas.line(V(int(b.real), int(b.imag)), V(int(font.real), int(font.imag)), c, w)
 
             w = rescale(2) + 1
             drawWindSpeed(w + 1, WHITE)
