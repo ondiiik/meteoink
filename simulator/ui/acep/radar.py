@@ -51,8 +51,8 @@ class RadarMap:
                             self.map.x,
                             self.map.y,
                             lambda a, n: crit1[a] if n[0] > 127 else crit0[a])
-            # with open(path, 'wb') as f:
-            #     f.write(self.bitmap.buf)
+            with open(path, 'wb') as f:
+                f.write(self.bitmap.buf)
 
         # Load clouds forecast
         crit = self._swp_cld
@@ -62,10 +62,10 @@ class RadarMap:
                         lambda a, n: crit[a] if n[3] > 64 else ALPHA)
 
         # Load rain forecast
-        self._load_file(f'https://tile.openweathermap.org/map/precipitation_new/{{}}/{{}}/{{}}?appid={api.APIKEY}',
-                        self.map.x,
-                        self.map.y,
-                        lambda a, n: BLUE if n[3] > 1 else ALPHA)
+        def scale(a, n):
+            v = n[3]
+            return ALPHA if v < 25 else crit[a] if v < 45 else GREEN if v < 50 else BLUE if v < 70 else ORANGE if v < 85 else RED
+        self._load_file(f'https://tile.openweathermap.org/map/precipitation_new/{{}}/{{}}/{{}}?appid={api.APIKEY}', self.map.x, self.map.y, scale)
 
         # Maps are download - no other connection required
         connection.disconnect()

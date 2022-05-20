@@ -1,6 +1,5 @@
-from ulogging import getLogger
+from ulogging import getLogger, dump_exception
 logger = getLogger(__name__)
-
 
 from bitmap import FONTS, BMP, WIND
 from display import Bitmap, BLACK, WHITE, GREEN, BLUE, RED, YELLOW, ORANGE, ALPHA
@@ -40,8 +39,17 @@ class UiFrame:
         # self.canvas.rect(self.ofs, self.dim, ORANGE)
         # self.canvas.text(16, type(self).__name__, self.ofs, ORANGE)
         self.canvas.ofs += self.ofs
-        self.draw(*args)
-        self.canvas.ofs -= self.ofs
+
+        try:
+            self.draw(*args)
+        except Exception as e:
+            dump_exception(f'Skipped {type(self).__name__} repaint', e)
+            self.canvas.rect(Z, self.dim, ORANGE)
+            self.canvas.line(Z, self.dim, ORANGE)
+            self.canvas.line(V(0, self.dim.y), V(self.dim.x, 0), ORANGE)
+            self.ui.text_center(16, str(e), self.dim // 2, color=RED, corona=YELLOW)
+        finally:
+            self.canvas.ofs -= self.ofs
 
 
 class Ui:
