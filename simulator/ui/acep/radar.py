@@ -72,7 +72,7 @@ class RadarMap:
 
         # Mark center map point
         fb = self.bitmap.fb
-        fb.fill_rect(self.dim2.y - 4, self.dim2.x - 4, 9, 9, ORANGE)
+        fb.fill_rect(self.dim2.y - 4, self.dim2.x - 4, 9, 9, BLACK)
         fb.fill_rect(self.dim2.y - 2, self.dim2.x - 2, 5, 5, WHITE)
 
     def _load_file(self, fmt, x, y, conv, ofs=Z):

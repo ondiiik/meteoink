@@ -68,9 +68,11 @@ except BaseException as e:
         self.copy('main.py')
         self.copy('setup')
         self.copy('web/www')
-        self.copy('bitmap/acep_rotated/wind.bin')
-        self.copy('bitmap/acep_rotated/fonts.bin')
-        self.copy('bitmap/acep_rotated/bmp.bin')
+
+        if self.variant == 'acep':
+            self.copy('bitmap/acep_rotated/wind.bin')
+            self.copy('bitmap/acep_rotated/fonts.bin')
+            self.copy('bitmap/acep_rotated/bmp.bin')
 
     def build_compile(self):
         self.convert(self.find(''))
@@ -93,10 +95,7 @@ except BaseException as e:
         self.command(f'rm {Path(self.dwd, "main.mpy")}')
         self.command(f'rm {Path(self.dwd, "display/epd_acep.mpy")}', 'bwy')
         self.command(f'rm {Path(self.dwd, "display/epd_bwy.mpy")}', 'acep')
-        self.command(f'rm {Path(self.dwd, "setup/__init__.py")}')
         self.command(f'rm {Path(self.dwd, "setup/display.mpy")}')
-        self.command(f'rm {Path(self.dwd, "setup/epd_acep.py")}')
-        self.command(f'rm {Path(self.dwd, "setup/epd_bwy.py")}')
         self.command(f'rm {Path(self.dwd, "setup/pins.mpy")}')
         self.command(f'rm {Path(self.dwd, "setup/epd_acep.mpy")}', 'bwy')
         self.command(f'rm {Path(self.dwd, "setup/epd_bwy.mpy")}', 'acep')
@@ -146,7 +145,7 @@ except BaseException as e:
     def copy(self, p):
         src = Path(self.cwd, p)
         dst = Path(self.dwd, p)
-        cmd = f'rm -Rf {dst}', f'mkdir -p {dst.parent}', 'rsync -avL --exclude="__pycache__" "{src}/." "{dst}/."' if src.is_dir() else f'cp "{src}" "{dst}"'
+        cmd = f'rm -Rf {dst}', f'mkdir -p {dst.parent}', f'rsync -avL --exclude="__pycache__" "{src}/." "{dst}/."' if src.is_dir() else f'cp "{src}" "{dst}"'
 
         for c in cmd:
             self.command(c)
