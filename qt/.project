@@ -16,14 +16,9 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>mp_esp/net.py</name>
+			<name>esp32/net.py</name>
 			<type>1</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/micropython/net.py</locationURI>
-		</link>
-		<link>
-			<name>mp_esp/urequests.py</name>
-			<type>1</type>
-			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/micropython/urequests.py</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

@@ -34,7 +34,7 @@ class Location:
 
         _cnt += 1
 
-       with open('config/location.py', 'w') as f:
+        with open('config/location.py', 'w') as f:
             f.write('from config import Location\nlocation = [\n')
 
             for c in location:
@@ -91,6 +91,7 @@ hotspot = Spot('{self.ssid}', '{self.passwd}')
 
 _cnt = {_cnt}
 ''')
+
 
 class Ui:
     def __init__(self, apikey, units, language, variant, refresh, dbl_refr_range):

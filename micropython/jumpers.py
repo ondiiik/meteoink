@@ -1,1 +1,1 @@
-/home/ondiiik/Development/meteo/meteo_py/qt/jumpers.py
+../qt/jumpers.py

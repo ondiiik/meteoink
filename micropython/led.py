@@ -1,1 +1,1 @@
-/home/ondiiik/Development/meteo/meteo_py/qt/led.py
+../qt/led.py

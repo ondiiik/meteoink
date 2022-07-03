@@ -1,1 +1,1 @@
-/home/ondiiik/Development/meteo/meteo_py/qt/boot.py
+../qt/boot.py
