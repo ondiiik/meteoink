@@ -97,18 +97,6 @@ class App:
         if (self.volt < vbat.LOW_VOLTAGE):
             self.led.disable()
 
-        # We shall checks if there is requested to toggle temperature alarm
-        if jumpers.alert:
-            beep.TEMP_BALANCED = not beep.TEMP_BALANCED
-
-            if beep.TEMP_BALANCED:
-                play((100, 50), (200, 50), (400, 50), (800, 50), (1600, 50), (3200, 50))
-                alert.ALREADY_TRIGGERED = False
-            else:
-                play((3200, 50), (1600, 50), (800, 50), (400, 50), (200, 50), (100, 50))
-
-            deepsleep(1)
-
         # As we uses E-Ink display, the most comfortable way
         # how to work with it is to define canvas object for
         # drawing objects and flushing them later on screen.
@@ -179,19 +167,25 @@ class App:
         ui.repaint_forecast(self.volt)
 
     def allerts(self, forecast):
+        # Is temperature balanced alert enabled?
         if not beep.TEMP_BALANCED:
             return
 
+        # Is temperature outside lower then inside?
         if temp.INDOOR_HIGH > forecast.home.temp:
             return
 
+        # Do we measure during afternoon?
         h = forecast.time.get_date_time(forecast.weather.dt)[3]
 
         if h == 13:
+            # Reset triggered flag in morning
             alert.ALREADY_TRIGGERED = False
             return
 
+        # Didn't we already triggered alert?
         if not alert.ALREADY_TRIGGERED and forecast.home.temp > forecast.weather.temp:
+            # Play alert and set that it has been triggered already
             for i in range(3):
                 play((4000, 30), (6000, 30), (4000, 30), (6000, 30), (4000, 30), (6000, 30), (4000, 30), (6000, 30), 500)
             alert.ALREADY_TRIGGERED = True
