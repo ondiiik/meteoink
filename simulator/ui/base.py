@@ -64,7 +64,7 @@ class Ui:
         return Bitmap(BMP[name][size])
 
     def wind(self, size, speed, angle):
-        angle = (angle + 187) // 15 * 15 % 360
+        angle = (((angle + 187) // 15) * 15) % 360
         for level, limit in zip(range(4), (2, 4, 8, 15)):
             if speed < limit:
                 return Bitmap(WIND[level][angle][size])

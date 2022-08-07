@@ -129,7 +129,7 @@ class App:
                 play((200, 500), (100, 500))
 
     def greetings(self):
-        ui = MeteoUi(self.canvas, None, self.net, self.led)
+        ui = MeteoUi(self.canvas, None, self.net, self.led, self.wdt)
         ui.repaint_welcome()
 
         display.DISPLAY_STATE = DISPLAY_REFRESH

@@ -3,6 +3,8 @@ GS4_HMSB = 0
 
 class FrameBuffer:
     def __init__(self, buf, w, h, f):
+        if not isinstance(buf, bytearray):
+            raise TypeError('object with buffer protocol required')
         self._buf = buf
         self._width = w
         self._height = h
@@ -37,10 +39,10 @@ class FrameBuffer:
 
     def rect(self, x, y, w, h, c):
         for yy in range(y, y + h - 1):
-            self.pixel(x,     yy, c)
+            self.pixel(x, yy, c)
             self.pixel(x + w - 1, yy, c)
         for xx in range(x, x + w - 1):
-            self.pixel(xx, y,     c)
+            self.pixel(xx, y, c)
             self.pixel(xx, y + h - 1, c)
 
     def fill_rect(self, x, y, w, h, c):

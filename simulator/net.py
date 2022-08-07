@@ -31,7 +31,7 @@ class Connection:
         return ('192.168.1.254', '255.255.255.0', '192.168.1.255')
 
     def http_get_json(self, url):
-        logger.info("HTTP GET: " + url)
+        logger.debug("HTTP GET: " + url)
 
         for retry in range(CONN_RETRY_CNT):
             try:

@@ -10,7 +10,7 @@ INFO = const(2)
 DEBUG = const(1)
 NOTSET = const(0)
 
-_lvl = NOTSET
+_lvl = INFO
 _lchr = '  ', '  ', '..', '??', '!!', '##'
 
 
@@ -43,7 +43,7 @@ class Logger:
 
 def getLogger(name):
     logger = Logger(name)
-    logger.info('Loading module ...')
+    logger.debug('Loading module ...')
     return logger
 
 

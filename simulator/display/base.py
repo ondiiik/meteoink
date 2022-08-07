@@ -88,9 +88,15 @@ class Bitmap:
 
         if isinstance(self.buf, int):
             name = f'bitmap/acep_rotated/{bmp[3]}.bin'
-            with open(name, 'rb') as f:
+            f = open(name, 'rb')
+            try:
                 f.seek(self.buf)
-                self.buf = bmp[2] = bytearray(f.read(bmp[0] * bmp[1] // 2))
+                b = f.read(bmp[0] * bmp[1] // 2)
+            finally:
+                f.close()
+
+            self.buf = bytearray(b)
+            bmp[2] = self.buf
 
         self.fb = FrameBuffer(self.buf, self.dim.x, self.dim.y, GS4_HMSB)
 
@@ -104,7 +110,7 @@ class Frame(FrameBuffer):
 
 class Base:
     @micropython.native
-    def vtrap(self, vl1, vl2, yu1,  yu2, c=BLACK):
+    def vtrap(self, vl1, vl2, yu1, yu2, c=BLACK):
         dx = vl2.x - vl1.x
 
         if dx > 0:

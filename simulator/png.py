@@ -503,7 +503,7 @@ class Reader:
         if self.plte:
             meta['palette'] = self._palete()
 
-        logger.info(f'Built reader: PNG {self.width} x {self.height}')
+        logger.debug(f'Built reader: PNG {self.width} x {self.height}')
         return self.width, self.height, pixels, meta
 
     def read_flat(self):

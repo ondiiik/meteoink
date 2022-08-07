@@ -25,12 +25,12 @@ class Canvas(Base):
         self.dim = Vect(self.epd.height, self.epd.width)
         self._r = self.epd.height
         self.ofs = Vect(0, 0)
-        logger.info("\tEPD - [ OK ]")
+        logger.debug("\tEPD - [ OK ]")
 
         self.buf = bytearray((self.epd.width * self.epd.height + 1) // 2)
         self.fb = FrameBuffer(self.buf, self.epd.width, self.epd.height, GS4_HMSB)
         self.clear()
-        logger.info("\tFrame buffer - [ OK ]")
+        logger.debug("\tFrame buffer - [ OK ]")
 
     @micropython.native
     def clear(self):
@@ -43,7 +43,7 @@ class Canvas(Base):
     @micropython.native
     def flush(self, deghost=True):
         if deghost:
-            logger.info('De-ghosting ...')
+            logger.debug('De-ghosting ...')
             self.epd.deghost(self.buf[:])
         logger.info('Flushing ...')
         self.epd.display_frame(self.buf)

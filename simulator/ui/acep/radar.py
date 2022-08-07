@@ -19,14 +19,14 @@ _BELLOW_OF = const(8)
 
 
 class RadarMap:
-    _sides = (_LEFT_OF,               V(1,  0)), \
-             (_LEFT_OF | _ABOVE_OF,   V(1,  1)), \
-             (_ABOVE_OF,              V(0,  1)), \
-             (_RIGHT_OF | _ABOVE_OF,  V(-1, 1)), \
-             (_RIGHT_OF,              V(-1, 0)), \
+    _sides = (_LEFT_OF, V(1, 0)), \
+             (_LEFT_OF | _ABOVE_OF, V(1, 1)), \
+             (_ABOVE_OF, V(0, 1)), \
+             (_RIGHT_OF | _ABOVE_OF, V(-1, 1)), \
+             (_RIGHT_OF, V(-1, 0)), \
              (_RIGHT_OF | _BELLOW_OF, V(-1, -1)), \
-             (_BELLOW_OF,             V(0,  -1)), \
-             (_LEFT_OF | _BELLOW_OF,  V(1,  -1))
+             (_BELLOW_OF, V(0, -1)), \
+             (_LEFT_OF | _BELLOW_OF, V(1, -1))
     _swp_map0 = {True: BLUE, False: GREEN}
     _swp_map1 = {True: WHITE, False: GREEN}
     _swp_cld = {True: ALPHA, False: WHITE}
@@ -81,7 +81,7 @@ class RadarMap:
         url = fmt.format(self.z, x, y)
         logger.info(f'Loading {url} ...')
         imgstr = urequests.get(url)
-        logger.info(f'Decoding PNG ...')
+        logger.debug(f'Decoding PNG ...')
         width, height, data, meta = Reader(imgstr.content).read()
         gc.collect()
 
@@ -89,7 +89,7 @@ class RadarMap:
         yofs = self.dim2.y - self.origin.y + ofs.y
         fb = self.bitmap.fb
         ww = self.dim.x
-        logger.info(f'Drawing tile ...')
+        logger.debug(f'Drawing tile ...')
         for row, yy in zip(data, range(yofs, yofs + height)):
             if 0 > yy:
                 missing |= _ABOVE_OF

@@ -65,7 +65,7 @@ class EPD:
                        sck=Pin(pins.SCK),
                        mosi=Pin(pins.MOSI),
                        miso=Pin(pins.MISO))
-        logger.info("\tSPI - [ OK ]")
+        logger.debug("\tSPI - [ OK ]")
 
         self._cs = Pin(pins.CS)
         self._dc = Pin(pins.DC)
@@ -73,8 +73,8 @@ class EPD:
         self._busy = Pin(pins.BUSY)
         self._resolution = pack('!HH', self.width, self.height)
 
-        self._cs.init(self._cs.OUT,  value=1)
-        self._dc.init(self._dc.OUT,  value=0)
+        self._cs.init(self._cs.OUT, value=1)
+        self._dc.init(self._dc.OUT, value=0)
         self._rst.init(self._rst.OUT, value=0)
         self._busy.init(self._busy.IN)
 
