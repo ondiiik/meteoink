@@ -50,7 +50,7 @@ try:
     run({self.sha})
     
 except KeyboardInterrupt as e:
-    dump_exception('Interrupted by keyboard ...', e)
+    logger.info('Interrupted by keyboard ...')
 except BaseException as e:
     dump_exception('!!! APPLICATION ERROR - REBOOTING !!!', e)
     import machine
@@ -145,7 +145,7 @@ except BaseException as e:
     def copy(self, p):
         src = Path(self.cwd, p)
         dst = Path(self.dwd, p)
-        cmd = f'rm -Rf {dst}', f'mkdir -p {dst.parent}', f'rsync -avL --exclude="__pycache__" "{src}/." "{dst}/."' if src.is_dir() else f'cp "{src}" "{dst}"'
+        cmd = f'rm -Rf {dst}', f'mkdir -p {dst if src.is_dir() else dst.parent}', f'rsync -avL --exclude="__pycache__" "{src}/." "{dst}/."' if src.is_dir() else f'cp "{src}" "{dst}"'
 
         for c in cmd:
             self.command(c)

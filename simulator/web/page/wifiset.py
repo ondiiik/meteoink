@@ -1,8 +1,7 @@
+import web
+from db import connection
 from ulogging import getLogger
 logger = getLogger(__name__)
-
-from db import connection
-import web
 
 
 def wifiset(page, args):
@@ -13,7 +12,7 @@ def wifiset(page, args):
             if 'location' in args:
                 connection.CONNECTIONS[i].location = int(args['location'])
             connection.CONNECTIONS[i].passwd = args['psw']
-            connection.CONNECTIONS[i].flush()
+            connection.flush()
             break
 
     web.index(page)
