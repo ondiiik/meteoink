@@ -8,7 +8,7 @@ import web
 
 @web.action_handler(__name__)
 def www(page, args):
-    page.heading(2, trn('DELETE LOCATION') + ' ??!')
+    page.heading(2, trn('DELETE LOCATION') + ' ?!')
     loc = location.LOCATIONS[int(args['idx'])]
 
     with page.form('locrm') as form:

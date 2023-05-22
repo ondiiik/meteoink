@@ -1,4 +1,5 @@
 from sys import modules
+from os import mkdir
 from .structs import DbStruct
 
 
@@ -7,6 +8,11 @@ class Db:
         self._name = name
         self._items = items
         self._cnt = cnt
+
+        try:
+            mkdir('var')
+        except OSError:
+            ...
 
     def flush(self):
         structures = set()
@@ -22,10 +28,10 @@ class Db:
                     if isinstance(i, DbStruct):
                         structures.add(type(i))
 
-        with open(f'db/_{self._name}.py', 'w') as f:
+        with open(f'var/_{self._name}.py', 'w') as f:
             for s in structures:
-                f.write(f'from .structs import {s.__name__}\n')
-            f.write(f'''from .base import Db
+                f.write(f'from db.structs import {s.__name__}\n')
+            f.write(f'''from db.base import Db
 class Data(Db):
     def __init__(self):
         super().__init__('{self._name}', {self._items}, {self._cnt+1})
@@ -56,9 +62,9 @@ def init(name, items):
     global modules
 
     try:
-        m = __import__(f'db._{name}', None, None, ['object'])
+        m = __import__(f'var._{name}', None, None, ['object'])
         modules[f'db.{name}'] = m.Data()
         return False
-    except Exception as font:
+    except Exception:
         Db(name, items(), 0).flush()
         return True

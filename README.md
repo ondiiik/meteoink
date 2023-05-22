@@ -21,7 +21,7 @@ charged through the USB on ESP board. Meteostation is usually operating half a y
 
 ![Meteostation wiring](graphics/doc/wiring.png "Meteostation wiring")
 
-Some pins can be moved to another position by changing config file [pins.py](https://github.com/ondiiik/meteoink/tree/master/box).
+Some pins can be moved to another position by changing config file [pins.py](https://github.com/ondiiik/meteoink/blob/master/esp32/micropython/acep/setup/pins.py).
 
 but keep in mind that not all pins are available for any operation (some are not capable of ADC, some are not capable of SPI, ...).
 Also battery is not displayed in wiring as it has its own connector so its connection is obvious.
@@ -29,10 +29,10 @@ Also battery is not displayed in wiring as it has its own connector so its conne
 
 ## Box
 
-Files for 3D printed parts are stored [here]().
+Files for 3D printed parts are stored [here](https://github.com/ondiiik/meteoink/tree/master/box).
 
 Both variants of box are partialy screwed and partially glued as well as electronics. To stitch processor board or battery
-you can use acrylate 3M double side tape. DHT22 sensor is glued to chassis (grid for air access sahll be on the side pointing
+you can use acrylate 3M double side tape. DHT22 sensor is glued to chassis (grid for air access shall be on the side pointing
 outside the box). When you glue it, apply glue very carefully as it shall not pass inside electronics
 (especially in the case of buttons or DHT sensor). When all electronics is inside, then chassis shall be either glued to frame
 (BWY variant) or screwed together (ACEP variant).

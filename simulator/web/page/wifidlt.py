@@ -8,7 +8,7 @@ import web
 
 @web.action_handler(__name__)
 def www(page, args):
-    page.heading(2, trn('DELETE CONNECTION') + ' ??!')
+    page.heading(2, trn('DELETE CONNECTION') + ' ?!')
     config = connection.CONNECTIONS[int(args['idx'])]
 
     with page.form('wifirm') as form:
