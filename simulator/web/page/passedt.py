@@ -1,4 +1,5 @@
 from ulogging import getLogger
+
 logger = getLogger(__name__)
 
 from db import spot
@@ -8,7 +9,7 @@ import web
 
 @web.action_handler(__name__)
 def www(page, args):
-    page.heading(2, trn('Set hotspot password'))
+    page.heading(2, trn("Set hotspot password"))
 
-    with page.form('passset') as form:
-        form.input(trn('Password'), 'p', spot.PASSWD)
+    with page.form("passset") as form:
+        form.input(trn("Password"), "p", spot.PASSWD)

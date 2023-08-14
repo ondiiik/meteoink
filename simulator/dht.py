@@ -1,4 +1,4 @@
-class DHT22():
+class DHT22:
     def __init__(self, pin):
         pass
 

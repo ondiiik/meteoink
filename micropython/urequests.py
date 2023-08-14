@@ -2,7 +2,6 @@ import usocket
 
 
 class Response:
-
     def __init__(self, f):
         self.raw = f
         self.encoding = "utf-8"
@@ -30,6 +29,7 @@ class Response:
 
     def json(self):
         import ujson
+
         return ujson.loads(self.content)
 
 
@@ -43,6 +43,7 @@ def request(method, url, data=None, json=None, headers={}, stream=None):
         port = 80
     elif proto == "https:":
         import ussl
+
         port = 443
     else:
         raise ValueError("Unsupported protocol: " + proto)
@@ -55,8 +56,9 @@ def request(method, url, data=None, json=None, headers={}, stream=None):
     try:
         ai = usocket.getaddrinfo(host, port, 0, usocket.SOCK_STREAM)
     except Exception as e:
-        print(f'Get address info failed {e} - are we disconnected ?!')
+        print(f"Get address info failed {e} - are we disconnected ?!")
         from machine import reset
+
         reset()
 
     ai = ai[0]
@@ -78,6 +80,7 @@ def request(method, url, data=None, json=None, headers={}, stream=None):
         if json is not None:
             assert data is None
             import ujson
+
             data = ujson.dumps(json)
             s.write(b"Content-Type: application/json\r\n")
         if data:

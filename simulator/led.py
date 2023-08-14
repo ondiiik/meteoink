@@ -1,4 +1,5 @@
 from ulogging import getLogger
+
 logger = getLogger(__name__)
 
 from machine import Pin, PWM
@@ -6,7 +7,7 @@ from setup import pins
 from db import led
 
 
-class Led():
+class Led:
     OFF = 0
     WARM_UP = 1
     DOWNLOAD = 2

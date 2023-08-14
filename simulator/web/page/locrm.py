@@ -1,4 +1,5 @@
 from ulogging import getLogger
+
 logger = getLogger(__name__)
 
 from db import location, connection
@@ -7,7 +8,7 @@ import web
 
 @web.action_handler(__name__)
 def www(page, args):
-    name = args['name']
+    name = args["name"]
     locations = location.LOCATIONS
     connections = connection.CONNECTIONS
 

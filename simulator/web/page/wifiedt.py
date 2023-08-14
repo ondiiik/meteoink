@@ -1,4 +1,5 @@
 from ulogging import getLogger
+
 logger = getLogger(__name__)
 
 from db import location, connection
@@ -8,15 +9,15 @@ import web
 
 @web.action_handler(__name__)
 def www(page, args):
-    page.heading(2, trn('Edit connection'))
-    config = connection.CONNECTIONS[int(args['idx'])]
+    page.heading(2, trn("Edit connection"))
+    config = connection.CONNECTIONS[int(args["idx"])]
 
-    with page.form('wifiset') as form:
-        form.label('SSID',          'ssid',  config.ssid)
-        form.label('BSSID',         'bssid', web.bytes2bssid(config.bssid))
-        form.input(trn('Password'), 'psw',   config.passwd, 'password')
+    with page.form("wifiset") as form:
+        form.label("SSID", "ssid", config.ssid)
+        form.label("BSSID", "bssid", web.bytes2bssid(config.bssid))
+        form.input(trn("Password"), "psw", config.passwd, "password")
         form.spacer()
 
-        with page.select(trn('Location'), 'location') as select:
+        with page.select(trn("Location"), "location") as select:
             for i in range(len(location.LOCATIONS)):
                 select.option(i, location.LOCATIONS[i].name, i == config.location)

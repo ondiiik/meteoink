@@ -1,4 +1,5 @@
 from ulogging import getLogger
+
 logger = getLogger(__name__)
 
 import micropython
@@ -42,9 +43,9 @@ class Canvas:
     @micropython.native
     def flush(self, deghost=True):
         if deghost:
-            logger.info('De-ghosting ...')
+            logger.info("De-ghosting ...")
             self.epd.deghost(self.buf[:])
-        logger.info('Flushing ...')
+        logger.info("Flushing ...")
         self.epd.display_frame(self.buf)
 
     @micropython.native
@@ -124,7 +125,7 @@ class Canvas:
         pos = pos.copy() - _corofs
 
         for char in text:
-            if ' ' == char:
+            if " " == char:
                 pos.x += int(0.3 * size) + 1
             else:
                 try:
@@ -141,7 +142,7 @@ class Canvas:
     def text_len(self, size, text):
         l = 0
         for char in text:
-            if ' ' == char:
+            if " " == char:
                 l += int(0.3 * size) + 1
             else:
                 f = Bitmap(FONTS[size][0][0][ord(char)], True)

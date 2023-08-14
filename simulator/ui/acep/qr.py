@@ -1,4 +1,5 @@
 from ulogging import getLogger
+
 logger = getLogger(__name__)
 
 from .. import UiFrame, V
@@ -18,7 +19,9 @@ class UiQr(UiFrame):
 
         for y in range(matrix[1]):
             for x in range(matrix[1]):
-                self.canvas.fill_rect(V(x * _PIX_SIZE, y * _PIX_SIZE), _pix_dim, matrix[0].pixel(x, y))
+                self.canvas.fill_rect(
+                    V(x * _PIX_SIZE, y * _PIX_SIZE), _pix_dim, matrix[0].pixel(x, y)
+                )
 
         l = matrix[1] * _PIX_SIZE
         if above:

@@ -1,4 +1,5 @@
 from ulogging import getLogger
+
 logger = getLogger(__name__)
 
 from db import connection, Connection
@@ -7,7 +8,7 @@ import web
 
 @web.action_handler(__name__)
 def www(page, args):
-    bssid = web.bssid2bytes(args['bssid'])
+    bssid = web.bssid2bytes(args["bssid"])
     connections = connection.CONNECTIONS
 
     for i in range(len(connections)):

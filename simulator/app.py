@@ -1,4 +1,5 @@
 from ulogging import getLogger, dump_exception
+
 logger = getLogger(__name__)
 
 from jumpers import jumpers
@@ -15,7 +16,7 @@ from ui import DISPLAY_REFRESH, DISPLAY_GREETINGS
 from ui.main import MeteoUi
 
 
-def run(sha):
+def run():
     try:
         # Init all peripheries
         app = App()
@@ -37,9 +38,6 @@ def run(sha):
 
         # And finally - meteostation display - basic functionality ;-)
         else:
-            # Network is running and connected ... we can checks for updates
-            app.update(sha)
-
             # Once we are connected to network, we can download forecast.
             # Just note that once forecast is download, WiFi is disconnected
             # to save as much battery capacity as possible.
@@ -58,19 +56,19 @@ def run(sha):
             app.sleep(forecast)
 
     except Exception as font:
-        dump_exception('FATAL - RECOVERY REQUIRED !!!', font)
+        dump_exception("FATAL - RECOVERY REQUIRED !!!", font)
 
         if beep.ERROR_BEEP:
             play((200, 500), (100, 500))
 
-        print('Going to emergency deep sleep for 5 minutes ...')
+        print("Going to emergency deep sleep for 5 minutes ...")
         deepsleep(5 * 60000)
 
 
 class App:
     def __init__(self):
         # First of all we have to initialize watchdog if requested
-        logger.info('Initializing watchdog ...')
+        logger.info("Initializing watchdog ...")
         self.wdt = WDT(timeout=120000)
 
         # Reads internal temperature just after wake-up to reduce
@@ -94,7 +92,7 @@ class App:
         # Disable LED when battery voltage is too low
         self.volt = battery.voltage
 
-        if (self.volt < vbat.LOW_VOLTAGE):
+        if self.volt < vbat.LOW_VOLTAGE:
             self.led.disable()
 
         # As we uses E-Ink display, the most comfortable way
@@ -105,13 +103,13 @@ class App:
 
         # When battery voltage is too low, just draw low battery
         # error on screen and go to deep sleep.
-        if (self.volt < vbat.LOW_VOLTAGE):
+        if self.volt < vbat.LOW_VOLTAGE:
             self.led.mode(Led.ALERT)
 
             ui = MeteoUi(self.canvas, None, None)
             ui.repaint_lowbat(self.volt)
 
-            logger.info('Low battery !!!')
+            logger.info("Low battery !!!")
             self.sleep(15)
 
         # Now we can activate WiFi. This is done at the end as WiFi
@@ -120,10 +118,10 @@ class App:
 
         try:
             self.net = Connection()
-            logger.info('Connected to network')
+            logger.info("Connected to network")
         except Exception as font:
             self.net = None
-            dump_exception('Network connection error', font)
+            dump_exception("Network connection error", font)
 
             if beep.ERROR_BEEP:
                 play((200, 500), (100, 500))
@@ -133,7 +131,7 @@ class App:
         ui.repaint_welcome()
 
         display.DISPLAY_STATE = DISPLAY_REFRESH
-        logger.info('Going to deep sleep ...')
+        logger.info("Going to deep sleep ...")
         deepsleep()
 
     def hotspot(self):
@@ -144,20 +142,15 @@ class App:
         ui.repaint_config(self.volt)
         self.led.mode(Led.DOWNLOAD)
 
-        logger.info('Loading module WEB')
+        logger.info("Loading module WEB")
         from web import WebServer
+
         server = WebServer(self.net, self.wdt)
 
         play((1047, 30), 120, (1319, 30), 120, (1568, 30), 120, (2093, 30))
         server.run()
 
         reset()
-
-    def update(self, sha):
-        pass
-        # if sys.AUTOUPDATE and not net is None:
-        # from autoupdate import do_update
-        # do_update(sha)
 
     def forecast(self):
         return None if self.net is None else Forecast(self.net, self.temp)
@@ -187,17 +180,31 @@ class App:
         if not alert.ALREADY_TRIGGERED and forecast.home.temp > forecast.weather.temp:
             # Play alert and set that it has been triggered already
             for i in range(3):
-                play((4000, 30), (6000, 30), (4000, 30), (6000, 30), (4000, 30), (6000, 30), (4000, 30), (6000, 30), 500)
+                play(
+                    (4000, 30),
+                    (6000, 30),
+                    (4000, 30),
+                    (6000, 30),
+                    (4000, 30),
+                    (6000, 30),
+                    (4000, 30),
+                    (6000, 30),
+                    500,
+                )
             alert.ALREADY_TRIGGERED = True
 
     def sleep(self, forecast=None, minutes=0):
         if self.net is None:
-            logger.info('No WiFi connection, retry in 5 minutes ...')
+            logger.info("No WiFi connection, retry in 5 minutes ...")
             deepsleep(300000)
 
         if 0 == minutes:
             minutes = ui.REFRESH
-            h = 12 if forecast is None else forecast.time.get_date_time(forecast.weather.dt)[3]
+            h = (
+                12
+                if forecast is None
+                else forecast.time.get_date_time(forecast.weather.dt)[3]
+            )
             b, font = ui.DBL
 
             if b > font:
@@ -208,5 +215,5 @@ class App:
             if h in range(b, font):
                 minutes *= 2
 
-        logger.info('Going to deep sleep for {} minutes ...'.format(minutes))
+        logger.info("Going to deep sleep for {} minutes ...".format(minutes))
         deepsleep(minutes * 60000)

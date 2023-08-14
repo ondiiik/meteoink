@@ -23,6 +23,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 from ulogging import getLogger
+
 logger = getLogger(__name__)
 
 from micropython import const
@@ -48,7 +49,7 @@ ACEP_TCON = const(0x60)
 ACEP_RESOLUTION = const(0x61)
 ACEP_PWS = const(0xE3)
 
-_cleanup = b''
+_cleanup = b""
 
 
 class EPD:
@@ -59,19 +60,21 @@ class EPD:
         self.height = 448
 
         self._spi = SPI(1)
-        self._spi.init(baudrate=2000000,
-                       polarity=0,
-                       phase=0,
-                       sck=Pin(pins.SCK),
-                       mosi=Pin(pins.MOSI),
-                       miso=Pin(pins.MISO))
+        self._spi.init(
+            baudrate=2000000,
+            polarity=0,
+            phase=0,
+            sck=Pin(pins.SCK),
+            mosi=Pin(pins.MOSI),
+            miso=Pin(pins.MISO),
+        )
         logger.debug("\tSPI - [ OK ]")
 
         self._cs = Pin(pins.CS)
         self._dc = Pin(pins.DC)
         self._rst = Pin(pins.RST)
         self._busy = Pin(pins.BUSY)
-        self._resolution = pack('!HH', self.width, self.height)
+        self._resolution = pack("!HH", self.width, self.height)
 
         self._cs.init(self._cs.OUT, value=1)
         self._dc.init(self._dc.OUT, value=0)
@@ -139,23 +142,23 @@ class EPD:
         self._wait4ready()
 
         sleep_ms(10)
-        self._cmd(ACEP_PANEL_SETTING, b'\xEF\x08')
-        self._cmd(ACEP_POWER_SETTING, b'\x37\x00\x23\x23')
-        self._cmd(ACEP_POWER_OFF_SEQUENCE, b'\x00')
-        self._cmd(ACEP_BOOSTER_SOFT_START, b'\xC7\xC7\x1D')
-        self._cmd(ACEP_PLL, b'\x3C')
-        self._cmd(ACEP_TSE, b'\x00')
-        self._cmd(ACEP_CDI, b'\x37')
-        self._cmd(ACEP_TCON, b'\x22')
+        self._cmd(ACEP_PANEL_SETTING, b"\xEF\x08")
+        self._cmd(ACEP_POWER_SETTING, b"\x37\x00\x23\x23")
+        self._cmd(ACEP_POWER_OFF_SEQUENCE, b"\x00")
+        self._cmd(ACEP_BOOSTER_SOFT_START, b"\xC7\xC7\x1D")
+        self._cmd(ACEP_PLL, b"\x3C")
+        self._cmd(ACEP_TSE, b"\x00")
+        self._cmd(ACEP_CDI, b"\x37")
+        self._cmd(ACEP_TCON, b"\x22")
         self._cmd(ACEP_RESOLUTION, self._resolution)
-        self._cmd(ACEP_PWS, b'\xAA')
+        self._cmd(ACEP_PWS, b"\xAA")
         sleep_ms(100)
 
     @micropython.native
     def _sleep(self):
         self._cmd(ACEP_POWER_OFF)
         self._wait4ready()
-        self._cmd(ACEP_DEEP_SLEEP, b'\xA5')
+        self._cmd(ACEP_DEEP_SLEEP, b"\xA5")
 
     @micropython.native
     def _wait4ready(self):
@@ -164,4 +167,4 @@ class EPD:
                 return
             sleep_ms(10)
 
-        raise RuntimeError('EPD Timeout')
+        raise RuntimeError("EPD Timeout")

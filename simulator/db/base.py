@@ -10,7 +10,7 @@ class Db:
         self._cnt = cnt
 
         try:
-            mkdir('var')
+            mkdir("var")
         except OSError:
             ...
 
@@ -28,17 +28,19 @@ class Db:
                     if isinstance(i, DbStruct):
                         structures.add(type(i))
 
-        with open(f'var/_{self._name}.py', 'w') as f:
+        with open(f"var/_{self._name}.py", "w") as f:
             for s in structures:
-                f.write(f'from db.structs import {s.__name__}\n')
-            f.write(f'''from db.base import Db
+                f.write(f"from db.structs import {s.__name__}\n")
+            f.write(
+                f"""from db.base import Db
 class Data(Db):
     def __init__(self):
         super().__init__('{self._name}', {self._items}, {self._cnt+1})
-''')
+"""
+            )
 
     def __getattr__(self, name):
-        if name[0] == '_':
+        if name[0] == "_":
             return super().__getattr__(name)
 
         try:
@@ -47,7 +49,7 @@ class Data(Db):
             raise AttributeError(name)
 
     def __setattr__(self, name, value):
-        if name[0] == '_':
+        if name[0] == "_":
             return super().__setattr__(name, value)
 
         items = self._items
@@ -62,8 +64,8 @@ def init(name, items):
     global modules
 
     try:
-        m = __import__(f'var._{name}', None, None, ['object'])
-        modules[f'db.{name}'] = m.Data()
+        m = __import__(f"var._{name}", None, None, ["object"])
+        modules[f"db.{name}"] = m.Data()
         return False
     except Exception:
         Db(name, items(), 0).flush()

@@ -42,23 +42,19 @@ class Vect:
 
     @micropython.viper
     def __add__(self, v):
-        return Vect(int(self.x) + int(v.x),
-                    int(self.y) + int(v.y))
+        return Vect(int(self.x) + int(v.x), int(self.y) + int(v.y))
 
     @micropython.viper
     def __sub__(self, v):
-        return Vect(int(self.x) - int(v.x),
-                    int(self.y) - int(v.y))
+        return Vect(int(self.x) - int(v.x), int(self.y) - int(v.y))
 
     @micropython.viper
     def __mul__(self, v: int):
-        return Vect(int(self.x) * v,
-                    int(self.y) * v)
+        return Vect(int(self.x) * v, int(self.y) * v)
 
     @micropython.viper
     def __floordiv__(self, v: int):
-        return Vect(int(self.x) // v,
-                    int(self.y) // v)
+        return Vect(int(self.x) // v, int(self.y) // v)
 
     @micropython.native
     def __gt__(self, v):
@@ -70,7 +66,7 @@ class Vect:
 
     @micropython.native
     def __repr__(self):
-        return f'Vect(x={self.x}, y={self.y})'
+        return f"Vect(x={self.x}, y={self.y})"
 
 
 Zero = Vect(0, 0)
@@ -87,8 +83,8 @@ class Bitmap:
         self.buf = bmp[2]
 
         if isinstance(self.buf, int):
-            name = f'bitmap/acep_rotated/{bmp[3]}.bin'
-            f = open(name, 'rb')
+            name = f"bitmap/acep_rotated/{bmp[3]}.bin"
+            f = open(name, "rb")
             try:
                 f.seek(self.buf)
                 b = f.read(bmp[0] * bmp[1] // 2)
@@ -174,8 +170,8 @@ def bmt(fonts, char, variant, size, color):
     s = fb[2]
 
     if isinstance(s, int):
-        name = f'bitmap/acep_rotated/{fb[3]}.bin'
-        with open(name, 'rb') as f:
+        name = f"bitmap/acep_rotated/{fb[3]}.bin"
+        with open(name, "rb") as f:
             f.seek(s)
             s = fb[2] = bytearray(f.read(fb[0] * fb[1] // 2))
 

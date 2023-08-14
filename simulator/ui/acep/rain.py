@@ -1,4 +1,5 @@
 from ulogging import getLogger
+
 logger = getLogger(__name__)
 
 from .. import UiFrame, V, BLACK, WHITE, BLUE, GREEN, YELLOW, RED
@@ -24,12 +25,14 @@ class UiRain(UiFrame):
                     for h in (q, q2, q3):
                         if r > h:
                             r = h + (r - h) // 2
-                    v, d = V(x - int(block // 2) + 1, self.height - r - 1), V(int(block) - 2, r)
+                    v, d = V(x - int(block // 2) + 1, self.height - r - 1), V(
+                        int(block) - 2, r
+                    )
                 else:
                     v, d = None, None
 
                 if (max(fl.rain, fl.snow) < p) and (p > max(fr.rain, fr.snow)):
-                    t = f'{p:.1f}', V(x, self.height - 2)
+                    t = f"{p:.1f}", V(x, self.height - 2)
                 else:
                     t = None
 

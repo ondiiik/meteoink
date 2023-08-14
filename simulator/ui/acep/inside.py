@@ -1,4 +1,5 @@
 from ulogging import getLogger
+
 logger = getLogger(__name__)
 
 from micropython import const
@@ -26,16 +27,20 @@ class UiInside(UiFrame):
 
         # Type weather details
         dt = self.ui.forecast.time.get_date_time(self.ui.forecast.weather.dt)
-        dt = f'{dt[2]:d}.{dt[1]:d}.{dt[0]:d} {dt[3]:d}:{dt[4]:02d}'
+        dt = f"{dt[2]:d}.{dt[1]:d}.{dt[0]:d} {dt[3]:d}:{dt[4]:02d}"
 
         if layout_2:
             y = self.dim.y - 20
             self.ui.text(16, dt, V(5, y))
             y -= SPACING
-            self.ui.text(16, location.LOCATIONS[connection.config.location].name, V(5, y), BLUE)
+            self.ui.text(
+                16, location.LOCATIONS[connection.config.location].name, V(5, y), BLUE
+            )
         else:
             y = batt.bellow + 4
             x = self.dim.x - 2
-            self.ui.text_right(16, location.LOCATIONS[connection.config.location].name, V(x, y), BLUE)
+            self.ui.text_right(
+                16, location.LOCATIONS[connection.config.location].name, V(x, y), BLUE
+            )
             y += SPACING
             self.ui.text_right(16, dt, V(x, y))

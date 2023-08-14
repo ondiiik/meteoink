@@ -6,5 +6,5 @@ def print_exception(font):
     traceback.print_exc()
 
 
-Implementation = namedtuple('Implementation', ('name', 'version', 'mpy'))
-implementation = Implementation('pc', (1, 15, 0), 10757)
+Implementation = namedtuple("Implementation", ("name", "version", "mpy"))
+implementation = Implementation("pc", (1, 15, 0), 10757)

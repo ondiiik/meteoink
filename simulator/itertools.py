@@ -84,7 +84,6 @@ def iter(*args):
         return builtins.iter(args[0])
 
     class _iter:
-
         def __init__(self, args):
             self.f, self.sentinel = args
 

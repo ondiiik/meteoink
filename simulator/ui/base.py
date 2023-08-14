@@ -1,4 +1,5 @@
 from ulogging import getLogger, dump_exception
+
 logger = getLogger(__name__)
 
 from bitmap import FONTS, BMP, WIND
@@ -43,7 +44,7 @@ class UiFrame:
         try:
             self.draw(*args)
         except Exception as e:
-            dump_exception(f'Skipped {type(self).__name__} repaint', e)
+            dump_exception(f"Skipped {type(self).__name__} repaint", e)
             self.canvas.rect(Z, self.dim, ORANGE)
             self.canvas.line(Z, self.dim, ORANGE)
             self.canvas.line(V(0, self.dim.y), V(self.dim.x, 0), ORANGE)
@@ -87,7 +88,9 @@ class EpdBase(Ui):
         self.forecast = forecast
         self.connection = connection
         self.led = led
-        self.block = 1 if forecast is None else self.canvas.width / (len(forecast.forecast) - 1)
+        self.block = (
+            1 if forecast is None else self.canvas.width / (len(forecast.forecast) - 1)
+        )
         self.wdt = wdt
 
     def forecast_singles(self):
@@ -125,11 +128,11 @@ class EpdBase(Ui):
             self.epd = epd
 
         def __enter__(self):
-            logger.info(f'Drawing {self.name} ...')
+            logger.info(f"Drawing {self.name} ...")
             self.epd.led.mode(self.epd.led.DRAWING)
             self.epd.canvas.clear()
 
         def __exit__(self, *args):
-            logger.info(f'Flushing {self.name} ...')
+            logger.info(f"Flushing {self.name} ...")
             self.epd.led.mode(self.epd.led.FLUSHING)
             self.epd.canvas.flush()

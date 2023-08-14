@@ -1,4 +1,5 @@
 from ulogging import getLogger
+
 logger = getLogger(__name__)
 
 from jumpers import jumpers
@@ -35,14 +36,32 @@ class Connection:
         self._ifc.active(False)
 
         # Start requested variant of connection
-        if jumpers.hotspot or not connection.CONNECTIONS or not location.LOCATIONS or not api.APIKEY:
+        use_hotspot = False
+
+        if jumpers.hotspot:
+            logger.info('Setting hotspot by jumper')
+            use_hotspot = True
+        
+        if not connection.CONNECTIONS:
+            logger.warning('Forcing hotspot: Missing WiFi setup')
+            use_hotspot = True
+            
+        if not location.LOCATIONS:
+            logger.warning('Forcing hotspot: Missing Location')
+            use_hotspot = True
+
+        if not api.APIKEY:
+            logger.warning('Forcing hotspot: Missing API key')
+            use_hotspot = True
+        
+        if use_hotspot:
             self._hotspot()
         else:
             self._attach()
 
     def _attach(self):
         # Activate WiFi interface
-        logger.info(f'Connecting to WiFi ...')
+        logger.info(f"Connecting to WiFi ...")
         self._ifc = WLAN(STA_IF)
 
         if not self._ifc.active(True):
@@ -81,11 +100,11 @@ class Connection:
 
         for i in range(30):
             if self._ifc.isconnected():
-                logger.info(f'Connected: {str(self.ifconfig)}')
+                logger.info(f"Connected: {str(self.ifconfig)}")
                 self.is_hotspot = False
                 return
 
-            logger.debug(f'Connecting ...')
+            logger.debug(f"Connecting ...")
             sleep(1)
 
         raise RuntimeError("Wifi connection refused")
@@ -100,14 +119,14 @@ class Connection:
             sleep(1)
 
         self.is_hotspot = True
-        logger.info(f'Running hotspot: {str(self.ifconfig)}')
+        logger.info(f"Running hotspot: {str(self.ifconfig)}")
 
     @property
     def ifconfig(self):
         return self._ifc.ifconfig()
 
     def http_get_json(self, url):
-        logger.info(f'HTTP GET: {url}')
+        logger.info(f"HTTP GET: {url}")
 
         for retry in range(CONN_RETRY_CNT):
             try:
@@ -115,14 +134,14 @@ class Connection:
                 collect()
                 return
             except OSError as e:
-                logger.warning('ECONNRESET -> retry')
+                logger.warning("ECONNRESET -> retry")
                 if e.errno == ECONNRESET:
                     continue
 
                 raise e
 
     def disconnect(self):
-        logger.info(f'Disconnecting from WiFi ...')
+        logger.info(f"Disconnecting from WiFi ...")
         WLAN(STA_IF).active(False)
         WLAN(AP_IF).active(False)
         self._ifc = None

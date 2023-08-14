@@ -1,4 +1,5 @@
 from ulogging import getLogger
+
 logger = getLogger(__name__)
 
 from .. import UiFrame, V, Z, BLACK, GREEN
@@ -42,7 +43,11 @@ class UiCalendar(UiFrame):
             # Draw weekends
             if show_days and ((dt[6] == 5) or (dt[6] == 6)):
                 if first:
-                    self.canvas.trect(V(int(x - dt[3] // hpi * hpi * block / hpi), 1), V(dblock, 26), GREEN)
+                    self.canvas.trect(
+                        V(int(x - dt[3] // hpi * hpi * block / hpi), 1),
+                        V(dblock, 26),
+                        GREEN,
+                    )
                 if 0 == hour:
                     self.canvas.trect(V(x, 1), V(dblock, 26), GREEN)
 

@@ -1,4 +1,5 @@
 from ulogging import getLogger
+
 logger = getLogger(__name__)
 from gc import collect
 from jumpers import jumpers
@@ -19,16 +20,32 @@ class Wifi:
 
 class Connection:
     def __init__(self):
-        self.is_hotspot = (jumpers.hotspot or not connection.CONNECTIONS or not location.LOCATIONS or not api.APIKEY)
+        self.is_hotspot = False
+
+        if jumpers.hotspot:
+            logger.info('Setting hotspot by jumper')
+            self.is_hotspot = True
+        
+        if not connection.CONNECTIONS:
+            logger.warning('Forcing hotspot: Missing WiFi setup')
+            self.is_hotspot = True
+            
+        if not location.LOCATIONS:
+            logger.warning('Forcing hotspot: Missing Location')
+            self.is_hotspot = True
+
+        if not api.APIKEY:
+            logger.warning('Forcing hotspot: Missing API key')
+            self.is_hotspot = True
 
         if not self.is_hotspot:
             self.config = connection.CONNECTIONS[0]
 
-        self.nets = [Wifi('mynet1', b'aaaaaa'), Wifi('mynet2', b'bbbbbb')]
+        self.nets = [Wifi("mynet1", b"aaaaaa"), Wifi("mynet2", b"bbbbbb")]
 
     @property
     def ifconfig(self):
-        return ('192.168.1.254', '255.255.255.0', '192.168.1.255')
+        return ("192.168.1.254", "255.255.255.0", "192.168.1.255")
 
     def http_get_json(self, url):
         logger.debug("HTTP GET: " + url)
@@ -39,7 +56,7 @@ class Connection:
                 collect()
                 return
             except OSError as font:
-                logger.info('ECONNRESET -> retry')
+                logger.info("ECONNRESET -> retry")
                 if font.errno == ECONNRESET:
                     continue
 

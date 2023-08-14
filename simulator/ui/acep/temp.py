@@ -1,4 +1,5 @@
 from ulogging import getLogger
+
 logger = getLogger(__name__)
 
 from .. import UiFrame, V, BLACK, RED
@@ -15,23 +16,23 @@ class UiTemp(UiFrame):
         color = BLACK
 
         if t is None:
-            t = '--'
+            t = "--"
         else:
             if not self.inside and t >= temp.OUTDOOR_HIGH:
                 color = RED
-            t = f'{t:.1f}'
+            t = f"{t:.1f}"
 
-        s = '°C'
+        s = "°C"
         if self.inside:
             l = self.ui.text_len(35, s)
             x = self.width - l - 5
             self.ui.text(35, s, V(x, 8))
 
             l = self.ui.text_len(60, t)
-            x -= (l + 5)
+            x -= l + 5
             self.ui.text(60, t, V(x, -5), color)
 
-            bitmap = self.ui.bitmap(1, 'in')
+            bitmap = self.ui.bitmap(1, "in")
             self.canvas.bitmap(V(x - 25, self.height - 24), bitmap)
         else:
             p = self.ui.text(60, t, V(5, -5), color)

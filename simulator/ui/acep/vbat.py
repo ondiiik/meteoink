@@ -1,4 +1,5 @@
 from ulogging import getLogger
+
 logger = getLogger(__name__)
 
 from micropython import const
@@ -20,4 +21,6 @@ class UiVBat(UiFrame):
         self.canvas.rect(V(0, YOFFS - 2), V(w + 3, h))
         self.canvas.fill_rect(V(-3, h // 2 + YOFFS - 4), V(3, 5))
         self.canvas.fill_rect(V(1 + w - l, YOFFS), V(l, h - 4), color)
-        self.ui.text_center(16, f'{volt:.2}V' if vbat.SHOW_VOLTAGE else f'{p:.0%}', V(w // 2 + 2, 0))
+        self.ui.text_center(
+            16, f"{volt:.2}V" if vbat.SHOW_VOLTAGE else f"{p:.0%}", V(w // 2 + 2, 0)
+        )

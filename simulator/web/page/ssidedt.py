@@ -1,4 +1,5 @@
 from ulogging import getLogger
+
 logger = getLogger(__name__)
 
 from db import spot
@@ -8,7 +9,7 @@ import web
 
 @web.action_handler(__name__)
 def www(page, args):
-    page.heading(2, trn('Hotspot SSID'))
+    page.heading(2, trn("Hotspot SSID"))
 
-    with page.form('ssidset') as form:
-        form.input('SSID', 'id', spot.SSID)
+    with page.form("ssidset") as form:
+        form.input("SSID", "id", spot.SSID)

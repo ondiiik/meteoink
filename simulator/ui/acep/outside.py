@@ -1,4 +1,5 @@
 from ulogging import getLogger
+
 logger = getLogger(__name__)
 
 from micropython import const
@@ -18,7 +19,11 @@ class UiOutside(UiFrame):
 
         # Draw wind
         weather = self.ui.forecast.weather
-        u = UiWArrow(self.ui, V(VALWIDTH - OVERLAP, 0), V(self.width - VALWIDTH + OVERLAP, self.height))
+        u = UiWArrow(
+            self.ui,
+            V(VALWIDTH - OVERLAP, 0),
+            V(self.width - VALWIDTH + OVERLAP, self.height),
+        )
         u.repaint(weather)
 
         # Type humidity

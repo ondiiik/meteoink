@@ -37,13 +37,11 @@ from pprint import pprint
 
 
 class Flags_bits(LittleEndianStructure):
-    _fields_ = (("c1", c_uint8, 4),
-                ("c0", c_uint8, 4))
+    _fields_ = (("c1", c_uint8, 4), ("c0", c_uint8, 4))
 
 
 class Flags(Union):
-    _fields_ = [("colors", Flags_bits),
-                ("asbyte", c_uint8)]
+    _fields_ = [("colors", Flags_bits), ("asbyte", c_uint8)]
 
 
 class Color:
@@ -58,25 +56,45 @@ class Color:
 
 
 from itertools import combinations
-usable_colors = Color.BLACK, Color.WHITE, Color.GREEN, Color.BLUE, Color.RED, Color.YELLOW, Color.ORANGE
+
+usable_colors = (
+    Color.BLACK,
+    Color.WHITE,
+    Color.GREEN,
+    Color.BLUE,
+    Color.RED,
+    Color.YELLOW,
+    Color.ORANGE,
+)
 color_combinations = [(c, c) for c in usable_colors]
-color_combinations += (Color.WHITE, Color.BLACK), (Color.WHITE, Color.BLUE), (Color.WHITE, Color.YELLOW), (Color.GREEN, Color.BLUE), (Color.RED, Color.BLUE)
+color_combinations += (
+    (Color.WHITE, Color.BLACK),
+    (Color.WHITE, Color.BLUE),
+    (Color.WHITE, Color.YELLOW),
+    (Color.GREEN, Color.BLUE),
+    (Color.RED, Color.BLUE),
+)
 color_combinations += list(combinations(usable_colors, 2))
 
-usable_colors_map = {Color.BLACK: np.array((0, 0, 0)),
-                     Color.WHITE: np.array((255, 255, 255)),
-                     Color.GREEN: np.array((0, 255, 0)),
-                     Color.BLUE: np.array((0, 0, 255)),
-                     Color.RED: np.array((255, 0, 0)),
-                     Color.YELLOW: np.array((255, 255, 0)),
-                     Color.ORANGE: np.array((255, 127, 0))}
+usable_colors_map = {
+    Color.BLACK: np.array((0, 0, 0)),
+    Color.WHITE: np.array((255, 255, 255)),
+    Color.GREEN: np.array((0, 255, 0)),
+    Color.BLUE: np.array((0, 0, 255)),
+    Color.RED: np.array((255, 0, 0)),
+    Color.YELLOW: np.array((255, 255, 0)),
+    Color.ORANGE: np.array((255, 127, 0)),
+}
 
-colr_sets = {(c1, c2): ((usable_colors_map[c1] + usable_colors_map[c2]) / 2).astype(np.uint8) for c1, c2 in color_combinations}
+colr_sets = {
+    (c1, c2): ((usable_colors_map[c1] + usable_colors_map[c2]) / 2).astype(np.uint8)
+    for c1, c2 in color_combinations
+}
 
 
 def rgb2color(rgba):
     try:
-        if (rgba[3] < 128):
+        if rgba[3] < 128:
             return Color.TRANSPARENT, Color.TRANSPARENT
     except:
         pass  # No transparency
@@ -115,8 +133,8 @@ def convert_bitmap(name, src, bmp, scales):
 
         im = np.zeros((bheight, width), dtype=np.uint8)
 
-        for y, row in zip(range(height), png[scale // 2::scale]):
-            for x, rgba in zip(range(width), row[scale // 2::scale]):
+        for y, row in zip(range(height), png[scale // 2 :: scale]):
+            for x, rgba in zip(range(width), row[scale // 2 :: scale]):
                 color = rgb2color(rgba)[(x + y) % 2]
                 im[y][x] = color
 
@@ -171,35 +189,37 @@ def convert_char(name, src, fv):
 # =========================================================================================
 # Build wind_py icons
 # =========================================================================================
-src_dir = Path('bitmap/png/acep').resolve()
-wind_dir = Path('bitmap/wind/acep').resolve()
+src_dir = Path("bitmap/png/acep").resolve()
+wind_dir = Path("bitmap/wind/acep").resolve()
 wind_dir.mkdir(exist_ok=True)
 
 for level in range(5):
-    print(f'Wind icons level {level}')
-    src = src_dir.joinpath(f'svg/wa{level}.png')
+    print(f"Wind icons level {level}")
+    src = src_dir.joinpath(f"svg/wa{level}.png")
 
     for angle in range(0, 360, 15):
-        py = wind_dir.joinpath(f'wa{level}{angle}.png')
+        py = wind_dir.joinpath(f"wa{level}{angle}.png")
         os.system(f'convert "{src}" -background none -rotate {angle} "{py}"')
 
-dst_dir = Path('../micropython/bitmap/acep_rotated').resolve()
+dst_dir = Path("../micropython/bitmap/acep_rotated").resolve()
 dst_dir.mkdir(exist_ok=True)
-wind_py = dst_dir.joinpath('wind.py')
-wind_bin = dst_dir.joinpath('wind.bin')
+wind_py = dst_dir.joinpath("wind.py")
+wind_bin = dst_dir.joinpath("wind.bin")
 
-with wind_py.open('w') as py, wind_bin.open('wb') as bin:
-    py.write('''from ulogging import getLogger
+with wind_py.open("w") as py, wind_bin.open("wb") as bin:
+    py.write(
+        """from ulogging import getLogger
 logger = getLogger(__name__)
 
-WIND = ''')
+WIND = """
+    )
 
     # Build basic structure
     wind = {}
     srcs = os.listdir(wind_dir)
     srcs.sort()
     for src_name in srcs:
-        if not src_name.endswith('.png'):
+        if not src_name.endswith(".png"):
             continue
         level = int(src_name[2:3])
         level = wind.setdefault(level, dict())
@@ -215,7 +235,7 @@ WIND = ''')
             for variant, value in angle.items():
                 data = value[2]
                 bin.write(data)
-                angle[variant] = [value[0], value[1], idx, 'wind']
+                angle[variant] = [value[0], value[1], idx, "wind"]
                 idx += len(data)
 
     pprint(wind, py, width=160)
@@ -224,21 +244,23 @@ WIND = ''')
 # =========================================================================================
 # Create bitmaps
 # =========================================================================================
-bitmap_py = dst_dir.joinpath('bmp.py')
-bitmap_bin = dst_dir.joinpath('bmp.bin')
+bitmap_py = dst_dir.joinpath("bmp.py")
+bitmap_bin = dst_dir.joinpath("bmp.bin")
 
-with bitmap_py.open('w') as py, bitmap_bin.open('wb') as bin:
-    py.write('''from ulogging import getLogger
+with bitmap_py.open("w") as py, bitmap_bin.open("wb") as bin:
+    py.write(
+        """from ulogging import getLogger
 logger = getLogger(__name__)
 
-BMP = ''')
+BMP = """
+    )
 
-#   # Build basic structure
+    #   # Build basic structure
     bmp = {}
     srcs = os.listdir(src_dir)
     srcs.sort()
     for src_name in srcs:
-        if not src_name.endswith('.png'):
+        if not src_name.endswith(".png"):
             continue
         src = src_dir.joinpath(src_name)
         convert_bitmap(src_name[:-4], src, bmp, (1, 4, 5))
@@ -249,7 +271,7 @@ BMP = ''')
         for variant, value in size.items():
             data = value[2]
             bin.write(data)
-            size[variant] = [value[0], value[1], idx, 'bmp']
+            size[variant] = [value[0], value[1], idx, "bmp"]
             idx += len(data)
 
     pprint(bmp, py, width=160)
@@ -258,19 +280,25 @@ BMP = ''')
 # =========================================================================================
 # Create fonts
 # =========================================================================================
-src_dir = Path('bitmap/font/acep')
-fonts_py = dst_dir.joinpath('fonts.py')
-fonts_bin = dst_dir.joinpath('fonts.bin')
+src_dir = Path("bitmap/font/acep")
+fonts_py = dst_dir.joinpath("fonts.py")
+fonts_bin = dst_dir.joinpath("fonts.bin")
 
-with fonts_py.open('w') as py, fonts_bin.open('wb') as bin:
-    py.write('''from ulogging import getLogger
+with fonts_py.open("w") as py, fonts_bin.open("wb") as bin:
+    py.write(
+        """from ulogging import getLogger
 logger = getLogger(__name__)
 
-FONTS = ''')
+FONTS = """
+    )
 
-#   # Build basic structure
+    #   # Build basic structure
     dirs = os.listdir(src_dir)
-    dirs.sort(key=lambda n: int(n[:1], 16) * 0x1000 + int(n[1:3], 16) * 0x100000 + int(n[3:-4], 16))
+    dirs.sort(
+        key=lambda n: int(n[:1], 16) * 0x1000
+        + int(n[1:3], 16) * 0x100000
+        + int(n[3:-4], 16)
+    )
     fonts = {}
 
     for src_name in dirs:
@@ -293,7 +321,7 @@ FONTS = ''')
                         if isinstance(data, int):
                             continue
                         bin.write(data)
-                        font[variant] = [value[0], value[1], idx, 'fonts']
+                        font[variant] = [value[0], value[1], idx, "fonts"]
                         idx += len(data)
 
     pprint(fonts, py, width=160)

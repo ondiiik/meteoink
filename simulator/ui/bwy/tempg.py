@@ -1,4 +1,5 @@
 from ulogging import getLogger
+
 logger = getLogger(__name__)
 
 from .. import UiFrame, V, BLACK, WHITE, YELLOW
@@ -26,12 +27,18 @@ class UiTempGr(UiFrame):
 
     def chart_draw(self, w, c, th=None, tl=None):
         for x1, f1, x2, f2 in self.ui.forecast_blocks():
-            if (th is None):
+            if th is None:
                 v1 = V(x1, self.chart_y(f1.feel))
                 v2 = V(x2, self.chart_y(f2.feel))
                 self.canvas.line(v1, v2, c, w)
 
-            if (th is None) or (f1.feel > th) or (f2.feel > th) or (f1.feel < tl) or (f2.feel < tl):
+            if (
+                (th is None)
+                or (f1.feel > th)
+                or (f2.feel > th)
+                or (f1.feel < tl)
+                or (f2.feel < tl)
+            ):
                 v1 = V(x1, self.chart_y(f1.temp))
                 v2 = V(x2, self.chart_y(f2.temp))
                 self.canvas.line(v1, v2, c, w * 2)

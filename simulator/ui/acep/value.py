@@ -1,4 +1,5 @@
 from ulogging import getLogger
+
 logger = getLogger(__name__)
 
 from micropython import const
@@ -17,13 +18,13 @@ class UiValue(UiFrame):
     def draw(self, val):
         if val is None:
             c = BLACK
-            t = '--'
+            t = "--"
         else:
             c = self.valcolor(val)
             t = self.fmt.format(val)
 
         self.ui.text_right(35, t, V(self.width - SYMDIST, 0), c, WHITE)
-        self.ui.text(16, self.units,  V(self.width - SYMDISTS, 11), BLACK, WHITE)
+        self.ui.text(16, self.units, V(self.width - SYMDISTS, 11), BLACK, WHITE)
 
     def valcolor(self, val):
         return BLACK

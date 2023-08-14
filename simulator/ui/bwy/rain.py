@@ -1,5 +1,6 @@
 from ulogging import getLogger
 from display.base import YELLOW
+
 logger = getLogger(__name__)
 
 from .. import UiFrame, V, BLACK, WHITE
@@ -33,4 +34,4 @@ class UiRain(UiFrame):
 
             # Type rain text
             if (max(fl.rain, fl.snow) < p) and (p > max(fr.rain, fr.snow)):
-                self.ui.text_center(10, '%.1f' % p, V(x, self.dim.y - 2), BLACK, WHITE)
+                self.ui.text_center(10, "%.1f" % p, V(x, self.dim.y - 2), BLACK, WHITE)

@@ -36,15 +36,15 @@ class Pin:
         self.n = n
 
     def on(self):
-        #print(f'PIN {self.n} ON')
+        # print(f'PIN {self.n} ON')
         pass
 
     def off(self):
-        #print(f'PIN {self.n} OFF')
+        # print(f'PIN {self.n} OFF')
         pass
 
     def value(self):
-        print(f'PIN {self.n} {_pins[self.n]}')
+        print(f"PIN {self.n} {_pins[self.n]}")
         return _pins[self.n]
 
 
@@ -64,7 +64,7 @@ class ADC:
 
 class PWM:
     def __init__(self, pin, freq, duty):
-        print('BEEP', freq)
+        print("BEEP", freq)
 
     def duty(self, v):
         pass
@@ -76,13 +76,22 @@ class PWM:
         pass
 
 
-class RTC():
+class RTC:
     def __init__(self):
         pass
 
     def datetime(self):
         dt = datetime.datetime.now().timetuple()
-        return dt.tm_year, dt.tm_mon, dt.tm_mday, dt.tm_wday, dt.tm_hour, dt.tm_min, dt.tm_sec, dt.tm_yday
+        return (
+            dt.tm_year,
+            dt.tm_mon,
+            dt.tm_mday,
+            dt.tm_wday,
+            dt.tm_hour,
+            dt.tm_min,
+            dt.tm_sec,
+            dt.tm_yday,
+        )
 
     def init(self, v):
         pass
@@ -93,7 +102,7 @@ def freq(max_freq):
 
 
 def deepsleep(t=0):
-    print('Deep sleep ....')
+    print("Deep sleep ....")
     for i in range(t // 1000):
         _check_events()
         time.sleep(1)
@@ -101,7 +110,7 @@ def deepsleep(t=0):
 
 
 def reset():
-    print('Reset ....')
+    print("Reset ....")
     sys.exit()
 
 
@@ -117,11 +126,11 @@ def _check_events():
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            print('Bye bye ...')
+            print("Bye bye ...")
             sys.exit(0)
 
         else:
-            print('EVENT:', event)
+            print("EVENT:", event)
 
 
 PWRON_RESET = 1

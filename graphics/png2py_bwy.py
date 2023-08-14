@@ -37,13 +37,11 @@ from pprint import pprint
 
 
 class Flags_bits(LittleEndianStructure):
-    _fields_ = (("c1", c_uint8, 4),
-                ("c0", c_uint8, 4))
+    _fields_ = (("c1", c_uint8, 4), ("c0", c_uint8, 4))
 
 
 class Flags(Union):
-    _fields_ = [("colors", Flags_bits),
-                ("asbyte", c_uint8)]
+    _fields_ = [("colors", Flags_bits), ("asbyte", c_uint8)]
 
 
 class Color:
@@ -58,10 +56,10 @@ class Color:
 
 
 def rgb2color(rgba):
-    if (rgba[3] < 128):
+    if rgba[3] < 128:
         return (Color.TRANSPARENT, Color.TRANSPARENT)
 
-    if (rgba[0] != rgba[2]):
+    if rgba[0] != rgba[2]:
         if rgba[2] > 127:
             return (Color.YELLOW, Color.WHITE)
         if rgba[0] < 85:
@@ -79,9 +77,9 @@ def convert(name, src_file_name, dst, scales=(None,)):
     use_scale = not scales[0] is None
 
     if use_scale:
-        dst.write(f'        {repr(name)} : {{')
+        dst.write(f"        {repr(name)} : {{")
     else:
-        dst.write(f'    {repr(name)} : {{ 0 : ')
+        dst.write(f"    {repr(name)} : {{ 0 : ")
 
     for scale in scales:
         if scale is None:
@@ -93,20 +91,22 @@ def convert(name, src_file_name, dst, scales=(None,)):
         bwidth = width + (1 if width % 2 else 0)
 
         if use_scale:
-            dst.write(f'{scale} : ({bwidth}, {height}, ')
+            dst.write(f"{scale} : ({bwidth}, {height}, ")
         else:
-            dst.write(f'({bwidth}, {height}, ')
+            dst.write(f"({bwidth}, {height}, ")
 
         buff = bytearray()
 
-        print(f'Converting "{src_file_name}" to "{name}" - {bwidth} x {height} ({scale} : 1) ...')
+        print(
+            f'Converting "{src_file_name}" to "{name}" - {bwidth} x {height} ({scale} : 1) ...'
+        )
         pix = Flags()
         pix.asbyte = 0
 
         im = numpy.zeros((bwidth, height), dtype=numpy.uint8)
 
-        for y, row in zip(range(height), png[scale // 2::scale]):
-            for x, rgba in zip(range(width), row[scale // 2::scale]):
+        for y, row in zip(range(height), png[scale // 2 :: scale]):
+            for x, rgba in zip(range(width), row[scale // 2 :: scale]):
                 color = rgb2color(rgba)[(x + y) % 2]
                 im[x][y] = color
 
@@ -122,10 +122,10 @@ def convert(name, src_file_name, dst, scales=(None,)):
                 pix.colors.c1 = Color.TRANSPARENT
                 buff.extend([pix.asbyte])
 
-        dst.write(f' bytearray({bytes(buff)})),')
+        dst.write(f" bytearray({bytes(buff)})),")
         if use_scale:
-            dst.write('\n')
-    dst.write('    },\n')
+            dst.write("\n")
+    dst.write("    },\n")
 
 
 def convert_bitmap(name, src, bmp, scales):
@@ -144,8 +144,8 @@ def convert_bitmap(name, src, bmp, scales):
 
         im = numpy.zeros((bwidth, height), dtype=numpy.uint8)
 
-        for y, row in zip(range(height), png[scale // 2::scale]):
-            for x, rgba in zip(range(width), row[scale // 2::scale]):
+        for y, row in zip(range(height), png[scale // 2 :: scale]):
+            for x, rgba in zip(range(width), row[scale // 2 :: scale]):
                 color = rgb2color(rgba)[(x + y) % 2]
                 im[x][y] = color
 
@@ -200,23 +200,25 @@ def convert_char(name, src, fv):
     fv[name] = bwidth, height, buff
 
 
-src_dir = Path('bitmap/png/bwy').resolve()
-dst_dir = Path('../micropython/bitmap/bwy').resolve()
+src_dir = Path("bitmap/png/bwy").resolve()
+dst_dir = Path("../micropython/bitmap/bwy").resolve()
 dst_dir.mkdir(exist_ok=True)
 
-bitmap = dst_dir.joinpath('bmp.py')
+bitmap = dst_dir.joinpath("bmp.py")
 
-with bitmap.open('w') as dst:
-    dst.write('''from ulogging import getLogger
+with bitmap.open("w") as dst:
+    dst.write(
+        """from ulogging import getLogger
 logger = getLogger(__name__)
 
-BMP = ''')
+BMP = """
+    )
 
     bmp = {}
     srcs = os.listdir(src_dir)
     srcs.sort()
     for src_name in srcs:
-        if not src_name.endswith('.png'):
+        if not src_name.endswith(".png"):
             continue
         src = os.path.join(src_dir, src_name)
         convert_bitmap(src_name[:-4], src, bmp, (1, 4, 5))
@@ -224,17 +226,23 @@ BMP = ''')
     pprint(bmp, dst, width=160)
 
 
-src_dir = Path('bitmap/font/bwy')
-fonts_path = dst_dir.joinpath('fonts.py')
+src_dir = Path("bitmap/font/bwy")
+fonts_path = dst_dir.joinpath("fonts.py")
 
-with fonts_path.open('w') as dst:
-    dst.write('''from ulogging import getLogger
+with fonts_path.open("w") as dst:
+    dst.write(
+        """from ulogging import getLogger
 logger = getLogger(__name__)
 
-FONTS = ''')
+FONTS = """
+    )
 
     dirs = os.listdir(src_dir)
-    dirs.sort(key=lambda n: int(n[:1], 16) * 0x1000 + int(n[1:3], 16) * 0x100000 + int(n[3:-4], 16))
+    dirs.sort(
+        key=lambda n: int(n[:1], 16) * 0x1000
+        + int(n[1:3], 16) * 0x100000
+        + int(n[3:-4], 16)
+    )
     fonts = {}
 
     for src_name in dirs:
