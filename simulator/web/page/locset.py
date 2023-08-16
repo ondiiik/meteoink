@@ -2,7 +2,7 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from db import location
+from config import location
 import web
 
 
@@ -12,10 +12,10 @@ def www(page, args):
     gps = [
         float(ll[:-1] if ll[-1] in ("N", "E") else ll) for ll in args["gps"].split(",")
     ]
-    location = location.LOCATIONS[i]
-    location.name = args["name"]
-    location.lat = gps[0]
-    location.lon = gps[1]
+    l = location["locations"][i]
+    l["name"] = args["name"]
+    l["lat"] = gps[0]
+    l["lon"] = gps[1]
     location.flush()
 
     web.index(page)

@@ -2,7 +2,7 @@ from collections import namedtuple
 import traceback
 
 
-def print_exception(font):
+def print_exception(exc):
     traceback.print_exc()
 
 

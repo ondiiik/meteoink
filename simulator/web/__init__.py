@@ -238,14 +238,6 @@ def button_enable(flag, url):
     return button(trn("Disable" if flag else "Enable"), url + ("d" if flag else "e"))
 
 
-def bssid2bytes(bssid):
-    b1 = bssid.split(":")
-    b2 = []
-    for i in range(6):
-        b2.append(int(b1[i], 16))
-    return bytes(b2)
-
-
 def bytes2bssid(bssid):
     return ":".join("{:02x}".format(b) for b in bssid)
 

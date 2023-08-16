@@ -4,7 +4,7 @@ logger = getLogger(__name__)
 
 from .. import UiFrame, V, BLACK, RED, GREEN, ORANGE, BLUE
 from micropython import const
-from db import temp
+from config import temp
 
 
 class UiTempGr(UiFrame):
@@ -29,12 +29,12 @@ class UiTempGr(UiFrame):
                 dl = (rl < f1.dt < rh) or (rl < f1.dt < rh)
 
                 v = max(f1.feel, f2.feel, f1.temp, f2.temp)
-                if v > temp.OUTDOOR_HIGH:
+                if v > temp["outdoor_high"]:
                     d = self.canvas.vtrap
                     c = ORANGE if dl else RED
                 else:
                     v = min(f1.feel, f2.feel, f1.temp, f2.temp)
-                    if v < temp.OUTDOOR_LOW:
+                    if v < temp["outdoor_low"]:
                         d = self.canvas.vttrap if dl else self.canvas.vtrap
                         c = BLUE
                     else:

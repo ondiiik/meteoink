@@ -2,7 +2,7 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from db import beep, location, connection, spot, temp, vbat, ui, time, api
+from config import beep, location, connection, spot, temp, vbat, ui, time, api
 from battery import battery
 from lang import trn
 import web
@@ -16,13 +16,13 @@ def index(page):
         'frame="hsides"',
         'style="text-align:left"',
     ) as table:
-        for i in location.LOCATIONS:
-            idx = {"idx": location.LOCATIONS.index(i)}
+        for i in location["locations"]:
+            idx = {"idx": location["locations"].index(i)}
             table.row(
                 (
-                    i.name,
-                    f"{i.lat:.7f}N",
-                    f"{i.lon:.7f}E",
+                    i["name"],
+                    f"{i['lat']:.7f}N",
+                    f"{i['lon']:.7f}E",
                     web.button(trn("Edit"), "locedt", idx),
                     web.button(trn("Delete"), "locdlt", idx),
                 ),
@@ -39,20 +39,20 @@ def index(page):
         'frame="hsides"',
         'style="text-align:left"',
     ) as table:
-        for i in connection.CONNECTIONS:
-            if i.bssid is None:
+        for i in connection["connections"]:
+            if i["bssid"] is None:
                 bssid = ""
             else:
-                bssid = web.bytes2bssid(i.bssid)
+                bssid = i["bssid"]
 
-            idx = {"idx": connection.CONNECTIONS.index(i)}
-            loc = int(i.location)
+            idx = {"idx": connection["connections"].index(i)}
+            loc = int(i["location"])
             table.row(
                 (
-                    i.ssid,
+                    i["ssid"],
                     bssid,
-                    location.LOCATIONS[loc].name
-                    if loc < len(location.LOCATIONS)
+                    location["locations"][loc]["name"]
+                    if loc < len(location["locations"])
                     else "...",
                     web.button(trn("Edit"), "wifiedt", idx),
                     web.button(trn("Delete"), "wifidlt", idx),
@@ -67,13 +67,13 @@ def index(page):
     page.heading(2, trn("Confort temperatures"))
     with page.table(None, 'frame="hsides"') as table:
         table.row(
-            (trn("Indoor high"), "{:.1f} °C".format(temp.INDOOR_HIGH)), web.SPACES
+            (trn("Indoor high"), "{:.1f} °C".format(temp["indoor_high"])), web.SPACES
         )
         table.row(
-            (trn("Outdoor high"), "{:.1f} °C".format(temp.OUTDOOR_HIGH)), web.SPACES
+            (trn("Outdoor high"), "{:.1f} °C".format(temp["outdoor_high"])), web.SPACES
         )
         table.row(
-            (trn("Outdoor low"), "{:.1f} °C".format(temp.OUTDOOR_LOW)), web.SPACES
+            (trn("Outdoor low"), "{:.1f} °C".format(temp["outdoor_low"])), web.SPACES
         )
         table.row((web.button(trn("Edit temperatures"), "tempedt"), ""), web.SPACES)
 
@@ -82,14 +82,14 @@ def index(page):
         table.row(
             (
                 trn("Outside temperature balanced"),
-                web.button_enable(beep.TEMP_BALANCED, "alerttemp"),
+                web.button_enable(beep["temp_balanced"], "alerttemp"),
             ),
             web.SPACES,
         )
         table.row(
             (
                 trn("Software bug detected"),
-                web.button_enable(beep.ERROR_BEEP, "alertbug"),
+                web.button_enable(beep["error_beep"], "alertbug"),
             ),
             web.SPACES,
         )
@@ -97,41 +97,43 @@ def index(page):
     page.heading(2, trn("General setup"))
     with page.table(None, 'frame="hsides"') as table:
         table.row(
-            (trn("Summer time"), "", web.button_enable(not time.WINTER, "summert")),
+            (trn("Summer time"), "", web.button_enable(not time["winter"], "summert")),
             web.SPACES,
         )
         table.row(
             (
                 trn("Refresh time"),
                 trn("{} min (doubled from {}:00 to {}:00)").format(
-                    ui.REFRESH, ui.DBL[0], ui.DBL[1]
+                    ui["refresh"], ui["dbl"][0], ui["dbl"][1]
                 ),
                 web.button(trn("Edit"), "refredt"),
             ),
             web.SPACES,
         )
         table.row(
-            (trn("Language"), api.LANGUAGE, web.button(trn("Edit"), "langedt")),
+            (trn("Language"), api["language"], web.button(trn("Edit"), "langedt")),
             web.SPACES,
         )
-        table.row((trn("Units"), api.UNITS, ""), web.SPACES)
+        table.row((trn("Units"), api["units"], ""), web.SPACES)
         table.row(
             (
                 trn("Variant"),
-                trn("Two days" if api.VARIANT == 2 else "Four days"),
+                trn("Two days" if api["variant"] == 2 else "Four days"),
                 web.button(trn("Edit"), "variantedt"),
             ),
             web.SPACES,
         )
         table.row(
-            ("API key", api.APIKEY, web.button(trn("Edit"), "apiedt")), web.SPACES
+            ("API key", api["apikey"], web.button(trn("Edit"), "apiedt")), web.SPACES
         )
 
     page.heading(2, trn("Hotspot setup"))
     with page.table(None, 'frame="hsides"') as table:
-        table.row(("SSID", spot.SSID, web.button(trn("Edit"), "ssidedt")), web.SPACES)
         table.row(
-            (trn("Password"), spot.PASSWD, web.button(trn("Edit"), "passedt")),
+            ("SSID", spot["ssid"], web.button(trn("Edit"), "ssidedt")), web.SPACES
+        )
+        table.row(
+            (trn("Password"), spot["passwd"], web.button(trn("Edit"), "passedt")),
             web.SPACES,
         )
 
@@ -143,7 +145,7 @@ def index(page):
         table.row(
             (
                 trn("Critical voltage"),
-                "{:.2f} V".format(vbat.LOW_VOLTAGE),
+                "{:.2f} V".format(vbat["low_voltage"]),
                 web.button(trn("Edit"), "battedt"),
             ),
             web.SPACES,

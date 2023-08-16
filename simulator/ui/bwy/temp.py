@@ -3,7 +3,7 @@ from ulogging import getLogger
 logger = getLogger(__name__)
 
 from .. import UiFrame, V, BLACK, YELLOW, WHITE
-from db import temp
+from config import temp
 
 
 class UiTemp(UiFrame):
@@ -22,7 +22,7 @@ class UiTemp(UiFrame):
         if t is None:
             t = "--"
         else:
-            if self.outside and t >= temp.OUTDOOR_HIGH:
+            if self.outside and t >= temp["outdoor_high"]:
                 color = YELLOW
             t = f"{t:.1f}"
 

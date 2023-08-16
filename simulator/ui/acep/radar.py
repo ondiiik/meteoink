@@ -23,7 +23,7 @@ import gc
 from framebuf import FrameBuffer, GS4_HMSB
 from micropython import const
 from io import BytesIO
-from db import location, api, ui
+from config import location, api, ui
 
 _pow2 = (
     1,
@@ -100,7 +100,7 @@ class RadarMap:
         # Load clouds forecast
         crit = self._swp_cld
         self._load_file(
-            f"https://tile.openweathermap.org/map/clouds_new/{{}}/{{}}/{{}}?appid={api.APIKEY}",
+            f"https://tile.openweathermap.org/map/clouds_new/{{}}/{{}}/{{}}?appid={api['apikey']}",
             self.map.x,
             self.map.y,
             lambda a, n: crit[a] if n[3] > 64 else ALPHA,
@@ -124,7 +124,7 @@ class RadarMap:
             )
 
         self._load_file(
-            f"https://tile.openweathermap.org/map/precipitation_new/{{}}/{{}}/{{}}?appid={api.APIKEY}",
+            f"https://tile.openweathermap.org/map/precipitation_new/{{}}/{{}}/{{}}?appid={api['apikey']}",
             self.map.x,
             self.map.y,
             scale,
@@ -205,9 +205,9 @@ class UiRadar(UiFrame):
             connection,
             wdt,
             V(self.dim.x - 4, self.dim.y),
-            location.LOCATIONS[connection.config.location].lat,
-            location.LOCATIONS[connection.config.location].lon,
-            ui.SHOW_RADAR,
+            location["locations"][connection.config["location"]]["lat"],
+            location["locations"][connection.config["location"]]["lon"],
+            ui["show_radar"],
         )
 
         self.canvas.bitmap(Z, wmap.bitmap)

@@ -47,9 +47,9 @@ def getLogger(name):
     return logger
 
 
-from db import sys
+from config import sys
 
-if sys.VERBOSE_LOG or sys.EXCEPTION_DUMP:
+if sys["verbose_log"] or sys["exception_dump"]:
     try:
         _log = open("sys.log", "a")
     except:
@@ -58,19 +58,19 @@ if sys.VERBOSE_LOG or sys.EXCEPTION_DUMP:
     _log.seek(0, 2)
 
 
-def dump_exception(msg, font):
+def dump_exception(msg, exc):
     print(msg)
-    print_exception(font)
+    print_exception(exc)
 
-    if sys.EXCEPTION_DUMP > 0:
+    if sys["exception_dump"] > 0:
         pos = _log.tell()
 
-        if pos < sys.EXCEPTION_DUMP:
+        if pos < sys["exception_dump"]:
             dt = RTC().datetime()
             _log.write(f"\n{dt[2]}.{dt[1]}.{dt[0]} {dt[4]}:{dt[5]:02} :: ")
             _log.write(msg)
             _log.write("\n")
-            print_exception(font, _log)
+            print_exception(exc, _log)
             _log.flush()
 
 
@@ -79,7 +79,7 @@ def _print(*args):
 
     pos = _log.tell()
 
-    if pos < sys.EXCEPTION_DUMP:
+    if pos < sys["exception_dump"]:
         dt = RTC().datetime()
         _log.write(f"{dt[2]}.{dt[1]}.{dt[0]} {dt[4]}:{dt[5]:02} ::")
 
@@ -90,7 +90,7 @@ def _print(*args):
         _log.flush()
 
 
-if not sys.VERBOSE_LOG:
+if not sys["verbose_log"]:
     _print = print
 
 _print(f"Loading module {__name__}")

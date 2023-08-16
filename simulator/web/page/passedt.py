@@ -2,7 +2,7 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from db import spot
+from config import spot
 from lang import trn
 import web
 
@@ -12,4 +12,4 @@ def www(page, args):
     page.heading(2, trn("Set hotspot password"))
 
     with page.form("passset") as form:
-        form.input(trn("Password"), "p", spot.PASSWD)
+        form.input(trn("Password"), "p", spot["passwd"])

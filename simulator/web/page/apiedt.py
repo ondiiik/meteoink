@@ -2,7 +2,7 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from db import api
+from config import api
 from lang import trn
 import web
 
@@ -12,4 +12,4 @@ def www(page, args):
     page.heading(2, trn("Edit API key"))
 
     with page.form("apiset") as form:
-        form.input("API key", "key", api.APIKEY)
+        form.input("API key", "key", api["apikey"])

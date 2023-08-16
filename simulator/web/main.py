@@ -34,15 +34,3 @@ class WebServer(Server):
         if page(self):
             page = __import__("web.index", None, None, ("page",), 0).page
             page(self)
-
-
-def bssid2bytes(bssid):
-    b1 = bssid.split(":")
-    b2 = []
-    for i in range(6):
-        b2.append(int(b1[i], 16))
-    return bytes(b2)
-
-
-def bytes2bssid(bssid):
-    return ":".join("{:02x}".format(b) for b in bssid)

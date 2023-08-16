@@ -3,7 +3,7 @@ from ulogging import getLogger
 logger = getLogger(__name__)
 
 from micropython import const
-from db import vbat
+from config import vbat
 from .. import UiFrame, V, ORANGE, RED, GREEN, YELLOW
 
 
@@ -14,7 +14,7 @@ class UiVBat(UiFrame):
 
         w = self.dim.x - 4
         h = self.dim.y - 22
-        p = min(max((volt - vbat.LOW_VOLTAGE) / (4.2 - vbat.LOW_VOLTAGE), 0), 1)
+        p = min(max((volt - vbat["low_voltage"]) / (4.2 - vbat["low_voltage"]), 0), 1)
         l = int(p * (w - 1))
 
         color = RED if p < 0.2 else ORANGE if p < 0.4 else YELLOW if p < 0.5 else GREEN
@@ -22,5 +22,5 @@ class UiVBat(UiFrame):
         self.canvas.fill_rect(V(-3, h // 2 + YOFFS - 4), V(3, 5))
         self.canvas.fill_rect(V(1 + w - l, YOFFS), V(l, h - 4), color)
         self.ui.text_center(
-            16, f"{volt:.2}V" if vbat.SHOW_VOLTAGE else f"{p:.0%}", V(w // 2 + 2, 0)
+            16, f"{volt:.2}V" if vbat["show_voltage"] else f"{p:.0%}", V(w // 2 + 2, 0)
         )

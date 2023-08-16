@@ -4,7 +4,7 @@ logger = getLogger(__name__)
 
 from machine import Pin, PWM
 from setup import pins
-from db import led
+from config import sys
 
 
 class Led:
@@ -17,7 +17,7 @@ class Led:
 
     def __init__(self):
         self._pin = PWM(Pin(pins.LED), freq=1, duty=0)
-        self._enabled = led.LED_ENABLED
+        self._enabled = sys["led_enabled"]
 
     def disable(self):
         self._enabled = False

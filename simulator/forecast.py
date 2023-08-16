@@ -7,7 +7,7 @@ from machine import Pin, deepsleep, RTC
 from micropython import const
 from collections import namedtuple
 from setup import pins
-from db import api, sys, location
+from config import api, sys, location
 from ltime import Time
 from buzzer import play
 
@@ -105,7 +105,7 @@ class Forecast:
         logger.info("Reading forecast data")
         self._read1(connection)
 
-        if api.VARIANT == 2:
+        if api["variant"] == 2:
             self._read2_short(connection)
         else:
             self._read2_long(connection, 96)
@@ -122,11 +122,11 @@ class Forecast:
         url = "http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}"
         fcast = connection.http_get_json(
             url.format(
-                location.LOCATIONS[connection.config.location].lat,
-                location.LOCATIONS[connection.config.location].lon,
-                api.APIKEY,
-                api.UNITS,
-                api.LANGUAGE,
+                location["locations"][connection.config["location"]]["lat"],
+                location["locations"][connection.config["location"]]["lon"],
+                api["apikey"],
+                api["units"],
+                api["language"],
                 "minutely,hourly,daily",
             )
         )
@@ -209,10 +209,10 @@ class Forecast:
         url = "http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}"
         fcast = connection.http_get_json(
             url.format(
-                location.LOCATIONS[connection.config.location].lat,
-                location.LOCATIONS[connection.config.location].lon,
-                api.APIKEY,
-                api.UNITS,
+                location["locations"][connection.config["location"]]["lat"],
+                location["locations"][connection.config["location"]]["lon"],
+                api["apikey"],
+                api["units"],
                 "EN",
                 "current,minutely,daily",
             )
@@ -272,10 +272,10 @@ class Forecast:
         url = "http://api.openweathermap.org/data/2.5/forecast?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&cnt={}"
         fcast = connection.http_get_json(
             url.format(
-                location.LOCATIONS[connection.config.location].lat,
-                location.LOCATIONS[connection.config.location].lon,
-                api.APIKEY,
-                api.UNITS,
+                location["locations"][connection.config["location"]]["lat"],
+                location["locations"][connection.config["location"]]["lon"],
+                api["apikey"],
+                api["units"],
                 "EN",
                 (hours + 2) // 3,
             )
@@ -353,7 +353,8 @@ class Forecast:
                 sensor.measure()
                 self.home = Forecast.Home(
                     sensor.temperature(),
-                    sensor.humidity() * sys.DHT_HUMI_CALIB[0] + sys.DHT_HUMI_CALIB[1],
+                    sensor.humidity() * sys["dht_humi_calib"][0]
+                    + sys["dht_humi_calib"][1],
                 )
                 return
             except:

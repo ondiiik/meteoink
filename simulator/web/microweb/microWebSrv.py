@@ -6,6 +6,7 @@ Copyright © 2018 Jean-Christophe Bos & HC² (www.hc2.fr)
 
 from json import loads, dumps
 from os import stat
+from usys import print_exception
 from _thread import start_new_thread
 import socket
 import gc
@@ -352,6 +353,7 @@ class MicroWebSrv:
                                         "MicroWebSrv handler exception:\r\n  - In route %s %s\r\n  - %s"
                                         % (self._method, self._resPath, ex)
                                     )
+                                    print_exception(ex)
                                     raise ex
                             elif self._method.upper() == "GET":
                                 filepath = self._microWebSrv._physPathFromURLPath(

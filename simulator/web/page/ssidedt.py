@@ -2,7 +2,7 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from db import spot
+from config import spot
 from lang import trn
 import web
 
@@ -12,4 +12,4 @@ def www(page, args):
     page.heading(2, trn("Hotspot SSID"))
 
     with page.form("ssidset") as form:
-        form.input("SSID", "id", spot.SSID)
+        form.input("SSID", "id", spot["ssid"])

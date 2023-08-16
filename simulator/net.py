@@ -6,7 +6,7 @@ from jumpers import jumpers
 from micropython import const
 from uerrno import ECONNRESET
 import urequests
-from db import location, connection, api
+from config import location, connection, api
 
 
 CONN_RETRY_CNT = const(6)
@@ -23,23 +23,23 @@ class Connection:
         self.is_hotspot = False
 
         if jumpers.hotspot:
-            logger.info('Setting hotspot by jumper')
-            self.is_hotspot = True
-        
-        if not connection.CONNECTIONS:
-            logger.warning('Forcing hotspot: Missing WiFi setup')
-            self.is_hotspot = True
-            
-        if not location.LOCATIONS:
-            logger.warning('Forcing hotspot: Missing Location')
+            logger.info("Setting hotspot by jumper")
             self.is_hotspot = True
 
-        if not api.APIKEY:
-            logger.warning('Forcing hotspot: Missing API key')
+        if not connection["connections"]:
+            logger.warning("Forcing hotspot: Missing WiFi setup")
+            self.is_hotspot = True
+
+        if not location["locations"]:
+            logger.warning("Forcing hotspot: Missing Location")
+            self.is_hotspot = True
+
+        if not api["apikey"]:
+            logger.warning("Forcing hotspot: Missing API key")
             self.is_hotspot = True
 
         if not self.is_hotspot:
-            self.config = connection.CONNECTIONS[0]
+            self.config = connection["connections"][0]
 
         self.nets = [Wifi("mynet1", b"aaaaaa"), Wifi("mynet2", b"bbbbbb")]
 

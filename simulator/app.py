@@ -4,7 +4,7 @@ logger = getLogger(__name__)
 
 from jumpers import jumpers
 from net import Connection
-from db import alert, display, beep, temp, vbat, ui
+from config import alert, display, beep, temp, vbat, ui
 from machine import deepsleep, reset, WDT
 from battery import battery
 from buzzer import play
@@ -25,7 +25,7 @@ def run():
         # and don't want to let it wake up during transport. In this case
         # we can put it to greetings mode, where only picture is displayed
         # and station kept sleeping till reset button is pressed
-        if DISPLAY_GREETINGS == display.DISPLAY_STATE or jumpers.sleep:
+        if DISPLAY_GREETINGS == display["display_state"] or jumpers.sleep:
             # Read all initializes all peripheries
             play((800, 30), 500, (400, 30))
             app.greetings()
@@ -58,7 +58,7 @@ def run():
     except Exception as font:
         dump_exception("FATAL - RECOVERY REQUIRED !!!", font)
 
-        if beep.ERROR_BEEP:
+        if beep["error_beep"]:
             play((200, 500), (100, 500))
 
         print("Going to emergency deep sleep for 5 minutes ...")
@@ -92,7 +92,7 @@ class App:
         # Disable LED when battery voltage is too low
         self.volt = battery.voltage
 
-        if self.volt < vbat.LOW_VOLTAGE:
+        if self.volt < vbat["low_voltage"]:
             self.led.disable()
 
         # As we uses E-Ink display, the most comfortable way
@@ -103,7 +103,7 @@ class App:
 
         # When battery voltage is too low, just draw low battery
         # error on screen and go to deep sleep.
-        if self.volt < vbat.LOW_VOLTAGE:
+        if self.volt < vbat["low_voltage"]:
             self.led.mode(Led.ALERT)
 
             ui = MeteoUi(self.canvas, None, None)
@@ -123,14 +123,15 @@ class App:
             self.net = None
             dump_exception("Network connection error", font)
 
-            if beep.ERROR_BEEP:
+            if beep["error_beep"]:
                 play((200, 500), (100, 500))
 
     def greetings(self):
         ui = MeteoUi(self.canvas, None, self.net, self.led, self.wdt)
         ui.repaint_welcome()
 
-        display.DISPLAY_STATE = DISPLAY_REFRESH
+        display["display_state"] = DISPLAY_REFRESH
+        display.flush()
         logger.info("Going to deep sleep ...")
         deepsleep()
 
@@ -161,11 +162,11 @@ class App:
 
     def allerts(self, forecast):
         # Is temperature balanced alert enabled?
-        if not beep.TEMP_BALANCED:
+        if not beep["temp_balanced"]:
             return
 
         # Is temperature outside lower then inside?
-        if temp.INDOOR_HIGH > forecast.home.temp:
+        if temp["indoor_high"] > forecast.home.temp:
             return
 
         # Do we measure during afternoon?
@@ -173,11 +174,15 @@ class App:
 
         if h == 13:
             # Reset triggered flag in morning
-            alert.ALREADY_TRIGGERED = False
+            alert["already_triggered"] = False
+            alert.flush()
             return
 
         # Didn't we already triggered alert?
-        if not alert.ALREADY_TRIGGERED and forecast.home.temp > forecast.weather.temp:
+        if (
+            not alert["already_triggered"]
+            and forecast.home.temp > forecast.weather.temp
+        ):
             # Play alert and set that it has been triggered already
             for i in range(3):
                 play(
@@ -191,7 +196,8 @@ class App:
                     (6000, 30),
                     500,
                 )
-            alert.ALREADY_TRIGGERED = True
+            alert["already_triggered"] = True
+            alert.flush()
 
     def sleep(self, forecast=None, minutes=0):
         if self.net is None:
@@ -199,13 +205,13 @@ class App:
             deepsleep(300000)
 
         if 0 == minutes:
-            minutes = ui.REFRESH
+            minutes = ui["refresh"]
             h = (
                 12
                 if forecast is None
                 else forecast.time.get_date_time(forecast.weather.dt)[3]
             )
-            b, font = ui.DBL
+            b, font = ui["dbl"]
 
             if b > font:
                 if h < font:

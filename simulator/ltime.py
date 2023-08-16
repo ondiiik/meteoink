@@ -1,4 +1,4 @@
-from db import time
+from config import time
 from utime import localtime
 from ulogging import getLogger
 
@@ -7,7 +7,7 @@ logger = getLogger(__name__)
 
 class Time:
     def __init__(self, timezone):
-        wt_offset = 3600 * time.WINTER
+        wt_offset = 3600 * time["winter"]
         self.time_offset = -946674000 - wt_offset - timezone
 
     def get_date_time(self, unix_time):

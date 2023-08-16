@@ -4,7 +4,7 @@ logger = getLogger(__name__)
 
 from .. import UiFrame, V, Z
 from .vbat import UiVBat
-from db import location
+from config import location
 
 
 class UiInside(UiFrame):
@@ -21,7 +21,9 @@ class UiInside(UiFrame):
         # Type weather details
         self.ui.text_right(10, self.ui.forecast.descr, V(self.dim.x, 15))
         self.ui.text_right(
-            10, location.LOCATIONS[connection.config.location].name, V(self.dim.x, 35)
+            10,
+            location["locations"][connection.config["location"]]["name"],
+            V(self.dim.x, 35),
         )
         dt = self.ui.forecast.time.get_date_time(self.ui.forecast.weather.dt)
         self.ui.text_right(

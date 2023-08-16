@@ -2,12 +2,13 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from db import spot
+from config import spot
 import web
 
 
 @web.action_handler(__name__)
 def www(page, args):
     p = args["p"]
-    spot.PASSWD = p
+    spot["passwd"] = p
+    spot.flush()
     web.index(page)

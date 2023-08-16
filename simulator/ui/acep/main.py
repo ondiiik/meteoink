@@ -1,7 +1,7 @@
 from ulogging import getLogger
 
 logger = getLogger(__name__)
-from db import ui
+from config import ui
 from ..base import EpdBase, V, Z
 from .calendar import UiCalendar
 from .clouds import UiClouds
@@ -32,7 +32,7 @@ class Epd(EpdBase):
                 # but temperature is.
                 logger.info("Drawing forecast ...")
 
-                if ui.SHOW_RADAR:
+                if ui["show_radar"]:
                     weather = UiRadar(self, Z, V(240, 180))
                     outside = UiOutside(self, V(weather.right, 0), V(210, 120))
                     inside = UiInside(
@@ -99,7 +99,7 @@ class Epd(EpdBase):
                 icons.repaint()
                 weather.repaint(self.connection, self.wdt)
                 outside.repaint()
-                inside.repaint(self.connection, volt, ui.SHOW_RADAR)
+                inside.repaint(self.connection, volt, ui["show_radar"])
                 out_temp.repaint()
                 in_temp.repaint()
 
@@ -112,7 +112,7 @@ class Epd(EpdBase):
             UiVBat(self, v, d).repaint(volt)
 
     def repaint_config(self, volt):
-        from db import spot
+        from config import spot
         from .qr import UiQr
         from .url import UiUrl
         from .vbat import UiVBat
@@ -120,9 +120,9 @@ class Epd(EpdBase):
 
         with self.Drawing("hotspot", self):
             url = f"http://{self.connection.ifconfig[0]}:5555"
-            wifi = f"WIFI:T:WPA;S:{spot.SSID};P:{spot.PASSWD};;"
+            wifi = f"WIFI:T:WPA;S:{spot['ssid']};P:{spot['passwd']};;"
 
-            logger.info(f'Listening on {url}')
+            logger.info(f"Listening on {url}")
 
             UiQr(self, Z, Z).repaint(wifi, "WiFi", False)
             UiQr(self, V(self.width - 140, self.height - 140), Z).repaint(

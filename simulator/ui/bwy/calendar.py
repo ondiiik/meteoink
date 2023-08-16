@@ -5,7 +5,7 @@ logger = getLogger(__name__)
 from .. import UiFrame, BLACK, V, Z
 from micropython import const
 from lang import day_of_week
-from db import api
+from config import api
 
 
 class UiCalendar(UiFrame):
@@ -14,7 +14,7 @@ class UiCalendar(UiFrame):
         block = self.ui.block
         h_space = const(4)
 
-        if api.VARIANT == 2:
+        if api["variant"] == 2:
             hpi = 1
             dblock = int(block * 24)
         else:

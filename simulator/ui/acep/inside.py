@@ -6,7 +6,7 @@ from micropython import const
 from .. import UiFrame, V, BLUE
 from .vbat import UiVBat
 from .rh import UiRh
-from db import location
+from config import location
 
 
 class UiInside(UiFrame):
@@ -34,13 +34,19 @@ class UiInside(UiFrame):
             self.ui.text(16, dt, V(5, y))
             y -= SPACING
             self.ui.text(
-                16, location.LOCATIONS[connection.config.location].name, V(5, y), BLUE
+                16,
+                location["locations"][connection.config["location"]]["name"],
+                V(5, y),
+                BLUE,
             )
         else:
             y = batt.bellow + 4
             x = self.dim.x - 2
             self.ui.text_right(
-                16, location.LOCATIONS[connection.config.location].name, V(x, y), BLUE
+                16,
+                location["locations"][connection.config["location"]]["name"],
+                V(x, y),
+                BLUE,
             )
             y += SPACING
             self.ui.text_right(16, dt, V(x, y))

@@ -2,9 +2,9 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from db import api
+from config import api
 
-if "CZ" == api.LANGUAGE:
+if "cz" == api["language"]:
     from .lang_cz import *
 else:
     from .lang_en import *
