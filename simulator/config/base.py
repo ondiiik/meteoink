@@ -12,7 +12,7 @@ class Json(dict):
             with open(file_name, "r") as f:
                 super().__init__(load(f))
         except:
-            super().__init__(default)
+            super().__init__(default if isinstance(default, dict) else default())
             self.flush()
 
     def flush(self) -> None:

@@ -48,7 +48,7 @@ connection = Json(
 
 spot = Json(
     "config/spot.json",
-    {
+    lambda: {
         "ssid": "metoink_"
         + "".join(
             [
