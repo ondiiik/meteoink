@@ -8,7 +8,7 @@
 
 Meteoink is home meteostation based on [4.2 inch dual color E-Ink display](https://www.waveshare.com/4.2inch-e-paper-module-c.htm) (BWY variant)
 or [5.65 inch 7 colors E-Ink display](https://www.waveshare.com/5.65inch-e-paper-module-f.htm) (ACEP variant),
-[TTGO-T8-ESP32](https://github.com/LilyGO/TTGO-T8-ESP32) and [micropython 1.18](https://micropython.org/). Meteostation
+[TTGO-T8-ESP32](https://github.com/LilyGO/TTGO-T8-ESP32) and [micropython 1.20](https://micropython.org/). Meteostation
 is connected to your home WiFi and uses data from [OpenWeatherMap](https://openweathermap.org/) project for obtaining
 weather forecast. It also uses [DHT22](https://github.com/semestrinis/Arduino/wiki/DHT22-temperature-humidity-sensor)
 sensor for measuring indoor temperature and humidity. Whole system is powered from one
@@ -53,41 +53,20 @@ outside the box). When you glue it, apply glue very carefully as it shall not pa
 
 ## Micropython
 
-To make software running on ESP32, you have to install Micropython first on it. You can install regular Micropython
-according to [this tutorial](https://micropython.org/download/esp32spiram/), or simply use
+To make software running on ESP32, you have to install Micropython first on it. You shall use
+[custom built of Micropython](https://github.com/ondiiik/meteoink/blob/master/esp32/micropython.bin)
+according to [this tutorial](https://micropython.org/download/esp32spiram/). The reason for custom build is,
+that startup of meteostation is then way faster. This significantly reduce battery consumption. You can also use
 [thonny IDE](https://randomnerdtutorials.com/getting-started-thonny-micropython-python-ide-esp32-esp8266/) to do
-this job for you. Currently the metostation is tested with
-[Micropython v. 1.18](https://micropython.org/resources/firmware/esp32spiram-20220117-v1.18.bin).
+this job for you.
 
 
-## Make littlefs
+## Upload binary files
 
-Once Micropython is installed, you can connect your ESP board to your computer by USB and attach to exposed UART
-(baudrate shall be 115200 Bd). Once yo are connected over serial port, you can start using python console provided
-through this port.
-
-    >>> import sys
-    >>> sys.implementation
-    (name='micropython', version=(1, 18, 0))
-
-As meteostation may time after time writes something on internal flash, then for flash healthy is better to use
-`littlefs` instead of `FAT`. This can be done according to
-[this tutorial](https://docs.micropython.org/en/latest/reference/filesystem.html#littlefs)
-
-    import os
-    os.umount('/')
-    os.VfsLfs2.mkfs(bdev)
-    os.mount(bdev, '/')
-
-
-## Upload python code
-
-The last step is to upload all python code into created file sytem. This code is located in repository folder
-[esp32/micropython](https://github.com/ondiiik/meteoink/tree/master/esp32/micropython). There are precompiled python
-files according to used variant of display. There is [esp32/micropython/bwy](https://github.com/ondiiik/meteoink/tree/master/esp32/micropython/bwy)
+The last step is to upload required binary files into device file sytem. This binaries are located in repository folder
+[esp32/micropython](https://github.com/ondiiik/meteoink/tree/master/esp32/micropython) for each variant of display. There is [esp32/micropython/bwy](https://github.com/ondiiik/meteoink/tree/master/esp32/micropython/bwy)
 folder for 4.2 inch Black/White/Yellow display, or [esp32/micropython/acep](https://github.com/ondiiik/meteoink/tree/master/esp32/micropython/acep)
-folder for 5.65 7-color ACEP display. Code is precompiled to speed up startup of software (shorter time when CPU consuming juice from battery),
-and for better usage of RAM (compiler is not heavily involved). All files from selected folder shall be copied into board.
+folder for 5.65 7-color ACEP display. All files from selected folder shall be copied into board.
 For this purpose REPL based file access engine such as [ampy](https://techtutorialsx.com/2017/06/04/esp32-esp8266-micropython-uploading-files-to-the-file-system/) or
 [thonny IDE](https://randomnerdtutorials.com/getting-started-thonny-micropython-python-ide-esp32-esp8266/) can be used for writing files into file system.
 Just keep in mind that you shall be disconnected from console otherwise this tools will not work properly.

@@ -16,6 +16,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>README.md</name>
+			<type>1</type>
+			<location>/home/ondiiik/Development/micropython/meteo/meteo_py/README.md</location>
+		</link>
+		<link>
 			<name>mp_esp/epd_acep.py</name>
 			<type>1</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/micropython/display/epd_acep.py</locationURI>

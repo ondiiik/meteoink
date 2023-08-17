@@ -13,9 +13,9 @@
 /simulator/hotspot.txt
 /simulator/onecall.json
 /simulator/reset_cause.txt
-/simulator/config/*.json
+/simulator/*.json
 /simulator/var
-/simulator/bitmap/acep_rotated/*.bin
+/simulator/bitmaps/*.bin
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

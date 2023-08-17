@@ -239,7 +239,7 @@ def button_enable(flag, url):
 
 
 def bytes2bssid(bssid):
-    return ":".join("{:02x}".format(b) for b in bssid)
+    return ":".join("{:02X}".format(b) for b in bssid)
 
 
 def name2page(name):

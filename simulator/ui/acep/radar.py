@@ -81,7 +81,7 @@ class RadarMap:
         self.wdt = wdt
 
         # Load openstreet map
-        path = f"bitmap/acep_rotated/map_{lat}_{lon}_{z}_{dim.x}_{dim.y}.bin"
+        path = f"bitmaps/map_{lat}_{lon}_{z}_{dim.x}_{dim.y}.bin"
         try:
             with open(path, "rb") as f:
                 f.readinto(self.bitmap.buf)

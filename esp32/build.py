@@ -22,10 +22,7 @@ class Builder:
     def __call__(self, cleanup=False):
         try:
             self.build_cleanup(cleanup)
-            self.build_autogen()
             self.build_copy()
-            self.build_compile()
-            self.build_reduce()
             self.build_check()
         finally:
             self.command(f"cd {root}")
@@ -36,70 +33,16 @@ class Builder:
 
         self.command(f"mkdir {self.dwd}")
 
-    def build_autogen(self):
-        with open(Path(self.cwd, "main.py"), "w") as f:
-            f.write(
-                f"""from ulogging import getLogger, dump_exception
-logger = getLogger('main')
-
-try:
-    logger.info('Starting the application ...')
-    from app import run
-    run()
-    
-except KeyboardInterrupt as e:
-    logger.info('Interrupted by keyboard ...')
-except BaseException as e:
-    dump_exception('!!! APPLICATION ERROR - REBOOTING !!!', e)
-    import machine
-    machine.reset()
-"""
-            )
-
-        with open(Path(self.cwd, "setup", "display.py"), "w") as f:
-            f.write(
-                f"""from .epd_{self.variant} import *
-# from .epd_bwy import *
-# from .epd_acep import *
-"""
-            )
-
     def build_copy(self):
-        self.copy("boot.py")
-        self.copy("main.py")
-        self.copy("setup")
         self.copy("web/www")
 
         if self.variant == "acep":
-            self.copy("bitmap/acep_rotated/wind.bin")
-            self.copy("bitmap/acep_rotated/fonts.bin")
-            self.copy("bitmap/acep_rotated/bmp.bin")
-
-    def build_compile(self):
-        self.convert(self.find(""))
-        self.convert(self.find("bitmap"))
-        self.convert(self.find("bitmap/acep_rotated"), "acep")
-        self.convert(self.find("bitmap/bwy"), "bwy")
-        self.convert(self.find("config"))
-        self.convert(self.find("display"))
-        self.convert(self.find("lang"))
-        self.convert(self.find("setup"))
-        self.convert(self.find("ui"))
-        self.convert(self.find("ui/acep"), "acep")
-        self.convert(self.find("ui/bwy"), "bwy")
-        self.convert(self.find("web"))
-        self.convert(self.find("web/microweb"))
-        self.convert(self.find("web/page"))
-
-    def build_reduce(self):
-        self.command(f'rm {Path(self.dwd, "boot.mpy")}')
-        self.command(f'rm {Path(self.dwd, "main.mpy")}')
-        self.command(f'rm {Path(self.dwd, "display/epd_acep.mpy")}', "bwy")
-        self.command(f'rm {Path(self.dwd, "display/epd_bwy.mpy")}', "acep")
-        self.command(f'rm {Path(self.dwd, "setup/display.mpy")}')
-        self.command(f'rm {Path(self.dwd, "setup/pins.mpy")}')
-        self.command(f'rm {Path(self.dwd, "setup/epd_acep.mpy")}', "bwy")
-        self.command(f'rm {Path(self.dwd, "setup/epd_bwy.mpy")}', "acep")
+            self.copy("bitmaps/wind.bin")
+            self.copy("bitmaps/fonts.bin")
+            self.copy("bitmaps/bmp.bin")
+        else:
+            with open(f"{self.dwd}/bitmaps", "w"):
+                ...
 
     def build_check(self):
         l = list(self.dwd.rglob("*"))
@@ -119,19 +62,6 @@ except BaseException as e:
         print(cmd)
         os.system(cmd)
 
-    def find(self, p, w="*.py", d=None):
-        if d is None:
-            d = self.cwd
-        s = Path(d, p)
-        os.chdir(s)
-
-        l = []
-
-        for f in glob.glob(w):
-            l.append((p, f))
-
-        return l
-
     def copy(self, p):
         src = Path(self.cwd, p)
         dst = Path(self.dwd, p)
@@ -146,25 +76,9 @@ except BaseException as e:
         for c in cmd:
             self.command(c)
 
-    def convert(self, l, variant=None):
-        if variant is not None and variant != self.variant:
-            return
-
-        try:
-            Path(self.dwd, l[0][0]).mkdir()
-        except FileExistsError:
-            pass
-
-        os.chdir(self.cwd)
-
-        for f in l:
-            src = os.path.relpath(Path(self.cwd, *f))
-            dst = os.path.abspath(Path(self.dwd, f[0], f[1][:-2] + "mpy"))
-            self.command("{} {} -o {}".format(self.mpc, src, dst))
-
 
 builder_bwy = Builder("micropython", "bwy")
-builder_bwy()
+builder_bwy(cleanup=True)
 
 builder_acep = Builder("micropython", "acep")
 builder_acep(cleanup=True)

@@ -83,7 +83,7 @@ class Bitmap:
         self.buf = bmp[2]
 
         if isinstance(self.buf, int):
-            name = f"bitmap/acep_rotated/{bmp[3]}.bin"
+            name = f"bitmaps/{bmp[3]}.bin"
             f = open(name, "rb")
             try:
                 f.seek(self.buf)
@@ -170,7 +170,7 @@ def bmt(fonts, char, variant, size, color):
     s = fb[2]
 
     if isinstance(s, int):
-        name = f"bitmap/acep_rotated/{fb[3]}.bin"
+        name = f"bitmaps/{fb[3]}.bin"
         with open(name, "rb") as f:
             f.seek(s)
             s = fb[2] = bytearray(f.read(fb[0] * fb[1] // 2))

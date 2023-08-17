@@ -1,17 +1,26 @@
-from ulogging import getLogger, dump_exception
-
-logger = getLogger("main")
+from os import stat
 
 try:
-    logger.info("Starting the application ...")
-    from app import run
+    stat("bitmaps")
 
-    run()
+    from ulogging import getLogger, dump_exception
 
-except KeyboardInterrupt as e:
-    logger.info("Interrupted by keyboard ...")
-except BaseException as e:
-    dump_exception("!!! APPLICATION ERROR - REBOOTING !!!", e)
-    import machine
+    logger = getLogger("main")
 
-    machine.reset()
+    try:
+        logger.info("Starting the application ...")
+        from app import run
+
+        run()
+
+    except KeyboardInterrupt as e:
+        logger.info("Interrupted by keyboard ...")
+    except BaseException as e:
+        dump_exception("!!! APPLICATION ERROR - REBOOTING !!!", e)
+        import machine
+
+        machine.reset()
+except OSError:
+    print("#############################################")
+    print("### Please upload bitmaps (folder bitmap) ###")
+    print("#############################################")

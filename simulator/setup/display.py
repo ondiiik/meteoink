@@ -1,4 +1,3 @@
-from .epd_acep import *
+from variant.epd_acep import *
 
-# from .epd_bwy import *
-# from .epd_acep import *
+# from variant.epd_bwy import *

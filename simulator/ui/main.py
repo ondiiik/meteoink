@@ -3,7 +3,7 @@ from ulogging import getLogger
 logger = getLogger(__name__)
 
 from setup.display import MODEL
-from setup import EPD_42_BWY, EPD_565_ACEP
+from variant import EPD_42_BWY, EPD_565_ACEP
 
 if MODEL == EPD_565_ACEP:
     from .acep.main import Epd

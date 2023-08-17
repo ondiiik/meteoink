@@ -5,6 +5,7 @@ logger = getLogger(__name__)
 from jumpers import jumpers
 from network import WLAN, STA_IF, AP_IF
 from config import connection, location, spot, api
+from web import bytes2bssid
 from utime import sleep
 import urequests
 from uerrno import ECONNRESET
@@ -71,8 +72,9 @@ class Connection:
         network = None
 
         for n in self.nets:
+            bssid = bytes2bssid(n.bssid)
             for c in connection["connections"]:
-                if n.bssid == c["bssid"]:
+                if bssid == c["bssid"]:
                     network = c
                     break
             else:
