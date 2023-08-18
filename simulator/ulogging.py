@@ -10,7 +10,7 @@ INFO = const(2)
 DEBUG = const(1)
 NOTSET = const(0)
 
-_lvl = INFO
+_lvl = DEBUG
 _lchr = "  ", "  ", "..", "??", "!!", "##"
 
 

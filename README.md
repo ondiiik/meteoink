@@ -55,9 +55,9 @@ outside the box). When you glue it, apply glue very carefully as it shall not pa
 
 To make software running on ESP32, you have to install Micropython first on it. You shall use
 [custom built of Micropython](https://github.com/ondiiik/meteoink/blob/master/esp32/micropython.bin)
-according to [this tutorial](https://micropython.org/download/esp32spiram/). The reason for custom build is,
-that startup of meteostation is then way faster. This significantly reduce battery consumption. You can also use
-[thonny IDE](https://randomnerdtutorials.com/getting-started-thonny-micropython-python-ide-esp32-esp8266/) to do
+according to [this tutorial](https://docs.micropython.org/en/latest/esp32/tutorial/intro.html#deploying-the-firmware).
+The reason for custom build is, that startup of meteostation is then way faster. This significantly reduce battery consumption.
+You can also use [thonny IDE](https://randomnerdtutorials.com/getting-started-thonny-micropython-python-ide-esp32-esp8266/) to do
 this job for you.
 
 
@@ -114,6 +114,34 @@ displayed (it may take about one minute)
 
 If you want to get into setup WEB page again, then you have restart meteostation and immediately hold **config**
 button, till beep (it may take even half minute). Then QR codes appears on screen and configuration web server will be ready after next beep.
+
+
+## Manual configuration
+
+All items configured by WEB interface are at the end stored in [JSON](https://cs.wikipedia.org/wiki/JavaScript_Object_Notation) files
+in root of internal file storage. If this files are missing, they are created automatically after first start of meteostation. This files
+can be also edited manually, and are then used after restart. However be careful when editing them, especially files `connection.json`
+and `location.json`, where `connection.json` which uses index to `location.json` as reference and is easy to break binding between
+them.
+
+Some of this files are described here:
+
+### api.json
+
+- `"units"` - Which units shall be used (`"metric"` or `"imperial"`).
+- `"language"` - Which language shall be used  (`"cz"` or `"en"`).
+- `"variant"` - How much days shall be displayed in forecast (number in range from 2 to 5, where 2 uses more detailed variant of forecast).
+- `"apikey"` - `apikey` obtained from [OpenWeatherMap](https://home.openweathermap.org/users/sign_up) used to download forecast.
+
+### beep.json
+
+- `"temp_balanced"` - Boolean telling if outdoor and indoor temperatures are balanced (so you can open window and start cooling your house).
+- `"error_beep"` - Boolean telling if station shell you notify by beeping when some software error occur (goot for long time testing).
+
+### spot.json
+
+- `"ssid"` - Boolean telling if outdoor and indoor temperatures are balanced (so you can open window and start cooling your house).
+- `"error_beep"` - Boolean telling if station shell you notify by beeping when some software error occur (goot for long time testing).
 
 
 ## Others
