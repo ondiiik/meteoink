@@ -3,7 +3,8 @@ from ulogging import getLogger
 logger = getLogger(__name__)
 
 import re
-from display import Frame, BLACK, WHITE
+from display.epd import BLACK, WHITE
+from framebuf import FrameBuffer, GS4_HMSB
 from micropython import const
 
 ERROR_CORRECT_L = const(1)
@@ -667,7 +668,7 @@ def _lost_point_level2(modules, modules_count):
                 try:
                     next(modules_range_iter)
                 except StopIteration:
-                    pass
+                    ...
             elif top_right != this_row[col]:
                 continue
             elif top_right != next_row[col]:
@@ -721,7 +722,7 @@ def _lost_point_level3(modules, modules_count):
                 try:
                     next(modules_range_short_iter)
                 except StopIteration:
-                    pass
+                    ...
 
     for col in modules_range:
         modules_range_short_iter = iter(modules_range_short)
@@ -753,7 +754,7 @@ def _lost_point_level3(modules, modules_count):
                 try:
                     next(modules_range_short_iter)
                 except StopIteration:
-                    pass
+                    ...
 
     return lost_point
 
@@ -1322,7 +1323,8 @@ class QRCode:
             return self.modules
 
         width = len(self.modules) + self.border * 2
-        fb = Frame(width, width)
+        buf = bytearray(width * (width + 1) // 2)
+        fb = FrameBuffer(buf, width, width, GS4_HMSB)
         fb.fill(WHITE)
         b = self.border
 

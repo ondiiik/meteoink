@@ -71,11 +71,11 @@ class Error(Exception):
 
 
 class FormatError(Error):
-    pass
+    ...
 
 
 class ChunkError(FormatError):
-    pass
+    ...
 
 
 class Reader:
@@ -174,7 +174,7 @@ class Reader:
         # byte is used instead.
         fu = max(1, self.psize)
 
-        # For the first line of a pass, synthesize a dummy previous
+        # For the first line of a ..., synthesize a dummy previous
         # line.  An alternative approach would be to observe that on the
         # first line 'up' is the same as 'null', 'paeth' is the same
         # as 'sub', with only 'average' requiring any special case.
@@ -211,12 +211,12 @@ class Reader:
             if xstart >= self.width:
                 continue
             # The previous (reconstructed) scanline.  None at the
-            # beginning of a pass to indicate that there is no previous
+            # beginning of a ... to indicate that there is no previous
             # line.
             recon = None
-            # Pixels per row (reduced pass image)
+            # Pixels per row (reduced ... image)
             ppr = int(math.ceil((self.width - xstart) / float(xstep)))
-            # Row size in bytes for this pass.
+            # Row size in bytes for this ....
             row_size = int(math.ceil(self.psize * ppr))
             for y in range(ystart, self.height, ystep):
                 filter_type = raw[source_offset]

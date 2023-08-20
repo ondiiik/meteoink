@@ -2,7 +2,7 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from .. import RED, GREEN, BLUE
+from display.epd import RED, GREEN, BLUE
 from .value import UiValue
 
 

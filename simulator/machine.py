@@ -1,4 +1,3 @@
-import sys
 import time
 import datetime
 import pygame
@@ -6,10 +5,10 @@ import pygame
 
 class SPI:
     def __init__(self, n):
-        pass
+        ...
 
     def init(self, baudrate, polarity, phase, sck, mosi, miso):
-        pass
+        ...
 
 
 _pins = [1] * 256
@@ -20,10 +19,10 @@ _pins[32] = 1  # 1 - Meteostation, 0 - Config server
 
 class WDT:
     def __init__(self, timeout):
-        pass
+        ...
 
     def feed(self):
-        pass
+        ...
 
 
 class Pin:
@@ -37,11 +36,11 @@ class Pin:
 
     def on(self):
         # print(f'PIN {self.n} ON')
-        pass
+        ...
 
     def off(self):
         # print(f'PIN {self.n} OFF')
-        pass
+        ...
 
     def value(self):
         print(f"PIN {self.n} {_pins[self.n]}")
@@ -53,10 +52,10 @@ class ADC:
     ATTN_11DB = 2
 
     def __init__(self, pin):
-        pass
+        ...
 
     def atten(self, at):
-        pass
+        ...
 
     def read(self):
         return 3287
@@ -67,18 +66,18 @@ class PWM:
         print("BEEP", freq)
 
     def duty(self, v):
-        pass
+        ...
 
     def freq(self, v):
-        pass
+        ...
 
     def deinit(self):
-        pass
+        ...
 
 
 class RTC:
     def __init__(self):
-        pass
+        ...
 
     def datetime(self):
         dt = datetime.datetime.now().timetuple()
@@ -94,31 +93,79 @@ class RTC:
         )
 
     def init(self, v):
-        pass
+        ...
 
 
 def freq(max_freq):
-    pass
+    ...
+
+
+_reset_cause = ""
 
 
 def deepsleep(t=0):
-    print("Deep sleep ....")
-    for i in range(t // 1000):
+    global _reset_cause
+    print("deepsleep", _reset_cause)
+
+    print("Deep sleep ....", t)
+
+    with open("reset_cause.txt", "w") as f:
+        if not _reset_cause:
+            _reset_cause = "deepsleep"
+        f.write(_reset_cause)
+
+    # for i in range(t // 1000):
+    while True:
         _check_events()
         time.sleep(1)
-    sys.exit(0)
+
+    raise MeteoDeepSleep()
 
 
 def reset():
+    global _reset_cause
+    print("reset", _reset_cause)
+
     print("Reset ....")
-    sys.exit()
+
+    with open("reset_cause.txt", "w") as f:
+        if not _reset_cause:
+            _reset_cause = "reset"
+        f.write(_reset_cause)
+
+    raise MeteoRestart()
+
+
+def _power_on():
+    global _reset_cause
+    print("_power_on", _reset_cause)
+
+    print("Power ON ....")
+
+    with open("reset_cause.txt", "w") as f:
+        f.write("power_on")
+
+    raise MeteoPowerOn()
+
+
+SOFT_RESET = 5
+HARD_RESET = 2
+PWRON_RESET = 1
+DEEPSLEEP = 4
 
 
 def reset_cause():
-    return 0
-
-
-DEEPSLEEP = 0
+    try:
+        with open("reset_cause.txt", "r") as f:
+            v = f.read()
+            if v == "deepsleep":
+                return DEEPSLEEP
+            elif v == "reset":
+                return HARD_RESET
+            else:
+                return PWRON_RESET
+    except:
+        return PWRON_RESET
 
 
 def _check_events():
@@ -127,10 +174,19 @@ def _check_events():
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             print("Bye bye ...")
-            sys.exit(0)
+            _power_on()
 
         else:
             print("EVENT:", event)
 
 
-PWRON_RESET = 1
+class MeteoDeepSleep(SystemExit):
+    ...
+
+
+class MeteoRestart(SystemExit):
+    ...
+
+
+class MeteoPowerOn(SystemExit):
+    ...

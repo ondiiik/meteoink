@@ -1,17 +1,12 @@
-from ulogging import getLogger
+from config import hw
 
-logger = getLogger(__name__)
+v = hw["variant"]
 
-from setup.display import MODEL
-from variant import EPD_42_BWY, EPD_565_ACEP
-
-if MODEL == EPD_565_ACEP:
-    from .acep.main import Epd
-elif MODEL == EPD_42_BWY:
-    from .bwy.main import Epd
+if v == "acep":
+    from .acep.main import MeteoUi
+elif v == "bwy":
+    from .bwy.main import MeteoUi
+elif v == "epd47":
+    from .epd47.main import MeteoUi
 else:
-    raise TypeError(f"Don't know display type {MODEL}")
-
-
-class MeteoUi(Epd):
-    pass
+    raise TypeError(f"Don't know display type for variant {v}")

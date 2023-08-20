@@ -6,8 +6,7 @@ import dht
 from machine import Pin, deepsleep, RTC
 from micropython import const
 from collections import namedtuple
-from setup import pins
-from config import api, sys, location
+from config import api, sys, location, hw
 from ltime import Time
 from buzzer import play
 
@@ -142,7 +141,7 @@ class Forecast:
                     logger.info("")
                     logger.info("Go into configuration mode to set server correctly")
                 except:
-                    pass
+                    ...
 
                 play(
                     (400, 1000),
@@ -154,7 +153,7 @@ class Forecast:
                 )
                 deepsleep()
         except:
-            pass
+            ...
 
         current = fcast["current"]
 
@@ -346,18 +345,19 @@ class Forecast:
     def _get_dht(self, in_temp):
         # DHT22 is powered only when display is powered
         # (network is not connected)
-        if pins.DHT >= 0:
-            sensor = dht.DHT22(Pin(pins.DHT))
+        p = hw["pins"]["dht"]
+
+        if p >= 0:
+            sensor = dht.DHT22(Pin(p))
 
             try:
                 sensor.measure()
                 self.home = Forecast.Home(
                     sensor.temperature(),
-                    sensor.humidity() * sys["dht_humi_calib"][0]
-                    + sys["dht_humi_calib"][1],
+                    sensor.humidity(),
                 )
                 return
             except:
-                pass
+                ...
 
         self.home = Forecast.Home(in_temp, None)

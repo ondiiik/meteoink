@@ -1,9 +1,10 @@
 from ulogging import getLogger
-from display.base import YELLOW
+from display.epd import YELLOW
 
 logger = getLogger(__name__)
 
-from .. import UiFrame, V, BLACK, WHITE
+from .. import UiFrame, Vect
+from display.epd import BLACK, WHITE
 
 
 class UiRain(UiFrame):
@@ -11,7 +12,7 @@ class UiRain(UiFrame):
         # Pre-calculates some range values and draw icons bar
         block = self.ui.block
 
-        self.canvas.hline(V(0, self.dim.y - 1), self.dim.x - 1, BLACK)
+        self.canvas.hline(Vect(0, self.dim.y - 1), self.dim.x - 1, BLACK)
 
         for x, fl, f, fr in self.ui.forecast_tripples():
             # Draw rain chart
@@ -23,8 +24,8 @@ class UiRain(UiFrame):
                 for h in (q, q * 2, q * 3):
                     if r > h:
                         r = h + (r - h) // 2
-                v = V(x - int(block // 2) + 1, self.dim.y - r - 1)
-                d = V(int(block) - 2, r)
+                v = Vect(x - int(block // 2) + 1, self.dim.y - r - 1)
+                d = Vect(int(block) - 2, r)
 
                 if f.rain > 0:
                     self.canvas.trect(v, d, BLACK)
@@ -34,4 +35,6 @@ class UiRain(UiFrame):
 
             # Type rain text
             if (max(fl.rain, fl.snow) < p) and (p > max(fr.rain, fr.snow)):
-                self.ui.text_center(10, "%.1f" % p, V(x, self.dim.y - 2), BLACK, WHITE)
+                self.ui.text_center(
+                    10, "%.1f" % p, Vect(x, self.dim.y - 2), BLACK, WHITE
+                )

@@ -14,6 +14,7 @@ class Builder:
     def __init__(self, dst, variant):
         self.cwd = root.joinpath("..", "micropython").resolve()
         self.dwd = root.joinpath(dst, variant).resolve()
+        print(self.cwd, "->", self.dwd)
         self.fw = root.joinpath("meteoink.fw")
         self.mpc = str(root.joinpath("mpy-cross")) + " -v -march=xtensawin"
         self.repo = git.Repo(search_parent_directories=True)
@@ -34,12 +35,15 @@ class Builder:
         self.command(f"mkdir {self.dwd}")
 
     def build_copy(self):
-        self.copy("web/www")
+        self.copy("www")
 
         if self.variant == "acep":
-            self.copy("bitmaps/wind.bin")
-            self.copy("bitmaps/fonts.bin")
-            self.copy("bitmaps/bmp.bin")
+            self.copy("bitmaps/acep/wind.bin")
+            self.copy("bitmaps/acep/fonts.bin")
+            self.copy("bitmaps/acep/bmp.bin")
+        elif self.variant == "gs":
+            self.copy("bitmaps/gs/fonts.bin")
+            self.copy("bitmaps/gs/bmp.bin")
         else:
             with open(f"{self.dwd}/bitmaps", "w"):
                 ...
@@ -81,4 +85,7 @@ builder_bwy = Builder("micropython", "bwy")
 builder_bwy(cleanup=True)
 
 builder_acep = Builder("micropython", "acep")
+builder_acep(cleanup=True)
+
+builder_acep = Builder("micropython", "gs")
 builder_acep(cleanup=True)

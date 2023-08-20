@@ -2,7 +2,8 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from .. import UiFrame, V, BLACK, WHITE
+from .. import UiFrame, Vect
+from display.epd import BLACK, WHITE
 
 
 class UiTempTxt(UiFrame):
@@ -12,7 +13,7 @@ class UiTempTxt(UiFrame):
                 self.ui.text_center(
                     16,
                     "{:.0f}°C".format(f.temp),
-                    V(x, graph_temp.chart_y(f.temp) - 20),
+                    Vect(x, graph_temp.chart_y(f.temp) - 20),
                     BLACK,
                     WHITE,
                 )
@@ -21,7 +22,7 @@ class UiTempTxt(UiFrame):
                 self.ui.text_center(
                     16,
                     "{:.0f}°C".format(f.temp),
-                    V(x, graph_temp.chart_y(f.temp) + 4),
+                    Vect(x, graph_temp.chart_y(f.temp) + 4),
                     BLACK,
                     WHITE,
                 )

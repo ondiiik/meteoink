@@ -1,6 +1,7 @@
 from usys import print_exception
 from machine import RTC
 from micropython import const
+from config import sys
 
 
 CRITICAL = const(5)
@@ -10,7 +11,14 @@ INFO = const(2)
 DEBUG = const(1)
 NOTSET = const(0)
 
-_lvl = DEBUG
+_txt2lvl = {
+    "critical": CRITICAL,
+    "error": ERROR,
+    "warning": WARNING,
+    "info": INFO,
+    "debug": DEBUG,
+}
+_lvl = _txt2lvl.get(sys["log_level"], INFO)
 _lchr = "  ", "  ", "..", "??", "!!", "##"
 
 
@@ -18,6 +26,10 @@ class Logger:
     def __init__(self, name):
         name = f"[{name}]"
         self._name = f"{name:<28}"
+
+    @staticmethod
+    def set_level(self, lvl):
+        _lvl = lvl
 
     def log(self, level, msg):
         global _print
@@ -47,9 +59,7 @@ def getLogger(name):
     return logger
 
 
-from config import sys
-
-if sys["verbose_log"] or sys["exception_dump"]:
+if sys["exception_dump"]:
     try:
         _log = open("sys.log", "a")
     except:
@@ -90,7 +100,7 @@ def _print(*args):
         _log.flush()
 
 
-if not sys["verbose_log"]:
+if not sys["exception_dump"]:
     _print = print
 
 _print(f"Loading module {__name__}")

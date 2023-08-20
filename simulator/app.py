@@ -4,16 +4,14 @@ logger = getLogger(__name__)
 
 from jumpers import jumpers
 from net import Connection
-from config import alert, display, beep, temp, vbat, ui
-from machine import deepsleep, reset, WDT
+from config import alert, display, beep, temp, vbat, behavior, hw
+from machine import deepsleep, reset, WDT, reset_cause, PWRON_RESET
 from battery import battery
 from buzzer import play
 from esp32 import raw_temperature
 from led import Led
 from display import Canvas
 from forecast import Forecast
-from ui import DISPLAY_REFRESH, DISPLAY_GREETINGS
-from ui.main import MeteoUi
 
 
 def run():
@@ -25,7 +23,7 @@ def run():
         # and don't want to let it wake up during transport. In this case
         # we can put it to greetings mode, where only picture is displayed
         # and station kept sleeping till reset button is pressed
-        if DISPLAY_GREETINGS == display["display_state"] or jumpers.sleep:
+        if display["greetings"] or jumpers.sleep:
             # Read all initializes all peripheries
             play((800, 30), 500, (400, 30))
             app.greetings()
@@ -34,7 +32,10 @@ def run():
         # or configuration. In this case we can not rely on existing WiFi connection
         # and we rather go to hot-spot mode.
         if app.net and app.net.is_hotspot:
-            app.hotspot()
+            if hw["variant"] == "epd47":
+                app.hotspot_epd47()
+            else:
+                app.hotspot()
 
         # And finally - meteostation display - basic functionality ;-)
         else:
@@ -106,41 +107,67 @@ class App:
         if self.volt < vbat["low_voltage"]:
             self.led.mode(Led.ALERT)
 
+            from ui.main import MeteoUi
+
             ui = MeteoUi(self.canvas, None, None)
             ui.repaint_lowbat(self.volt)
 
             logger.info("Low battery !!!")
             self.sleep(15)
 
-        # Now we can activate WiFi. This is done at the end as WiFi
+        # Now we can create connection instance. Instance will not
+        # connect immediately but only when it is needed as WiFi
         # heavily increase consumption of chip.
         self.led.mode(Led.DOWNLOAD)
-
-        try:
-            self.net = Connection()
-            logger.info("Connected to network")
-        except Exception as font:
-            self.net = None
-            dump_exception("Network connection error", font)
-
-            if beep["error_beep"]:
-                play((200, 500), (100, 500))
+        self.net = Connection()
 
     def greetings(self):
+        from ui.main import MeteoUi
+
         ui = MeteoUi(self.canvas, None, self.net, self.led, self.wdt)
         ui.repaint_welcome()
 
-        display["display_state"] = DISPLAY_REFRESH
+        display["greetings"] = False
         display.flush()
         logger.info("Going to deep sleep ...")
-        deepsleep()
+        self.canvas.epd.deepsleep(0)
 
     def hotspot(self):
         play((2093, 30), 120, (2093, 30))
         self.led.mode(Led.DOWNLOAD)
 
+        from ui.main import MeteoUi
+
         ui = MeteoUi(self.canvas, None, self.net, self.led, self.wdt)
+
+        self.net.connect()
         ui.repaint_config(self.volt)
+
+        self.web_server()
+
+    def hotspot_epd47(self):
+        if reset_cause() == PWRON_RESET:
+            # EPD47 needs special handling as it have to draw screen and then
+            # reboot to reach WiFi.
+            play((2093, 30), 120, (2093, 30), 120, (2093, 30))
+            self.led.mode(Led.DOWNLOAD)
+
+            from ui.main import MeteoUi
+
+            ui = MeteoUi(self.canvas, None, self.net, self.led, self.wdt)
+            ui.repaint_config(self.volt)
+            ui.canvas.epd.display_frame_now()
+
+            deepsleep(1)
+        else:
+            # We are after deepsleep reset - screen is displayed,
+            # so we can start server.
+            play((2093, 30), 120, (2093, 30))
+            self.net.connect()
+            self.web_server()
+            reset()
+
+    def web_server(self):
         self.led.mode(Led.DOWNLOAD)
 
         logger.info("Loading module WEB")
@@ -154,9 +181,15 @@ class App:
         reset()
 
     def forecast(self):
-        return None if self.net is None else Forecast(self.net, self.temp)
+        if self.net is None:
+            return None
+        else:
+            self.net.connect()
+            return Forecast(self.net, self.temp)
 
     def repaint(self, forecast):
+        from ui.main import MeteoUi
+
         ui = MeteoUi(self.canvas, forecast, self.net, self.led, self.wdt)
         ui.repaint_forecast(self.volt)
 
@@ -202,16 +235,16 @@ class App:
     def sleep(self, forecast=None, minutes=0):
         if self.net is None:
             logger.info("No WiFi connection, retry in 5 minutes ...")
-            deepsleep(300000)
+            self.canvas.epd.deepsleep(300000)
 
         if 0 == minutes:
-            minutes = ui["refresh"]
+            minutes = behavior["refresh"]
             h = (
                 12
                 if forecast is None
                 else forecast.time.get_date_time(forecast.weather.dt)[3]
             )
-            b, font = ui["dbl"]
+            b, font = behavior["dbl"]
 
             if b > font:
                 if h < font:
@@ -222,4 +255,4 @@ class App:
                 minutes *= 2
 
         logger.info("Going to deep sleep for {} minutes ...".format(minutes))
-        deepsleep(minutes * 60000)
+        self.canvas.epd.deepsleep(minutes * 60000)

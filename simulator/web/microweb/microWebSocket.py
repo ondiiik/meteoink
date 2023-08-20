@@ -39,7 +39,7 @@ class MicroWebSocket:
                 gc.collect()
                 return bytearray(size)
             except:
-                pass
+                ...
         return None
 
     # ----------------------------------------------------------------------------
@@ -61,7 +61,7 @@ class MicroWebSocket:
                     start_new_thread("MWS_THREAD_%s" % _mws_thread_id, func, args)
                     return True
                 except:
-                    pass
+                    ...
         return False
 
     # ============================================================================
@@ -104,7 +104,7 @@ class MicroWebSocket:
                 self._socketfile.close()
             self._socket.close()
         except:
-            pass
+            ...
 
     # ============================================================================
     # ===( Functions )============================================================
@@ -120,7 +120,7 @@ class MicroWebSocket:
                 httpResponse.WriteSwitchProto("websocket", {"Sec-WebSocket-Accept": r})
                 return True
         except:
-            pass
+            ...
         return False
 
     # ----------------------------------------------------------------------------
@@ -259,7 +259,7 @@ class MicroWebSocket:
                         self._lock.release()
                         return ret
                 except:
-                    pass
+                    ...
                 self._lock.release()
         return False
 
@@ -289,7 +289,7 @@ class MicroWebSocket:
                 self._socket.close()
                 self._closed = True
             except:
-                pass
+                ...
 
     # ============================================================================
     # ============================================================================

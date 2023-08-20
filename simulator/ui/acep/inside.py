@@ -3,7 +3,8 @@ from ulogging import getLogger
 logger = getLogger(__name__)
 
 from micropython import const
-from .. import UiFrame, V, BLUE
+from ui import UiFrame, Vect
+from display.epd import BLUE
 from .vbat import UiVBat
 from .rh import UiRh
 from config import location
@@ -15,14 +16,14 @@ class UiInside(UiFrame):
         spacing = self.height // (2 if layout_2 else 3) + 1
 
         # Type humidity
-        rh = UiRh(self.ui, V(0, self.height - spacing), V(self.width, spacing))
+        rh = UiRh(self.ui, Vect(0, self.height - spacing), Vect(self.width, spacing))
         rh.repaint(self.ui.forecast.home.rh)
 
         # Display battery state
         if layout_2:
-            batt = UiVBat(self.ui, V(self.width - 40, 8), V(24, 36))
+            batt = UiVBat(self.ui, Vect(self.width - 40, 8), Vect(24, 36))
         else:
-            batt = UiVBat(self.ui, V(self.width - 40, 0), V(24, 36))
+            batt = UiVBat(self.ui, Vect(self.width - 40, 0), Vect(24, 36))
         batt.repaint(volt)
 
         # Type weather details
@@ -31,12 +32,12 @@ class UiInside(UiFrame):
 
         if layout_2:
             y = self.dim.y - 20
-            self.ui.text(16, dt, V(5, y))
+            self.ui.text(16, dt, Vect(5, y))
             y -= SPACING
             self.ui.text(
                 16,
                 location["locations"][connection.config["location"]]["name"],
-                V(5, y),
+                Vect(5, y),
                 BLUE,
             )
         else:
@@ -45,8 +46,8 @@ class UiInside(UiFrame):
             self.ui.text_right(
                 16,
                 location["locations"][connection.config["location"]]["name"],
-                V(x, y),
+                Vect(x, y),
                 BLUE,
             )
             y += SPACING
-            self.ui.text_right(16, dt, V(x, y))
+            self.ui.text_right(16, dt, Vect(x, y))

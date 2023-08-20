@@ -2,7 +2,8 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from .. import UiFrame, V, BLACK, RED
+from .. import UiFrame, Vect
+from display.epd import BLACK, RED
 from config import temp
 
 
@@ -26,14 +27,14 @@ class UiTemp(UiFrame):
         if self.inside:
             l = self.ui.text_len(35, s)
             x = self.width - l - 5
-            self.ui.text(35, s, V(x, 8))
+            self.ui.text(35, s, Vect(x, 8))
 
             l = self.ui.text_len(60, t)
             x -= l + 5
-            self.ui.text(60, t, V(x, -5), color)
+            self.ui.text(60, t, Vect(x, -5), color)
 
             bitmap = self.ui.bitmap(1, "in")
-            self.canvas.bitmap(V(x - 25, self.height - 24), bitmap)
+            self.canvas.bitmap(Vect(x - 25, self.height - 24), bitmap)
         else:
-            p = self.ui.text(60, t, V(5, -5), color)
-            self.ui.text(35, s, p + V(6, 16))
+            p = self.ui.text(60, t, Vect(5, -5), color)
+            self.ui.text(35, s, p + Vect(6, 16))

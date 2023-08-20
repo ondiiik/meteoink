@@ -260,7 +260,11 @@ if __name__ == "__main__":
     dst_loc_path = Path("bitmap", "font")
     dst_loc_path.mkdir(exist_ok=True)
 
-    for variant, font_sizes in ("acep", (60, 35, 16)), ("bwy", (50, 25, 16, 10)):
+    for variant, font_sizes in (
+        ("acep", (60, 35, 16)),
+        ("bwy", (50, 25, 16, 10)),
+        ("gs", (100, 60, 25, 16)),
+    ):
         dst_variant_path = dst_loc_path.joinpath(variant)
         dst_variant_path.mkdir(exist_ok=True)
 

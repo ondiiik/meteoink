@@ -4,10 +4,9 @@ logger = getLogger(__name__)
 
 import micropython
 from micropython import const
-from framebuf import FrameBuffer, GS4_HMSB
 
-from .base import Vect, Bitmap, WHITE, BLACK, ALPHA, bmt
-from .epd import EPD
+from .base import Vect, Bitmap, bmt, Base
+from .epd import ALPHA, BLACK
 from bitmap import FONTS
 
 
@@ -16,37 +15,11 @@ _CORONA_SPC = const(_CORONA_SIZE + 2)
 _corofs = Vect(_CORONA_SIZE, _CORONA_SIZE)
 
 
-class Canvas:
+class Canvas(Base):
     @micropython.native
     def __init__(self):
         logger.info("Building canvas")
-        self.epd = EPD()
-        self.width = self.epd.width
-        self.height = self.epd.height
-        self.dim = Vect(self.epd.width, self.epd.height)
-        self.ofs = Vect(0, 0)
-        logger.info("\tEPD - [ OK ]")
-
-        self.buf = bytearray((self.epd.width * self.epd.height + 1) // 2)
-        self.fb = FrameBuffer(self.buf, self.epd.width, self.epd.height, GS4_HMSB)
-        self.clear()
-        logger.info("\tFrame buffer - [ OK ]")
-
-    @micropython.native
-    def clear(self):
-        self.fb.fill(WHITE)
-
-    @micropython.native
-    def fill(self, c):
-        self.fb.fill(c)
-
-    @micropython.native
-    def flush(self, deghost=True):
-        if deghost:
-            logger.info("De-ghosting ...")
-            self.epd.deghost(self.buf[:])
-        logger.info("Flushing ...")
-        self.epd.display_frame(self.buf)
+        super().__init__(False)
 
     @micropython.native
     def hline(self, v, w, c=BLACK):

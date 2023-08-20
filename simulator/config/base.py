@@ -1,7 +1,4 @@
-from sys import modules
-from os import mkdir
 from ujson import load, dump
-from ubinascii import hexlify
 
 
 class Json(dict):

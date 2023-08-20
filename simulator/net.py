@@ -1,6 +1,7 @@
 from ulogging import getLogger
 
 logger = getLogger(__name__)
+
 from gc import collect
 from jumpers import jumpers
 from micropython import const
@@ -43,6 +44,9 @@ class Connection:
 
         self.nets = [Wifi("mynet1", b"aaaaaa"), Wifi("mynet2", b"bbbbbb")]
 
+    def connect(self):
+        ...
+
     @property
     def ifconfig(self):
         return ("192.168.1.254", "255.255.255.0", "192.168.1.255")
@@ -63,4 +67,8 @@ class Connection:
                 raise font
 
     def disconnect(self):
-        pass
+        ...
+
+
+def bytes2bssid(bssid):
+    return ":".join("{:02X}".format(b) for b in bssid)

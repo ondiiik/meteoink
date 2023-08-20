@@ -13,7 +13,7 @@
 /simulator/hotspot.txt
 /simulator/onecall.json
 /simulator/reset_cause.txt
-/simulator/*.json
+/simulator/cfg
 /simulator/var
 /simulator/bitmaps/*.bin
 

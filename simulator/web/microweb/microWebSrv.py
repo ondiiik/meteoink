@@ -15,12 +15,12 @@ import re
 try:
     from microWebTemplate import MicroWebTemplate
 except:
-    pass
+    ...
 
 try:
     from microWebSocket import MicroWebSocket
 except:
-    pass
+    ...
 
 
 class MicroWebSrvRoute:
@@ -279,7 +279,7 @@ class MicroWebSrv:
                                 try:
                                     value = int(value)
                                 except:
-                                    pass
+                                    ...
                                 routeArgs[name] = value
                             return (rh.func, routeArgs)
                         else:
@@ -423,7 +423,7 @@ class MicroWebSrv:
                     self._socketfile.close()
                 self._socket.close()
             except:
-                pass
+                ...
 
         # ------------------------------------------------------------------------
 
@@ -453,7 +453,7 @@ class MicroWebSrv:
                                     ] = value
                     return True
             except:
-                pass
+                ...
             return False
 
         # ------------------------------------------------------------------------
@@ -549,7 +549,7 @@ class MicroWebSrv:
                 try:
                     return self._socketfile.read(size)
                 except:
-                    pass
+                    ...
             return b""
 
         # ------------------------------------------------------------------------
@@ -578,7 +578,7 @@ class MicroWebSrv:
                 try:
                     return loads(data.decode())
                 except:
-                    pass
+                    ...
             return None
 
     # ============================================================================
@@ -732,7 +732,7 @@ class MicroWebSrv:
                             self.WriteResponseInternalServerError()
                             return False
             except:
-                pass
+                ...
             self.WriteResponseNotFound()
             return False
 

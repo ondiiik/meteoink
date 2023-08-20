@@ -5,7 +5,6 @@ logger = getLogger(__name__)
 from jumpers import jumpers
 from network import WLAN, STA_IF, AP_IF
 from config import connection, location, spot, api
-from web import bytes2bssid
 from utime import sleep
 import urequests
 from uerrno import ECONNRESET
@@ -22,43 +21,85 @@ class Wifi:
 
 class Connection:
     def __init__(self):
-        # Scan networks in surrounding
-        self._ifc = WLAN(STA_IF)
-
-        if not self._ifc.active(True):
-            raise RuntimeError("WiFi activation failed")
-
-        sc = self._ifc.scan()
-        self.nets = []
-
-        for n in sc:
-            self.nets.append(Wifi(n[0].decode(), n[1]))
-
-        self._ifc.active(False)
-
-        # Start requested variant of connection
-        use_hotspot = False
+        self.is_hotspot = False
+        self._ifc = None
 
         if jumpers.hotspot:
             logger.info("Setting hotspot by jumper")
-            use_hotspot = True
+            self.is_hotspot = True
 
         if not connection["connections"]:
             logger.warning("Forcing hotspot: Missing WiFi setup")
-            use_hotspot = True
+            self.is_hotspot = True
 
         if not location["locations"]:
             logger.warning("Forcing hotspot: Missing Location")
-            use_hotspot = True
+            self.is_hotspot = True
 
         if not api["apikey"]:
             logger.warning("Forcing hotspot: Missing API key")
-            use_hotspot = True
+            self.is_hotspot = True
 
-        if use_hotspot:
-            self._hotspot()
-        else:
-            self._attach()
+    def connect(self):
+        if self._ifc is not None:
+            return
+
+        try:
+            # Scan networks in surrounding
+            self._ifc = WLAN(STA_IF)
+
+            if not self._ifc.active(True):
+                raise RuntimeError("WiFi activation failed")
+
+            sc = self._ifc.scan()
+            self.nets = []
+
+            for n in sc:
+                self.nets.append(Wifi(n[0].decode(), n[1]))
+
+            self._ifc.active(False)
+
+            # Start requested variant of connection
+            if self.is_hotspot:
+                self._hotspot()
+            else:
+                self._attach()
+            logger.info("Connected to network")
+
+            type(self)._connected = True
+        except Exception as font:
+            self.net = None
+            dump_exception("Network connection error", font)
+
+            if beep["error_beep"]:
+                play((200, 500), (100, 500))
+
+            raise
+
+    def disconnect(self):
+        logger.info(f"Disconnecting from WiFi ...")
+        WLAN(STA_IF).active(False)
+        WLAN(AP_IF).active(False)
+        self._ifc = None
+
+    @property
+    def ifconfig(self):
+        return self._ifc.ifconfig()
+
+    def http_get_json(self, url):
+        logger.info(f"HTTP GET: {url}")
+
+        for retry in range(CONN_RETRY_CNT):
+            try:
+                return urequests.get(url).json()
+                collect()
+                return
+            except OSError as e:
+                logger.warning("ECONNRESET -> retry")
+                if e.errno == ECONNRESET:
+                    continue
+
+                raise e
 
     def _attach(self):
         # Activate WiFi interface
@@ -125,30 +166,9 @@ class Connection:
         self.is_hotspot = True
         logger.info(f"Running hotspot: {str(self.ifconfig)}")
 
-    @property
-    def ifconfig(self):
-        return self._ifc.ifconfig()
 
-    def http_get_json(self, url):
-        logger.info(f"HTTP GET: {url}")
-
-        for retry in range(CONN_RETRY_CNT):
-            try:
-                return urequests.get(url).json()
-                collect()
-                return
-            except OSError as e:
-                logger.warning("ECONNRESET -> retry")
-                if e.errno == ECONNRESET:
-                    continue
-
-                raise e
-
-    def disconnect(self):
-        logger.info(f"Disconnecting from WiFi ...")
-        WLAN(STA_IF).active(False)
-        WLAN(AP_IF).active(False)
-        self._ifc = None
+def bytes2bssid(bssid):
+    return ":".join("{:02X}".format(b) for b in bssid)
 
 
 def _bssid2bytes(bssid):

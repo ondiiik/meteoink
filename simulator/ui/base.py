@@ -2,9 +2,23 @@ from ulogging import getLogger, dump_exception
 
 logger = getLogger(__name__)
 
-from bitmap import FONTS, BMP, WIND
-from display import Bitmap, BLACK, WHITE, GREEN, BLUE, RED, YELLOW, ORANGE, ALPHA
-from display import Vect as V, Zero as Z
+from bitmap import BMP, WIND
+from display import Bitmap, Vect, ZERO, ONE, TWO
+from display.epd import BLACK
+
+try:
+    from display.epd import YELLOW
+except ImportError:
+    YELLOW = BLACK
+    RED = BLACK
+    ORANGE = BLACK
+else:
+    try:
+        from display.epd import RED
+        from display.epd import ORANGE
+    except ImportError:
+        RED = YELLOW
+        ORANGE = YELLOW
 
 
 class UiFrame:
@@ -45,9 +59,9 @@ class UiFrame:
             self.draw(*args)
         except Exception as e:
             dump_exception(f"Skipped {type(self).__name__} repaint", e)
-            self.canvas.rect(Z, self.dim, ORANGE)
-            self.canvas.line(Z, self.dim, ORANGE)
-            self.canvas.line(V(0, self.dim.y), V(self.dim.x, 0), ORANGE)
+            self.canvas.rect(ZERO, self.dim, ORANGE)
+            self.canvas.line(ZERO, self.dim, ORANGE)
+            self.canvas.line(Vect(0, self.dim.y), Vect(self.dim.x, 0), ORANGE)
             self.ui.text_center(16, str(e), self.dim // 2, color=RED, corona=YELLOW)
         finally:
             self.canvas.ofs -= self.ofs
@@ -82,7 +96,7 @@ class Ui:
         return self.text(size, text, pos, color, corona)
 
 
-class EpdBase(Ui):
+class UiBase(Ui):
     def __init__(self, canvas, forecast, connection, led, wdt):
         super().__init__(canvas)
         self.forecast = forecast

@@ -4,10 +4,9 @@ logger = getLogger(__name__)
 
 import micropython
 from micropython import const
-from framebuf import FrameBuffer, GS4_HMSB
 
-from .base import Vect, Bitmap, WHITE, BLACK, ALPHA, bmt, Base
-from .epd import EPD
+from .base import Vect, Bitmap, bmt, Base
+from .epd import ALPHA, BLACK
 from bitmap import FONTS
 
 
@@ -20,34 +19,8 @@ class Canvas(Base):
     @micropython.native
     def __init__(self):
         logger.info("Building canvas")
-        self.epd = EPD()
-        self.width = self.epd.height
-        self.height = self.epd.width
-        self.dim = Vect(self.epd.height, self.epd.width)
+        super().__init__(True)
         self._r = self.epd.height
-        self.ofs = Vect(0, 0)
-        logger.debug("\tEPD - [ OK ]")
-
-        self.buf = bytearray((self.epd.width * self.epd.height + 1) // 2)
-        self.fb = FrameBuffer(self.buf, self.epd.width, self.epd.height, GS4_HMSB)
-        self.clear()
-        logger.debug("\tFrame buffer - [ OK ]")
-
-    @micropython.native
-    def clear(self):
-        self.fb.fill(WHITE)
-
-    @micropython.native
-    def fill(self, c):
-        self.fb.fill(c)
-
-    @micropython.native
-    def flush(self, deghost=True):
-        if deghost:
-            logger.debug("De-ghosting ...")
-            self.epd.deghost(self.buf[:])
-        logger.info("Flushing ...")
-        self.epd.display_frame(self.buf)
 
     @micropython.native
     def hline(self, v, w, c=BLACK):

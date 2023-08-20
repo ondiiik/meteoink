@@ -1,8 +1,8 @@
 from ulogging import getLogger
 
 logger = getLogger(__name__)
-from config import ui
-from ..base import EpdBase, V, Z
+from config import behavior
+from ..base import UiBase, Vect, ZERO
 from .calendar import UiCalendar
 from .clouds import UiClouds
 from .icons import UiIcons
@@ -18,11 +18,11 @@ from .weather import UiWeather
 from .wind import UiWind
 
 
-class Epd(EpdBase):
+class MeteoUi(UiBase):
     def repaint_welcome(self):
         with self.Drawing("welcome", self):
             bitmap = self.bitmap(1, "greetings")
-            self.canvas.bitmap(Z, bitmap)
+            self.canvas.bitmap(ZERO, bitmap)
 
     def repaint_forecast(self, volt):
         if self.connection is not None:
@@ -32,61 +32,65 @@ class Epd(EpdBase):
                 # but temperature is.
                 logger.info("Drawing forecast ...")
 
-                if ui["show_radar"]:
-                    weather = UiRadar(self, Z, V(240, 180))
-                    outside = UiOutside(self, V(weather.right, 0), V(210, 120))
+                if behavior["show_radar"]:
+                    weather = UiRadar(self, ZERO, Vect(240, 180))
+                    outside = UiOutside(self, Vect(weather.right, 0), Vect(210, 120))
                     inside = UiInside(
                         self,
-                        V(weather.right, weather.bellow - 80),
-                        V(self.width - weather.right, 80),
+                        Vect(weather.right, weather.bellow - 80),
+                        Vect(self.width - weather.right, 80),
                     )
                     out_temp = UiOutTemp(
-                        self, V(weather.left, weather.bellow), V(weather.width, 60)
+                        self,
+                        Vect(weather.left, weather.bellow),
+                        Vect(weather.width, 60),
                     )
                 else:
-                    weather = UiWeather(self, Z, V(130, 120))
+                    weather = UiWeather(self, ZERO, Vect(130, 120))
                     outside = UiOutside(
-                        self, V(weather.right, 0), V(210, weather.height)
+                        self, Vect(weather.right, 0), Vect(210, weather.height)
                     )
                     inside = UiInside(
                         self,
-                        V(outside.right, 0),
-                        V(self.width - outside.right, weather.height),
+                        Vect(outside.right, 0),
+                        Vect(self.width - outside.right, weather.height),
                     )
                     out_temp = UiOutTemp(
-                        self, V(weather.left, weather.bellow), V(self.width // 2, 60)
+                        self,
+                        Vect(weather.left, weather.bellow),
+                        Vect(self.width // 2, 60),
                     )
 
                 in_temp = UiInTemp(
                     self,
-                    V(out_temp.right, out_temp.above),
-                    V(self.width - out_temp.width, out_temp.height),
+                    Vect(out_temp.right, out_temp.above),
+                    Vect(self.width - out_temp.width, out_temp.height),
                 )
                 calendar_head = UiCalendar(
-                    self, V(0, in_temp.bellow), V(self.width, 46)
+                    self, Vect(0, in_temp.bellow), Vect(self.width, 46)
                 )
                 icons = UiIcons(
-                    self, V(0, calendar_head.bellow + 12), V(self.width, 72)
+                    self, Vect(0, calendar_head.bellow + 12), Vect(self.width, 72)
                 )
                 calendar_tail = UiCalendar(
                     self,
-                    V(0, icons.bellow + 12),
-                    V(self.width, self.height - icons.bellow - 60),
+                    Vect(0, icons.bellow + 12),
+                    Vect(self.width, self.height - icons.bellow - 60),
                 )
                 clouds = UiClouds(
-                    self, V(0, calendar_tail.above + 8), V(self.width, 40)
+                    self, Vect(0, calendar_tail.above + 8), Vect(self.width, 40)
                 )
                 graph_temp = UiTempGr(
                     self,
-                    V(0, clouds.bellow + 12),
-                    V(self.width, calendar_tail.height - clouds.height - 24),
+                    Vect(0, clouds.bellow + 12),
+                    Vect(self.width, calendar_tail.height - clouds.height - 24),
                 )
                 text_temp = UiTempTxt(self, *graph_temp.same)
                 graph_rain = UiRain(self, *graph_temp.same)
                 wind = UiWind(
                     self,
-                    V(0, calendar_tail.bellow + 16),
-                    V(self.width, self.height - calendar_tail.bellow - 16),
+                    Vect(0, calendar_tail.bellow + 16),
+                    Vect(self.width, self.height - calendar_tail.bellow - 16),
                 )
 
                 calendar_head.repaint(True)
@@ -99,7 +103,7 @@ class Epd(EpdBase):
                 icons.repaint()
                 weather.repaint(self.connection, self.wdt)
                 outside.repaint()
-                inside.repaint(self.connection, volt, ui["show_radar"])
+                inside.repaint(self.connection, volt, behavior["show_radar"])
                 out_temp.repaint()
                 in_temp.repaint()
 
@@ -107,8 +111,8 @@ class Epd(EpdBase):
         with self.Drawing("lowbat", self):
             from .vbat import UiVBat
 
-            v = V(self.canvas.width // 2 - 30, self.canvas.height // 2)
-            d = V(60, 30)
+            v = Vect(self.canvas.width // 2 - 30, self.canvas.height // 2)
+            d = Vect(60, 30)
             UiVBat(self, v, d).repaint(volt)
 
     def repaint_config(self, volt):
@@ -124,18 +128,22 @@ class Epd(EpdBase):
 
             logger.info(f"Listening on {url}")
 
-            UiQr(self, Z, Z).repaint(wifi, "WiFi", False)
-            UiQr(self, V(self.width - 140, self.height - 140), Z).repaint(
+            UiQr(self, ZERO, ZERO).repaint(wifi, "WiFi", False)
+            UiQr(self, Vect(self.width - 140, self.height - 140), ZERO).repaint(
                 url, "Config URL", True
             )
             UiUrl(
                 self,
-                V(0, self.canvas.height // 2),
-                V(self.canvas.width - 132, self.canvas.height // 2),
+                Vect(0, self.canvas.height // 2),
+                Vect(self.canvas.width - 132, self.canvas.height // 2),
             ).repaint(url)
             UiWifi(
-                self, V(200, 0), V(self.canvas.width - 132, self.canvas.height // 2)
+                self,
+                Vect(200, 0),
+                Vect(self.canvas.width - 132, self.canvas.height // 2),
             ).repaint(spot)
             UiVBat(
-                self, V(self.canvas.width // 2 - 10, self.canvas.height // 2), V(20, 32)
+                self,
+                Vect(self.canvas.width // 2 - 10, self.canvas.height // 2),
+                Vect(20, 32),
             ).repaint(volt)

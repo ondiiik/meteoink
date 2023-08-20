@@ -29,9 +29,18 @@ logger = getLogger(__name__)
 from micropython import const
 from time import sleep_ms
 from struct import pack
-from machine import SPI, Pin
-from setup import pins
+from machine import SPI, Pin, deepsleep
+from config import hw
+from machine import deepsleep
 
+ALPHA = const(7)
+BLACK = const(0)
+BLUE = const(3)
+GREEN = const(2)
+ORANGE = const(6)
+RED = const(4)
+WHITE = const(1)
+YELLOW = const(5)
 
 ACEP_PANEL_SETTING = const(0x00)
 ACEP_POWER_SETTING = const(0x01)
@@ -59,21 +68,25 @@ class EPD:
         self.width = 600
         self.height = 448
 
+        self._fb = bytearray((self.width * self.height + 1) // 2)
+
+        p = hw["pins"]
+
         self._spi = SPI(1)
         self._spi.init(
             baudrate=2000000,
             polarity=0,
             phase=0,
-            sck=Pin(pins.SCK),
-            mosi=Pin(pins.MOSI),
-            miso=Pin(pins.MISO),
+            sck=Pin(p["sck"]),
+            mosi=Pin(p["mosi"]),
+            miso=Pin(p["miso"]),
         )
         logger.debug("\tSPI - [ OK ]")
 
-        self._cs = Pin(pins.CS)
-        self._dc = Pin(pins.DC)
-        self._rst = Pin(pins.RST)
-        self._busy = Pin(pins.BUSY)
+        self._cs = Pin(p["cs"])
+        self._dc = Pin(p["dc"])
+        self._rst = Pin(p["rst"])
+        self._busy = Pin(p["busy"])
         self._resolution = pack("!HH", self.width, self.height)
 
         self._cs.init(self._cs.OUT, value=1)
@@ -84,17 +97,26 @@ class EPD:
         self._initialized = False
 
     @micropython.native
-    def display_frame(self, buf):
+    def fb(self):
+        return self._fb
+
+    @micropython.native
+    def display_frame(self):
         self._init()
-        self._flush_frame(buf)
+        self._flush_frame(self._fb)
         self._sleep()
 
     @micropython.native
-    def deghost(self, buf):
+    def deghost(self):
         self._init()
+        buf = bytearray((self.width * self.height + 1) // 2)
         for i in range(len(buf)):
             buf[i] = 0x77
         self._flush_frame(buf)
+
+    @micropython.native
+    def deepsleep(self, t):
+        deepsleep(t)
 
     @micropython.native
     def _cmd(self, command, data=None):

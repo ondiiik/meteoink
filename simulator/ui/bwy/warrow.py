@@ -2,7 +2,8 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from .. import V, UiFrame, BLACK, WHITE, YELLOW
+from .. import Vect, UiFrame
+from display.epd import BLACK, WHITE, YELLOW
 from cmath import rect, pi
 
 
@@ -11,11 +12,13 @@ class UiWArrow(UiFrame):
         def rescale(v):
             return v * scale // 16
 
-        pos = pos + V(0, rescale(30))
+        pos = pos + Vect(0, rescale(30))
 
         if weather.speed < 2.5:
             self.canvas.fill_rect(
-                V(rescale(-2), rescale(-2)) + pos, V(rescale(4), rescale(4)), BLACK
+                Vect(rescale(-2), rescale(-2)) + pos,
+                Vect(rescale(4), rescale(4)),
+                BLACK,
             )
             return
 
@@ -44,7 +47,10 @@ class UiWArrow(UiFrame):
 
             def drawWindSpeed(w, c):
                 self.canvas.line(
-                    V(int(d.real), int(d.imag)), V(int(d1.real), int(d1.imag)), c, w
+                    Vect(int(d.real), int(d.imag)),
+                    Vect(int(d1.real), int(d1.imag)),
+                    c,
+                    w,
                 )
 
                 for i in range(int(weather.speed / 2.5)):
@@ -53,8 +59,8 @@ class UiWArrow(UiFrame):
                     b = rect(rr, (weather.dir - 90) * pi / 180) + o
                     font = rect(l, (weather.dir - 30) * pi / 180) + b
                     self.canvas.line(
-                        V(int(b.real), int(b.imag)),
-                        V(int(font.real), int(font.imag)),
+                        Vect(int(b.real), int(b.imag)),
+                        Vect(int(font.real), int(font.imag)),
                         c,
                         w,
                     )
@@ -71,16 +77,16 @@ class UiWArrow(UiFrame):
 
         d1 = d2 + rect(r * 2, (weather.dir - 75) * pi / 180)
         self.canvas.line(
-            V(int(d1.real), int(d1.imag)), V(int(d2.real), int(d2.imag)), c, w
+            Vect(int(d1.real), int(d1.imag)), Vect(int(d2.real), int(d2.imag)), c, w
         )
         self.canvas.line(
-            V(int(d1.real), int(d1.imag)), V(int(o.real), int(o.imag)), c, w
+            Vect(int(d1.real), int(d1.imag)), Vect(int(o.real), int(o.imag)), c, w
         )
 
         d1 = d2 + rect(r * 2, (weather.dir - 105) * pi / 180)
         self.canvas.line(
-            V(int(d1.real), int(d1.imag)), V(int(d2.real), int(d2.imag)), c, w
+            Vect(int(d1.real), int(d1.imag)), Vect(int(d2.real), int(d2.imag)), c, w
         )
         self.canvas.line(
-            V(int(d1.real), int(d1.imag)), V(int(o.real), int(o.imag)), c, w
+            Vect(int(d1.real), int(d1.imag)), Vect(int(o.real), int(o.imag)), c, w
         )

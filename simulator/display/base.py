@@ -1,16 +1,18 @@
+from ulogging import getLogger
+
+logger = getLogger(__name__)
+
+from .epd import EPD, BLACK, WHITE
 import micropython
 from framebuf import FrameBuffer, GS4_HMSB
-from micropython import const
+from config import hw
 
-
-BLACK = const(0)
-WHITE = const(1)
-GREEN = const(2)
-BLUE = const(3)
-RED = const(4)
-YELLOW = const(5)
-ORANGE = const(6)
-ALPHA = const(7)
+v2d = {
+    "acep": "bitmaps/acep/{}.bin",
+    "bwy": "bitmaps/bwy/{}.bin",
+    "epd47": "bitmaps/gs/{}.bin",
+}
+bmpd = v2d[hw["variant"]]
 
 
 class Vect:
@@ -69,7 +71,9 @@ class Vect:
         return f"Vect(x={self.x}, y={self.y})"
 
 
-Zero = Vect(0, 0)
+ZERO = Vect(0, 0)
+ONE = Vect(1, 1)
+TWO = Vect(2, 2)
 
 
 class Bitmap:
@@ -83,7 +87,7 @@ class Bitmap:
         self.buf = bmp[2]
 
         if isinstance(self.buf, int):
-            name = f"bitmaps/{bmp[3]}.bin"
+            name = bmpd.format(bmp[3])
             f = open(name, "rb")
             try:
                 f.seek(self.buf)
@@ -97,14 +101,40 @@ class Bitmap:
         self.fb = FrameBuffer(self.buf, self.dim.x, self.dim.y, GS4_HMSB)
 
 
-class Frame(FrameBuffer):
-    @micropython.native
-    def __init__(self, width, height):
-        self.buf = bytearray(((width + 1) // 2 * 2 * height) // 2)
-        super().__init__(self.buf, width, height, GS4_HMSB)
-
-
 class Base:
+    def __init__(self, t):
+        self.epd = EPD()
+
+        width, height = (
+            (self.epd.height, self.epd.width)
+            if t
+            else (self.epd.width, self.epd.height)
+        )
+
+        self.width = width
+        self.height = height
+        self.dim = Vect(width, height)
+        self.ofs = Vect(0, 0)
+        self.buf = self.epd.fb()
+        self.fb = FrameBuffer(self.buf, self.epd.width, self.epd.height, GS4_HMSB)
+        self.clear()
+
+    @micropython.native
+    def clear(self):
+        self.fb.fill(WHITE)
+
+    @micropython.native
+    def fill(self, c):
+        self.fb.fill(c)
+
+    @micropython.native
+    def flush(self, deghost=True):
+        if deghost:
+            logger.info("De-ghosting ...")
+            self.epd.deghost()
+        logger.info("Flushing ...")
+        self.epd.display_frame()
+
     @micropython.native
     def vtrap(self, vl1, vl2, yu1, yu2, c=BLACK):
         dx = vl2.x - vl1.x
@@ -170,7 +200,7 @@ def bmt(fonts, char, variant, size, color):
     s = fb[2]
 
     if isinstance(s, int):
-        name = f"bitmaps/{fb[3]}.bin"
+        name = bmpd.format(fb[3])
         with open(name, "rb") as f:
             f.seek(s)
             s = fb[2] = bytearray(f.read(fb[0] * fb[1] // 2))

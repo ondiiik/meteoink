@@ -2,28 +2,19 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from .. import (
+from ui import (
     UiFrame,
     Bitmap,
-    V,
-    Z,
-    BLACK,
-    WHITE,
-    GREEN,
-    BLUE,
-    RED,
-    YELLOW,
-    ORANGE,
-    ALPHA,
+    Vect,
+    ZERO,
 )
+from display.epd import ALPHA, BLACK, BLUE, GREEN, ORANGE, RED, WHITE
 from png import Reader
 import math
 import urequests
 import gc
-from framebuf import FrameBuffer, GS4_HMSB
 from micropython import const
-from io import BytesIO
-from config import location, api, ui
+from config import location, api, behavior
 
 _pow2 = (
     1,
@@ -59,14 +50,14 @@ _BELLOW_OF = const(8)
 
 class RadarMap:
     _sides = (
-        (_LEFT_OF, V(1, 0)),
-        (_LEFT_OF | _ABOVE_OF, V(1, 1)),
-        (_ABOVE_OF, V(0, 1)),
-        (_RIGHT_OF | _ABOVE_OF, V(-1, 1)),
-        (_RIGHT_OF, V(-1, 0)),
-        (_RIGHT_OF | _BELLOW_OF, V(-1, -1)),
-        (_BELLOW_OF, V(0, -1)),
-        (_LEFT_OF | _BELLOW_OF, V(1, -1)),
+        (_LEFT_OF, Vect(1, 0)),
+        (_LEFT_OF | _ABOVE_OF, Vect(1, 1)),
+        (_ABOVE_OF, Vect(0, 1)),
+        (_RIGHT_OF | _ABOVE_OF, Vect(-1, 1)),
+        (_RIGHT_OF, Vect(-1, 0)),
+        (_RIGHT_OF | _BELLOW_OF, Vect(-1, -1)),
+        (_BELLOW_OF, Vect(0, -1)),
+        (_LEFT_OF | _BELLOW_OF, Vect(1, -1)),
     )
     _swp_map0 = {True: BLUE, False: GREEN}
     _swp_map1 = {True: WHITE, False: GREEN}
@@ -138,7 +129,7 @@ class RadarMap:
         fb.fill_rect(self.dim2.y - 4, self.dim2.x - 4, 9, 9, BLACK)
         fb.fill_rect(self.dim2.y - 2, self.dim2.x - 2, 5, 5, WHITE)
 
-    def _load_file(self, fmt, x, y, conv, ofs=Z):
+    def _load_file(self, fmt, x, y, conv, ofs=ZERO):
         # Load requested tile
         self.wdt.feed()
         url = fmt.format(self.z, x, y)
@@ -174,10 +165,10 @@ class RadarMap:
                             fb.pixel(yy, ww - xx, c)
 
         # Load missing tiles
-        if ofs != Z or 0 == missing:
+        if ofs != ZERO or 0 == missing:
             return
 
-        pos = V(x, y)
+        pos = Vect(x, y)
         for mask, shift in self._sides:
             if (missing & mask) == mask:
                 p = pos + shift
@@ -196,7 +187,7 @@ class RadarMap:
         )
         t = complex(int(p.real), int(p.imag))
         o = (p - t) * 256
-        return V(int(t.real), int(t.imag)), V(int(o.real), int(o.imag))
+        return Vect(int(t.real), int(t.imag)), Vect(int(o.real), int(o.imag))
 
 
 class UiRadar(UiFrame):
@@ -204,12 +195,12 @@ class UiRadar(UiFrame):
         wmap = RadarMap(
             connection,
             wdt,
-            V(self.dim.x - 4, self.dim.y),
+            Vect(self.dim.x - 4, self.dim.y),
             location["locations"][connection.config["location"]]["lat"],
             location["locations"][connection.config["location"]]["lon"],
-            ui["show_radar"],
+            behavior["show_radar"],
         )
 
-        self.canvas.bitmap(Z, wmap.bitmap)
-        self.canvas.vline(V(self.dim.x - 4, 0), self.dim.y)
-        self.canvas.hline(V(0, self.dim.y), self.canvas.dim.x)
+        self.canvas.bitmap(ZERO, wmap.bitmap)
+        self.canvas.vline(Vect(self.dim.x - 4, 0), self.dim.y)
+        self.canvas.hline(Vect(0, self.dim.y), self.canvas.dim.x)

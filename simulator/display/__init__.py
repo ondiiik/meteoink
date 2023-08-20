@@ -2,12 +2,11 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from .base import BLACK, WHITE, GREEN, BLUE, RED, YELLOW, ORANGE, ALPHA
-from .base import Vect, Zero, Bitmap, Frame
+from .base import Vect, Bitmap, ZERO, ONE, TWO
 
-from setup.display import DISPLAY_ROTATED
+from config import hw
 
-if DISPLAY_ROTATED:
+if hw["variant"] == "acep":
     from .rotated import Canvas
 else:
     from .normal import Canvas

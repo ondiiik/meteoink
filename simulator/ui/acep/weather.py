@@ -2,7 +2,7 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from .. import UiFrame, V
+from .. import UiFrame, Vect
 
 
 class UiWeather(UiFrame):
@@ -11,4 +11,4 @@ class UiWeather(UiFrame):
         wdt.feed()
         weather = self.ui.forecast.weather
         bitmap = self.ui.bitmap(1, weather.icon)
-        self.canvas.bitmap(V(5, 0), bitmap)
+        self.canvas.bitmap(Vect(5, 0), bitmap)

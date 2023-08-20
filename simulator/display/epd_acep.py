@@ -1,10 +1,21 @@
-import pygame
-from itertools import product
 from framebuf import FrameBuffer, GS4_HMSB
+from itertools import product
+from machine import deepsleep
+import pygame
 
 
 EPD_WIDTH = 600
 EPD_HEIGHT = 448
+
+ALPHA = 7
+BLACK = 0
+BLUE = 3
+GREEN = 2
+ORANGE = 6
+RED = 4
+WHITE = 1
+YELLOW = 5
+
 
 colors = (
     (43, 46, 62),
@@ -25,6 +36,8 @@ class EPD:
         self._factor = 1
         self._frame = 6
 
+        self._fb = bytearray((self.width * self.height + 1) // 2)
+
         wsize = (
             (self._frame * 2 + self.height) * self._factor,
             (self._frame * 2 + self.width) * self._factor,
@@ -40,7 +53,25 @@ class EPD:
         pygame.display.set_caption("EPD {} x {} - ACEP".format(self.width, self.height))
 
     def init(self):
-        pass
+        ...
+
+    def fb(self):
+        return self._fb
+
+    def display_frame(self):
+        fb = FrameBuffer(self._fb, EPD_WIDTH, EPD_HEIGHT, GS4_HMSB)
+
+        for y, x in product(range(EPD_HEIGHT), range(EPD_WIDTH)):
+            self._draw_pixel(x, y, colors[fb.pixel(x, y) & 7])
+
+        pygame.display.flip()
+        self._clock.tick(2)
+
+    def deghost(self):
+        ...
+
+    def deepsleep(self, t):
+        deepsleep(t)
 
     def _draw_pixel(self, x, y, c):
         pygame.draw.rect(
@@ -53,16 +84,3 @@ class EPD:
                 self._factor,
             ],
         )
-
-    def display_frame(self, buf):
-        fb = FrameBuffer(buf, EPD_WIDTH, EPD_HEIGHT, GS4_HMSB)
-
-        for y, x in product(range(EPD_HEIGHT), range(EPD_WIDTH)):
-            self._draw_pixel(x, y, colors[fb.pixel(x, y) & 7])
-
-        pygame.display.flip()
-        self._clock.tick(2)
-
-    def deghost(self, buf):
-        for i in range(len(buf)):
-            buf[i] = 0x77

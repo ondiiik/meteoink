@@ -2,16 +2,10 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from buzzer import play
-from gc import collect
 from lang import trn
-from machine import deepsleep
 from micropython import const
-from uerrno import ECONNRESET, ENOTCONN, EAGAIN, ETIMEDOUT
-from uio import BytesIO
+from net import bytes2bssid
 from .microweb.microWebSrv import MicroWebSrv
-from utime import sleep_ms
-import socket
 
 
 SPACES = const(4)
@@ -34,7 +28,7 @@ class WebServer:
     def run(self):
         self.wdt.feed()
         logger.info("Starting WEB server")
-        www_dir = "/web/www"
+        www_dir = "/www"
         server = MicroWebSrv(webPath=f"{www_dir}/", port=5555)
         server.MaxWebSocketRecvLen = 256
         server.WebSocketThreaded = False
@@ -236,10 +230,6 @@ def action_handler(name):
 
 def button_enable(flag, url):
     return button(trn("Disable" if flag else "Enable"), url + ("d" if flag else "e"))
-
-
-def bytes2bssid(bssid):
-    return ":".join("{:02X}".format(b) for b in bssid)
 
 
 def name2page(name):

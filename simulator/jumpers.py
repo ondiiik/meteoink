@@ -2,8 +2,8 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from machine import Pin, reset_cause, DEEPSLEEP
-from setup import pins
+from machine import Pin, reset_cause, PWRON_RESET
+from config import hw
 from buzzer import play
 
 
@@ -16,10 +16,11 @@ def _pin_value(pin):
 
 
 class jumpers:
-    hotspot = _pin_value(pins.HOTSPOT_BUTTON)
-    alert = _pin_value(pins.ALLERT_BUTTON)
-    sleep = _pin_value(pins.SLEEP_BUTTON)
+    b = hw["buttons"]
+    hotspot = _pin_value(b["hotspot"])
+    alert = _pin_value(b["alert"])
+    sleep = _pin_value(b["sleep"])
 
 
-if not DEEPSLEEP == reset_cause():
+if PWRON_RESET == reset_cause():
     play((2093, 30))

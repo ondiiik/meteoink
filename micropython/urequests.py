@@ -3,7 +3,7 @@ import usocket
 
 
 class Request:
-    pass
+    ...
 
 
 class Response:
@@ -141,7 +141,7 @@ def request(
                     break
 
                 if parse_headers is False:
-                    pass
+                    ...
                 elif parse_headers is True:
                     l = l.decode()
                     k, v = l.split(":", 1)

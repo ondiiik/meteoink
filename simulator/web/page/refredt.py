@@ -2,7 +2,7 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from config import ui
+from config import behavior
 from lang import trn
 import web
 
@@ -12,6 +12,6 @@ def www(page, args):
     page.heading(2, trn("Display refresh time"))
 
     with page.form("refrset") as form:
-        form.input(trn("Refresh time"), "t", ui["refresh"])
-        form.input(trn("Doubled from"), "b", ui["dbl"][0])
-        form.input(trn("Doubled to"), "e", ui["dbl"][1])
+        form.input(trn("Refresh time"), "t", behavior["refresh"])
+        form.input(trn("Doubled from"), "b", behavior["dbl"][0])
+        form.input(trn("Doubled to"), "e", behavior["dbl"][1])

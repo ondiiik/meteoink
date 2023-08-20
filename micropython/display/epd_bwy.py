@@ -29,9 +29,15 @@ logger = getLogger(__name__)
 import micropython
 from struct import pack
 from time import sleep_ms
-from machine import SPI, Pin
-from setup import pins
-from .base import BLACK, WHITE, YELLOW
+from machine import SPI, Pin, deepsleep
+from config import hw
+
+
+ALPHA = const(7)
+BLACK = const(0)
+WHITE = const(1)
+YELLOW = const(5)
+
 
 # also works for black/white/yellow GDEW042C37?
 
@@ -59,21 +65,25 @@ class EPD:
         self.width = 400
         self.height = 300
 
+        self._fb = bytearray((self.width * self.height + 1) // 2)
+
+        p = hw["pins"]
+
         self._spi = SPI(1)
         self._spi.init(
             baudrate=2000000,
             polarity=0,
             phase=0,
-            sck=Pin(pins.SCK),
-            mosi=Pin(pins.MOSI),
-            miso=Pin(pins.MISO),
+            sck=Pin(p["sck"]),
+            mosi=Pin(p["mosi"]),
+            miso=Pin(p["miso"]),
         )
         logger.info("\tSPI - [ OK ]")
 
-        self._cs = Pin(pins.CS)
-        self._dc = Pin(pins.DC)
-        self._rst = Pin(pins.RST)
-        self._busy = Pin(pins.BUSY)
+        self._cs = Pin(p["cs"])
+        self._dc = Pin(p["dc"])
+        self._rst = Pin(p["rst"])
+        self._busy = Pin(p["busy"])
         self._resolution = pack("!HH", self.width, self.height)
 
         self._cs.init(self._cs.OUT, value=1)
@@ -82,11 +92,15 @@ class EPD:
         self._busy.init(self._busy.IN)
 
     @micropython.native
-    def display_frame(self, buf):
+    def fb(self):
+        return self._fb
+
+    @micropython.native
+    def display_frame(self):
         self._init()
 
         black = _convert(
-            buf,
+            self._fb,
             {
                 (WHITE << 4) | WHITE: 0b11,
                 (WHITE << 4) | YELLOW: 0b10,
@@ -100,7 +114,7 @@ class EPD:
             },
         )
         yellow = _convert(
-            buf,
+            self._fb,
             {
                 (WHITE << 4) | WHITE: 0b11,
                 (WHITE << 4) | YELLOW: 0b10,
@@ -121,8 +135,12 @@ class EPD:
         self._sleep()
 
     @micropython.native
-    def deghost(self, buf):
-        pass
+    def deghost(self):
+        ...
+
+    @micropython.native
+    def deepsleep(self, t):
+        deepsleep(t)
 
     @micropython.native
     def _cmd(self, command, data=None):

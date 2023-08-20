@@ -2,16 +2,17 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from .. import UiFrame, V, BLACK, WHITE, BLUE, GREEN, YELLOW, RED
+from .. import UiFrame, Vect
+from display.epd import BLACK, BLUE, YELLOW, RED, WHITE
 
 
 class UiRain(UiFrame):
     def draw(self):
         block = self.ui.block
 
-        self.canvas.hline(V(0, self.height - 1), self.dim.x - 1, BLACK)
-        crv = V(3, 3)
-        crd = crv + V(crv.x, 0)
+        self.canvas.hline(Vect(0, self.height - 1), self.dim.x - 1, BLACK)
+        crv = Vect(3, 3)
+        crd = crv + Vect(crv.x, 0)
         q = self.height // 4
         q2 = q * 2
         q3 = q * 3
@@ -25,14 +26,14 @@ class UiRain(UiFrame):
                     for h in (q, q2, q3):
                         if r > h:
                             r = h + (r - h) // 2
-                    v, d = V(x - int(block // 2) + 1, self.height - r - 1), V(
+                    v, d = Vect(x - int(block // 2) + 1, self.height - r - 1), Vect(
                         int(block) - 2, r
                     )
                 else:
                     v, d = None, None
 
                 if (max(fl.rain, fl.snow) < p) and (p > max(fr.rain, fr.snow)):
-                    t = f"{p:.1f}", V(x, self.height - 2)
+                    t = f"{p:.1f}", Vect(x, self.height - 2)
                 else:
                     t = None
 

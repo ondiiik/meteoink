@@ -1,13 +1,18 @@
-from setup.display import MODEL
-from variant import EPD_42_BWY, EPD_565_ACEP
+from config import hw
 
-if MODEL == EPD_565_ACEP:
+v = hw["variant"]
+
+if v == "acep":
     from .acep_rotated.fonts import FONTS
     from .acep_rotated.bmp import BMP
     from .acep_rotated.wind import WIND
-elif MODEL == EPD_42_BWY:
+elif v == "bwy":
     from .bwy.fonts import FONTS
     from .bwy.bmp import BMP
     from .bwy.wind import WIND
+elif v == "epd47":
+    from .gs.fonts import FONTS
+    from .gs.bmp import BMP
+    from .bwy.wind import WIND
 else:
-    raise TypeError(f"Don't know display type {MODEL}")
+    raise TypeError(f"Don't know display type for variant {v}")

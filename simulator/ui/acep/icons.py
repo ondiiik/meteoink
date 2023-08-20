@@ -2,7 +2,7 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from .. import UiFrame, V
+from .. import UiFrame, Vect
 from micropython import const
 
 
@@ -25,4 +25,4 @@ class UiIcons(UiFrame):
                 bitmap = self.ui.bitmap(4, fid)
                 icon[fid] = bitmap
 
-            self.canvas.bitmap(V(xx, i % rows_cnt * h_icons), bitmap)
+            self.canvas.bitmap(Vect(xx, i % rows_cnt * h_icons), bitmap)

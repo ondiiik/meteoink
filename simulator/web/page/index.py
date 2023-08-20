@@ -2,7 +2,7 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from config import beep, location, connection, spot, temp, vbat, ui, time, api
+from config import beep, location, connection, spot, temp, vbat, behavior, time, api
 from battery import battery
 from lang import trn
 import web
@@ -104,7 +104,7 @@ def index(page):
             (
                 trn("Refresh time"),
                 trn("{} min (doubled from {}:00 to {}:00)").format(
-                    ui["refresh"], ui["dbl"][0], ui["dbl"][1]
+                    behavior["refresh"], behavior["dbl"][0], behavior["dbl"][1]
                 ),
                 web.button(trn("Edit"), "refredt"),
             ),

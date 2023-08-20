@@ -3,6 +3,7 @@ from ulogging import getLogger
 logger = getLogger(__name__)
 
 from lang import trn
+from net import bytes2bssid
 import web
 
 
@@ -14,7 +15,7 @@ def www(page, args):
         ("SSID", "BSSID", ""), 'frame="hsides"', 'style="text-align:left"'
     ) as table:
         for w in web.WebServer.net.nets:
-            bssid = web.bytes2bssid(w.bssid)
+            bssid = bytes2bssid(w.bssid)
             table.row(
                 (
                     w.ssid,

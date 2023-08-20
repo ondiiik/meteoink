@@ -21,6 +21,11 @@
 			<location>/home/ondiiik/Development/micropython/meteo/meteo_py/README.md</location>
 		</link>
 		<link>
+			<name>graphics</name>
+			<type>2</type>
+			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/graphics</locationURI>
+		</link>
+		<link>
 			<name>mp_esp/epd_acep.py</name>
 			<type>1</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/micropython/display/epd_acep.py</locationURI>
@@ -29,6 +34,11 @@
 			<name>mp_esp/epd_bwy.py</name>
 			<type>1</type>
 			<locationURI>$%7BPARENT-1-PROJECT_LOC%7D/micropython/display/epd_bwy.py</locationURI>
+		</link>
+		<link>
+			<name>mp_esp/epd_t5_gs.py</name>
+			<type>1</type>
+			<location>/home/ondiiik/Development/micropython/meteo/meteo_py/micropython/display/epd_t5_gs.py</location>
 		</link>
 		<link>
 			<name>mp_esp/net.py</name>

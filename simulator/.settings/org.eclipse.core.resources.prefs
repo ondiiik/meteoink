@@ -1,4 +1,7 @@
 eclipse.preferences.version=1
+encoding//graphics/font2png.py=utf-8
+encoding//graphics/png2py_acep_rotated.py=utf-8
+encoding//graphics/png2py_gs.py=utf-8
 encoding//tools/font2png.py=utf-8
 encoding//tools/png2py_acep_rotated.py=utf-8
 encoding//tools/png2py_bwy.py=utf-8

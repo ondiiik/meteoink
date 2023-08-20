@@ -97,7 +97,7 @@ def rgb2color(rgba):
         if rgba[3] < 128:
             return Color.TRANSPARENT, Color.TRANSPARENT
     except:
-        pass  # No transparency
+        ...  # No transparency
 
     rgba = np.array(rgba[:3])
     mag_max = 1024

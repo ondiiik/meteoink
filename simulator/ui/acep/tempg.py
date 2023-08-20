@@ -2,7 +2,8 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from .. import UiFrame, V, BLACK, RED, GREEN, ORANGE, BLUE
+from .. import UiFrame, Vect
+from display.epd import BLACK, BLUE, GREEN, ORANGE, RED
 from micropython import const
 from config import temp
 
@@ -22,8 +23,8 @@ class UiTempGr(UiFrame):
 
         def gen():
             for x1, f1, x2, f2 in self.ui.forecast_blocks():
-                f = V(x1, self.chart_y(f1.feel)), V(x2, self.chart_y(f2.feel))
-                t = V(x1, self.chart_y(f1.temp)), V(x2, self.chart_y(f2.temp))
+                f = Vect(x1, self.chart_y(f1.feel)), Vect(x2, self.chart_y(f2.feel))
+                t = Vect(x1, self.chart_y(f1.temp)), Vect(x2, self.chart_y(f2.temp))
                 rl = f1.srt + stp
                 rh = f1.sst + stp
                 dl = (rl < f1.dt < rh) or (rl < f1.dt < rh)

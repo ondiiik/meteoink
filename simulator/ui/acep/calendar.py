@@ -2,7 +2,8 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from .. import UiFrame, V, Z, BLACK, GREEN
+from ui import UiFrame, Vect, ZERO
+from display.epd import BLACK, GREEN
 from micropython import const
 from lang import day_of_week
 from config import api
@@ -23,7 +24,7 @@ class UiCalendar(UiFrame):
 
         # Draw upper horizontal lines
         if show_days:
-            self.canvas.hline(Z, self.dim.x - 1)
+            self.canvas.hline(ZERO, self.dim.x - 1)
 
         # Find time related to next day
         week_day = self.ui.forecast.time.get_date_time(forecast[0].dt)[6]
@@ -44,28 +45,30 @@ class UiCalendar(UiFrame):
             if show_days and ((dt[6] == 5) or (dt[6] == 6)):
                 if first:
                     self.canvas.trect(
-                        V(int(x - dt[3] // hpi * hpi * block / hpi), 1),
-                        V(dblock, 26),
+                        Vect(int(x - dt[3] // hpi * hpi * block / hpi), 1),
+                        Vect(dblock, 26),
                         GREEN,
                     )
                 if 0 == hour:
-                    self.canvas.trect(V(x, 1), V(dblock, 26), GREEN)
+                    self.canvas.trect(Vect(x, 1), Vect(dblock, 26), GREEN)
 
             # Draw separators
             sep_space = self.dim.y + h_space - (20 if show_days else 10)
             if 0 == hour:
                 if (dt[6] == 5) or (dt[6] == 0):
-                    self.canvas.vline(V(x + 1, 0), sep_space, BLACK)
+                    self.canvas.vline(Vect(x + 1, 0), sep_space, BLACK)
 
-                self.canvas.vline(V(x, 0), sep_space, BLACK)
+                self.canvas.vline(Vect(x, 0), sep_space, BLACK)
 
             if show_days:
                 # Draw hours text
                 if hour % 6 == 0:
-                    self.ui.text_center(16, str(hour), V(x, self.dim.y // 2 + h_space))
+                    self.ui.text_center(
+                        16, str(hour), Vect(x, self.dim.y // 2 + h_space)
+                    )
 
                 # Draw day of week text
                 if (hour + 12) % 24 == 0:
-                    self.ui.text_center(16, day_of_week[dt[6]], V(x, h_space))
+                    self.ui.text_center(16, day_of_week[dt[6]], Vect(x, h_space))
 
             first = False
