@@ -9,6 +9,16 @@ import web
 
 
 def index(page):
+    _pg_loc(page)
+    _pg_wifi(page)
+    _pg_set(page)
+
+    page.heading(2, trn("Misc"))
+    page.button(trn("Go to travel mode"), "zzz")
+    page.button(trn("Go to normal mode"), "reset")
+
+
+def _pg_loc(page):
     page.heading(2, trn("Locations setup"))
 
     with page.table(
@@ -33,6 +43,8 @@ def index(page):
     page.button(trn("Add new location"), "locnew")
     page.br()
 
+
+def _pg_wifi(page):
     page.heading(2, trn("WiFi setup"))
     with page.table(
         ("SSID", "BSSID", trn("Location"), "", ""),
@@ -64,6 +76,8 @@ def index(page):
     page.button(trn("Add new WiFi"), "wifinew")
     page.br()
 
+
+def _pg_set(page):
     page.heading(2, trn("Confort temperatures"))
     with page.table(None, 'frame="hsides"') as table:
         table.row(
@@ -151,10 +165,6 @@ def index(page):
             web.SPACES,
         )
 
-    page.heading(2, trn("Misc"))
-    page.button(trn("Go to travel mode"), "zzz")
-    page.button(trn("Go to normal mode"), "reset")
-
 
 @web.webpage_handler(__name__, "GET")
 def www(page, args):
@@ -163,6 +173,8 @@ def www(page, args):
 
 @web.webpage_handler(__name__, "POST")
 def www(page, args):
+    logger.debug(f'args: {", ".join([k+"="+v for k, v in args.items()])}')
+
     action = args.get("action", None)
 
     if action:

@@ -9,6 +9,8 @@ import web
 
 @web.action_handler(__name__)
 def www(page, args):
+    logger.debug(f'args: {", ".join([k+"="+v for k, v in args.items()])}')
+
     page.heading(2, trn("Display refresh time"))
 
     with page.form("refrset") as form:

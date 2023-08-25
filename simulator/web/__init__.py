@@ -134,21 +134,24 @@ class _Form(_Table):
         self.row(
             (
                 f"<label>{txt}</label>",
-                '<input type="{3}" id="{0}" name="{0}" value="{2}">'.format(
-                    var, txt, dfl, tp
-                ),
+                f'<input type="{tp}" id="{var}" name="{var}" value="{dfl}">',
             ),
             space,
         )
 
     def variable(self, var, val):
         self.row(
-            (
-                '<input type="hidden" id="{0}" name="{0}" value="{1}" />'.format(
-                    var, val
-                ),
-            ),
+            (f'<input type="hidden" id="{var}" name="{var}" value="{val}" />',),
             0,
+        )
+
+    def checkbox(self, txt, var, checked=False, space=4):
+        self.row(
+            (
+                f"<label>{txt}</label>",
+                f'<input type="checkbox" id="{var}" name="{var}"{" checked" if checked else ""}>',
+            ),
+            space,
         )
 
     def spacer(self):

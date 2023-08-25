@@ -9,6 +9,8 @@ import web
 
 @web.action_handler(__name__)
 def www(page, args):
+    logger.debug(f'args: {", ".join([k+"="+v for k, v in args.items()])}')
+
     loc = location["locations"][int(args["idx"])]
     page.heading(2, trn("Edit location"))
     with page.form("locset") as form:

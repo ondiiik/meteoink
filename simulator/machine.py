@@ -14,7 +14,7 @@ class SPI:
 _pins = [1] * 256
 
 
-_pins[32] = 1  # 1 - Meteostation, 0 - Config server
+_pins[32] = 0  # 1 - Meteostation, 0 - Config server
 
 
 class WDT:

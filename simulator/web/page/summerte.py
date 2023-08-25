@@ -8,6 +8,8 @@ import web
 
 @web.action_handler(__name__)
 def www(page, args):
+    logger.debug(f'args: {", ".join([k+"="+v for k, v in args.items()])}')
+
     time["winter"] = False
     time.flush()
     web.index(page)

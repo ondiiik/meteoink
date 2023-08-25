@@ -6,13 +6,15 @@ logger = getLogger(__name__)
 
 
 def wifiset(page, args):
-    for i in range(len(connection["connections"])):
-        if connection["connections"][i]["bssid"] == bssid:
-            if "location" in args:
-                connection["connections"][i]["location"] = int(args["location"])
-            connection["connections"][i].passwd = args["psw"]
-            connection.flush()
-            break
+    logger.debug(f'args: {", ".join([k+"="+v for k, v in args.items()])}')
+
+    c = connection["connections"][int(args["idx"])]
+    c["ssid"] = args["ssid"]
+    c["bssid"] = args["bssid"]
+    c["ignore_bssid"] = True if "ib" in args else False
+    c["location"] = int(args["location"])
+    c["passwd"] = args["psw"]
+    connection.flush()
 
     web.index(page)
 

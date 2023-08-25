@@ -8,5 +8,7 @@ import web
 
 @web.action_handler(__name__)
 def www(page, args):
+    logger.debug(f'args: {", ".join([k+"="+v for k, v in args.items()])}')
+
     api["language"] = args["l"]
     web.index(page)
