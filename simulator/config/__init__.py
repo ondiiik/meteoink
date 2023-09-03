@@ -18,7 +18,7 @@ alert = Json(
 
 display = Json(
     "cfg/display.json",
-    {"greetings": False},
+    {"greetings": False, "lowbat": False},
 )
 
 sys = Json(

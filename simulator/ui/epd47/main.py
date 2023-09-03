@@ -86,7 +86,7 @@ class MeteoUi(UiBase):
         with self.Drawing("lowbat", self):
             from .vbat import UiVBat
 
-            v = Vect(self.canvas.width // 2 - 30, self.canvas.height // 2)
+            v = Vect(self.canvas.width // 2 - 30, self.canvas.height // 2 - 15)
             d = Vect(60, 30)
             UiVBat(self, v, d).repaint(volt)
 

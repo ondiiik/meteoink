@@ -105,15 +105,28 @@ class App:
         # When battery voltage is too low, just draw low battery
         # error on screen and go to deep sleep.
         if self.volt < vbat["low_voltage"]:
-            self.led.mode(Led.ALERT)
-
-            from ui.main import MeteoUi
-
-            ui = MeteoUi(self.canvas, None, None)
-            ui.repaint_lowbat(self.volt)
-
             logger.info("Low battery !!!")
-            self.sleep(15)
+
+            if not display.get("lowbat", False):
+                self.net = None
+
+                self.led.mode(Led.ALERT)
+
+                from ui.main import MeteoUi
+
+                ui = MeteoUi(self.canvas, None, None, self.led, self.wdt)
+                ui.repaint_lowbat(self.volt)
+
+                display["lowbat"] = True
+                display.flush()
+
+                self.sleep(30)  # Use EPD deep sleep to ensure to repaint display
+            else:
+                deepsleep(30 * 60000)  # Display is painted - just go to deep sleep
+
+        else:
+            display["lowbat"] = False
+            display.flush()
 
         # Now we can create connection instance. Instance will not
         # connect immediately but only when it is needed as WiFi

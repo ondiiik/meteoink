@@ -3,7 +3,7 @@ from ulogging import getLogger
 logger = getLogger(__name__)
 
 from ui import UiFrame, Vect
-from display.epd import BLACK, WHITE
+from display.epd import WHITE
 from config import vbat
 
 
@@ -27,7 +27,3 @@ class UiVBat(UiFrame):
             f"{volt:.2}V" if vbat["show_voltage"] else f"{p:.0%}",
             Vect(w // 2 + 2, -5),
         )
-
-        if volt < vbat["low_voltage"]:
-            self.canvas.line(Vect(13, 0), self.dim, WHITE, w=6)
-            self.canvas.line(Vect(13, 0), self.dim, BLACK, w=2)
