@@ -2,14 +2,15 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from ui import Vect
+from ui import Vect, with_forecast
 from .warrow import UiWArrow
 
 
 class UiOutside(UiWArrow):
-    def draw(self):
+    @with_forecast
+    def draw(self, forecast):
         # Draw wind
-        weather = self.ui.forecast.weather
+        weather = forecast.weather
         self.draw_wind(Vect(self.width - 230, 40), weather)
 
         # Type wind speed

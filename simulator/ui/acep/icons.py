@@ -2,15 +2,16 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from .. import UiFrame, Vect
+from ui import UiFrame, Vect, with_forecast
 from micropython import const
 
 
 class UiIcons(UiFrame):
-    def draw(self):
+    @with_forecast
+    def draw(self, forecast):
         # Pre-calculates some range values and draw icons bar
+        forecast = forecast.forecast
         rows_cnt = const(2)
-        forecast = self.ui.forecast.forecast
         cnt = len(forecast)
         h_icons = self.dim.y // rows_cnt
         icon = {}

@@ -150,3 +150,15 @@ class UiBase(Ui):
             logger.info(f"Flushing {self.name} ...")
             self.epd.led.mode(self.epd.led.FLUSHING)
             self.epd.canvas.flush()
+
+
+def with_forecast(fn):
+    def wrapper(self, *args):
+        forecast = self.ui.forecast
+
+        if forecast is None:
+            return
+
+        fn(self, forecast, *args)
+
+    return wrapper

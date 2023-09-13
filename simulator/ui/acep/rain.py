@@ -2,12 +2,24 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from .. import UiFrame, Vect
+from ui import UiFrame, Vect
 from display.epd import BLACK, BLUE, YELLOW, RED, WHITE
+from lang import trn
 
 
 class UiRain(UiFrame):
     def draw(self):
+        if self.ui.forecast is None:
+            self.ui.text_center(
+                35, trn("Unable to download"), Vect(self.dim.x // 2, 0), RED
+            )
+            self.ui.text_center(
+                35, trn("weather data!"), Vect(self.dim.x // 2, 35), RED
+            )
+        else:
+            self._draw()
+
+    def _draw(self):
         block = self.ui.block
 
         self.canvas.hline(Vect(0, self.height - 1), self.dim.x - 1, BLACK)

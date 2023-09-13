@@ -2,13 +2,14 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from .. import Vect, ZERO, UiFrame
+from ui import Vect, UiFrame, with_forecast
 from .warrow import UiWArrow
 
 
 class UiWind(UiFrame):
-    def draw(self):
-        forecast = self.ui.forecast.forecast
+    @with_forecast
+    def draw(self, forecast):
+        forecast = forecast.forecast
         cnt = len(forecast) + 1
         s = Vect(self.height, self.height) // 2
         d = self.dim.y // 5

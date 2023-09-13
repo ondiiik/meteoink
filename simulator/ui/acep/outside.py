@@ -3,7 +3,7 @@ from ulogging import getLogger
 logger = getLogger(__name__)
 
 from micropython import const
-from .. import Vect, UiFrame
+from ui import Vect, UiFrame, with_forecast
 from .warrow import UiWArrow
 from .rh import UiRh
 from .ws import UiWs
@@ -11,14 +11,15 @@ from .rv import UiRv
 
 
 class UiOutside(UiFrame):
-    def draw(self):
+    @with_forecast
+    def draw(self, forecast):
         VALWIDTH = const(100)
         OVERLAP = const(35)
         spacing = self.height // 3 + 1
         valsize = Vect(VALWIDTH, spacing)
 
         # Draw wind
-        weather = self.ui.forecast.weather
+        weather = forecast.weather
         u = UiWArrow(
             self.ui,
             Vect(VALWIDTH - OVERLAP, 0),

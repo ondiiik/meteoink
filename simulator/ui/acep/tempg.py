@@ -2,17 +2,19 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from .. import UiFrame, Vect
+from ui import UiFrame, Vect, with_forecast
 from display.epd import BLACK, BLUE, GREEN, ORANGE, RED
 from micropython import const
 from config import temp
 
 
 class UiTempGr(UiFrame):
-    def draw(self):
-        forecast = self.ui.forecast.forecast
-        stp = self.ui.forecast.step
-        temps = [f.feel for f in forecast] + [f.temp for f in forecast]
+    @with_forecast
+    def draw(self, forecast):
+        stp = forecast.step
+        temps = [f.feel for f in forecast.forecast] + [
+            f.temp for f in forecast.forecast
+        ]
         temp_max = max(temps)
         self.temp_min = min(temps)
 

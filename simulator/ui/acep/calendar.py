@@ -2,7 +2,7 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from ui import UiFrame, Vect, ZERO
+from ui import UiFrame, Vect, ZERO, with_forecast
 from display.epd import BLACK, GREEN
 from micropython import const
 from lang import day_of_week
@@ -10,8 +10,8 @@ from config import api
 
 
 class UiCalendar(UiFrame):
-    def draw(self, show_days):
-        forecast = self.ui.forecast.forecast
+    @with_forecast
+    def draw(self, forecast, show_days):
         block = self.ui.block
         h_space = const(4)
 
@@ -27,10 +27,10 @@ class UiCalendar(UiFrame):
             self.canvas.hline(ZERO, self.dim.x - 1)
 
         # Find time related to next day
-        week_day = self.ui.forecast.time.get_date_time(forecast[0].dt)[6]
+        week_day = forecast.time.get_date_time(forecast.forecast[0].dt)[6]
 
-        for i in range(len(forecast)):
-            dt = self.ui.forecast.time.get_date_time(forecast[i].dt)
+        for i in range(len(forecast.forecast)):
+            dt = forecast.time.get_date_time(forecast.forecast[i].dt)
             if not week_day == dt[6]:
                 dh = dt[3]
                 break
@@ -38,7 +38,7 @@ class UiCalendar(UiFrame):
         # Draw all items related to forecast
         first = True
         for x, f in self.ui.forecast_singles():
-            dt = self.ui.forecast.time.get_date_time(f.dt)
+            dt = forecast.time.get_date_time(f.dt)
             hour = dt[3] - dh
 
             # Draw weekends

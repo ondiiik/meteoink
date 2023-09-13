@@ -2,12 +2,13 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from ui import UiFrame, Vect
+from ui import UiFrame, Vect, with_forecast
 from display.epd import BLUE
 
 
 class UiClouds(UiFrame):
-    def draw(self):
+    @with_forecast
+    def draw(self, _):
         k = self.height / 200
         m = self.height // 2
         for x1, f1, x2, f2 in self.ui.forecast_blocks():

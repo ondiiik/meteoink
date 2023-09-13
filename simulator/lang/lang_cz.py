@@ -53,11 +53,13 @@ _trn = {
     "Submit": "Potvrdit",
     "Summer time": "Letní čas",
     "Two days": "Dvoudenní",
+    "Unable to download": "Nepodařilo se stáhnout",
     "Units": "Jednotky",
     "Use with BSSID": "použít včetně BSSID",
     "Use": "Použít",
     "Variant": "Varianta",
     "WiFi setup": "Nastavení WiFi",
+    "weather data!": "stav počasí!",
     "{} min (doubled from {}:00 to {}:00)": "{} min (mezi {}:00 a {}:00 dvakrát delší)",
 }
 

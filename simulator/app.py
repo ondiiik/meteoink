@@ -38,7 +38,9 @@ def run():
                 app.hotspot()
 
         # And finally - meteostation display - basic functionality ;-)
-        else:
+        # Checks if we will display RAW image from remote display server
+        # or makes own meteostation screen based on openweathermap data.
+        elif not app.remote_display():
             # Once we are connected to network, we can download forecast.
             # Just note that once forecast is download, WiFi is disconnected
             # to save as much battery capacity as possible.
@@ -193,12 +195,28 @@ class App:
 
         reset()
 
+    def remote_display(self):
+        if not behavior.get("remote_display", True):
+            return False
+
+        self.net.connect()
+        addr = self.net.config.get("remote_display", None)
+
+        if addr is None:
+            return False
+
+        logger.info(f"Connecting to display server: {addr}")
+        return False
+
     def forecast(self):
         if self.net is None:
             return None
         else:
             self.net.connect()
-            return Forecast(self.net, self.temp)
+            try:
+                return Forecast(self.net, self.temp)
+            except OSError:
+                return None
 
     def repaint(self, forecast):
         from ui.main import MeteoUi

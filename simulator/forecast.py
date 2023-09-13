@@ -6,7 +6,7 @@ import dht
 from machine import Pin, deepsleep, RTC
 from micropython import const
 from collections import namedtuple
-from config import api, sys, location, hw
+from config import api, location, hw
 from ltime import Time
 from buzzer import play
 

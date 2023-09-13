@@ -86,7 +86,7 @@ api = Json(
 
 behavior = Json(
     "cfg/behavior.json",
-    {"refresh": 15, "dbl": (0, 7), "show_radar": 5},
+    {"refresh": 15, "dbl": (0, 7), "show_radar": 5, "remote_display": True},
 )
 
 hw = Json(

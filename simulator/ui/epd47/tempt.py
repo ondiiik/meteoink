@@ -2,12 +2,13 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from .. import UiFrame, Vect
-from display.epd import BLACK, WHITE
+from ui import UiFrame, Vect, with_forecast
+from display.epd import BLACK
 
 
 class UiTempTxt(UiFrame):
-    def draw(self, graph_temp):
+    @with_forecast
+    def draw(self, _, graph_temp):
         for x, fl, f, fr in self.ui.forecast_tripples():
             if (fl.temp < f.temp) and (f.temp > fr.temp):
                 self.ui.text_center(

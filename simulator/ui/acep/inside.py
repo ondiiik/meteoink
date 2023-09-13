@@ -3,7 +3,7 @@ from ulogging import getLogger
 logger = getLogger(__name__)
 
 from micropython import const
-from ui import UiFrame, Vect
+from ui import UiFrame, Vect, with_forecast
 from display.epd import BLUE
 from .vbat import UiVBat
 from .rh import UiRh
@@ -11,13 +11,14 @@ from config import location
 
 
 class UiInside(UiFrame):
-    def draw(self, connection, volt, layout_2):
+    @with_forecast
+    def draw(self, forecast, connection, volt, layout_2):
         SPACING = const(18)
         spacing = self.height // (2 if layout_2 else 3) + 1
 
         # Type humidity
         rh = UiRh(self.ui, Vect(0, self.height - spacing), Vect(self.width, spacing))
-        rh.repaint(self.ui.forecast.home.rh)
+        rh.repaint(forecast.home.rh)
 
         # Display battery state
         if layout_2:
@@ -27,7 +28,7 @@ class UiInside(UiFrame):
         batt.repaint(volt)
 
         # Type weather details
-        dt = self.ui.forecast.time.get_date_time(self.ui.forecast.weather.dt)
+        dt = forecast.time.get_date_time(forecast.weather.dt)
         dt = f"{dt[2]:d}.{dt[1]:d}.{dt[0]:d} {dt[3]:d}:{dt[4]:02d}"
 
         if layout_2:

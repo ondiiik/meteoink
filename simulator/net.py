@@ -54,17 +54,22 @@ class Connection:
     def http_get_json(self, url):
         logger.debug("HTTP GET: " + url)
 
-        for retry in range(CONN_RETRY_CNT):
+        for _ in range(CONN_RETRY_CNT):
             try:
                 return urequests.get(url).json()
                 collect()
                 return
-            except OSError as font:
-                logger.info("ECONNRESET -> retry")
-                if font.errno == ECONNRESET:
+            except OSError as e:
+                if e.errno == ECONNRESET:
+                    logger.warning("ECONNRESET -> retry")
                     continue
+                logger.error(f"Connection error: {e}")
+                ...
+            except Exception as e:
+                logger.error(f"Connection error: {e}")
+                ...
 
-                raise font
+        raise OSError("Page does not respond")
 
     def disconnect(self):
         ...

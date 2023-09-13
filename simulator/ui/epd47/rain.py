@@ -1,12 +1,24 @@
 from ulogging import getLogger
 from ui import UiFrame, Vect, ONE, TWO
 from display.epd import BLACK, WHITE, GRAY
+from lang import trn
 
 logger = getLogger(__name__)
 
 
 class UiRain(UiFrame):
     def draw(self):
+        if self.ui.forecast is None:
+            self.ui.text_center(
+                25, trn("Unable to download"), Vect(self.dim.x // 2, 0), BLACK
+            )
+            self.ui.text_center(
+                25, trn("weather data!"), Vect(self.dim.x // 2, 35), BLACK
+            )
+        else:
+            self._draw()
+
+    def _draw(self):
         # Pre-calculates some range values and draw icons bar
         block = self.ui.block
 

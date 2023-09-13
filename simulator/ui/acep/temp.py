@@ -2,7 +2,7 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from .. import UiFrame, Vect
+from ui import UiFrame, Vect, with_forecast
 from display.epd import BLACK, RED
 from config import temp
 
@@ -12,8 +12,9 @@ class UiTemp(UiFrame):
         super().__init__(ui, ofs, dim)
         self.inside = inside
 
-    def draw(self):
-        t = self.ui.forecast.home.temp if self.inside else self.ui.forecast.weather.temp
+    @with_forecast
+    def draw(self, forecast):
+        t = forecast.home.temp if self.inside else forecast.weather.temp
         color = BLACK
 
         if t is None:

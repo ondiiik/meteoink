@@ -2,13 +2,14 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from .. import UiFrame, Vect
+from ui import UiFrame, Vect, with_forecast
 from display.epd import BLACK
 
 
 class UiWeather(UiFrame):
-    def draw(self):
-        weather = self.ui.forecast.weather
+    @with_forecast
+    def draw(self, forecast):
+        weather = forecast.weather
         bitmap = self.ui.bitmap(1, weather.icon)
         self.canvas.bitmap(Vect(5, 0), bitmap)
 

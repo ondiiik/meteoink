@@ -89,17 +89,22 @@ class Connection:
     def http_get_json(self, url):
         logger.info(f"HTTP GET: {url}")
 
-        for retry in range(CONN_RETRY_CNT):
+        for _ in range(CONN_RETRY_CNT):
             try:
                 return urequests.get(url).json()
                 collect()
                 return
             except OSError as e:
-                logger.warning("ECONNRESET -> retry")
                 if e.errno == ECONNRESET:
+                    logger.warning("ECONNRESET -> retry")
                     continue
+                logger.error(f"Connection error: {e}")
+                ...
+            except Exception as e:
+                logger.error(f"Connection error: {e}")
+                ...
 
-                raise e
+        raise OSError("Page does not respond")
 
     def _attach(self):
         # Activate WiFi interface

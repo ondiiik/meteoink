@@ -2,7 +2,7 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from .. import UiFrame, Vect, ZERO
+from ui import UiFrame, Vect, ZERO, with_forecast
 from display.epd import BLACK
 from micropython import const
 from lang import day_of_week
@@ -10,8 +10,9 @@ from config import api
 
 
 class UiCalendar(UiFrame):
-    def draw(self, show_days):
-        forecast = self.ui.forecast.forecast
+    @with_forecast
+    def draw(self, forecast, show_days):
+        forecast = forecast.forecast
         block = self.ui.block
         h_space = const(4)
 
