@@ -1,4 +1,4 @@
-from ulogging import getLogger
+from ulogging import getLogger, dump_exception
 
 logger = getLogger(__name__)
 

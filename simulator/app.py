@@ -4,7 +4,7 @@ logger = getLogger(__name__)
 
 from jumpers import jumpers
 from net import Connection
-from config import alert, display, beep, temp, vbat, behavior, hw
+from config import alert, display, beep, temp, vbat, behavior, hw, spot
 from machine import deepsleep, reset, WDT, reset_cause, PWRON_RESET
 from battery import battery
 from buzzer import play
@@ -12,6 +12,8 @@ from esp32 import raw_temperature
 from led import Led
 from display import Canvas
 from forecast import Forecast
+from socket import socket, getaddrinfo
+from ujson import dumps
 
 
 def run():
@@ -38,9 +40,11 @@ def run():
                 app.hotspot()
 
         # And finally - meteostation display - basic functionality ;-)
-        # Checks if we will display RAW image from remote display server
-        # or makes own meteostation screen based on openweathermap data.
-        elif not app.remote_display():
+        else:
+            # Checks if we will display RAW image from remote display server
+            # or makes own meteostation screen based on openweathermap data.
+            app.remote_display()
+
             # Once we are connected to network, we can download forecast.
             # Just note that once forecast is download, WiFi is disconnected
             # to save as much battery capacity as possible.
@@ -58,8 +62,8 @@ def run():
             # according to current weather forecast and UI needs and is in minutes.
             app.sleep(forecast)
 
-    except Exception as font:
-        dump_exception("FATAL - RECOVERY REQUIRED !!!", font)
+    except Exception as e:
+        dump_exception("FATAL - RECOVERY REQUIRED !!!", e)
 
         if beep["error_beep"]:
             play((200, 500), (100, 500))
@@ -196,17 +200,70 @@ class App:
         reset()
 
     def remote_display(self):
-        if not behavior.get("remote_display", True):
-            return False
+        display_port = behavior.get("display_port", 6625)
+
+        if display_port == 0:
+            return
 
         self.net.connect()
-        addr = self.net.config.get("remote_display", None)
+        address = self.net.config.get("remote_display", None)
 
-        if addr is None:
-            return False
+        if address is None:
+            return
 
-        logger.info(f"Connecting to display server: {addr}")
-        return False
+        logger.info(f"Connecting to display server: {address}")
+
+        try:
+            logger.debug(f"Opening framebuff server at: 0.0.0.0:{display_port}")
+            rs = socket()
+            rs.bind(getaddrinfo("0.0.0.0", display_port)[0][-1])
+            rs.listen(1)
+
+            rq = socket()
+            addr, port = address.split(":")
+            port = int(port)
+            rq.connect(getaddrinfo(addr, port)[0][-1])
+            info = dumps(
+                {
+                    "id": spot["ssid"],
+                    "port": display_port,
+                    "display": {
+                        "variant": hw["variant"],
+                        "size": [self.canvas.width, self.canvas.height],
+                        "rotation": self.canvas.rotation,
+                    },
+                    "sensors": {
+                        "vbat": self.volt,
+                        "temp": self.temp,
+                    },
+                }
+            )
+            logger.debug(f"Sending request: {info}")
+            rq.sendall(info.encode())
+            rq.close()
+
+            cl, addr = rs.accept()
+            r = len(self.canvas.buf)
+            b = memoryview(self.canvas.buf)
+
+            logger.debug("Receiving framebuffer:")
+            f = cl.makefile("rb", 0)
+
+            while r:
+                logger.debug(f"   remaining {r}B ...")
+                r -= f.readinto(b[-r:])
+
+            logger.debug(f"   remaining sleep time & flags ...")
+            minutes, flags = [i for i in f.read(2)]
+            rs.close()
+
+            logger.info(f"Frame buffer received")
+
+            self.canvas.flush()
+            self.sleep(minutes=minutes)
+
+        except Exception as e:
+            dump_exception(f"Unable to connect display server at {address}", e)
 
     def forecast(self):
         if self.net is None:

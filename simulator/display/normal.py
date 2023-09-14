@@ -16,6 +16,8 @@ _corofs = Vect(_CORONA_SIZE, _CORONA_SIZE)
 
 
 class Canvas(Base):
+    rotation = 0
+
     @micropython.native
     def __init__(self):
         logger.info("Building canvas")
