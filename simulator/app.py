@@ -1,3 +1,9 @@
+# Measure chip temperature as soon as possible as chip is heating
+from esp32 import raw_temperature
+
+raw_temperature = raw_temperature()
+
+# Now we can load the rest of system
 from ulogging import getLogger, dump_exception
 
 logger = getLogger(__name__)
@@ -5,10 +11,10 @@ logger = getLogger(__name__)
 from jumpers import jumpers
 from net import Connection
 from config import alert, display, beep, temp, vbat, behavior, hw, spot
-from machine import deepsleep, reset, WDT, reset_cause, PWRON_RESET
+from machine import deepsleep, reset, WDT, reset_cause, PWRON_RESET, Pin
+from dht import DHT22
 from battery import battery
 from buzzer import play
-from esp32 import raw_temperature
 from led import Led
 from display import Canvas
 from forecast import Forecast
@@ -78,16 +84,20 @@ class App:
         logger.info("Initializing watchdog ...")
         self.wdt = WDT(timeout=120000)
 
-        # Reads internal temperature just after wake-up to reduce
-        # influence of chip warm-up and use some kind of ambient
-        # reduction to get more close to indoor temperature. This
-        # value will be used when DTH22 or DHT11 sensor is
-        # not found on selected pin.
-        #
-        # Just note that better is to connect DHT22/DTH11 for
-        # more precise temperature measurement and also for information
-        # about humidity.
-        self.temp = ((raw_temperature() - 32) / 1.8) - 26.0
+        # Try to read DHT sensor to get better temperature and humidity values.
+        # Otherwise use at least less precise CPU temperature.
+        try:
+            p = hw["pins"]["dht"]
+            if p >= 0:
+                sensor = DHT22(Pin(p))
+                sensor.measure()
+                self.temp = sensor.temperature()
+                self.rh = sensor.humidity()
+            else:
+                raise RuntimeError("No DHT")
+        except:
+            self.temp = ((raw_temperature() - 32) / 1.8) - 26.0
+            self.rh = None
 
         # There is LED driver for debugging purposes. LED control
         # is running on background and can be disabled to save
@@ -235,6 +245,7 @@ class App:
                     "sensors": {
                         "vbat": self.volt,
                         "temp": self.temp,
+                        "rh": self.rh,
                     },
                 }
             )
@@ -246,15 +257,17 @@ class App:
             r = len(self.canvas.buf)
             b = memoryview(self.canvas.buf)
 
-            logger.debug("Receiving framebuffer:")
+            logger.debug("Receiving response ...")
             f = cl.makefile("rb", 0)
 
+            minutes, _, _, _ = [i for i in f.read(4)]
+
+            logger.debug("Receiving frame-buffer ...")
             while r:
                 logger.debug(f"   remaining {r}B ...")
                 r -= f.readinto(b[-r:])
 
             logger.debug(f"   remaining sleep time & flags ...")
-            minutes, flags = [i for i in f.read(2)]
             rs.close()
 
             logger.info(f"Frame buffer received")
@@ -271,7 +284,7 @@ class App:
         else:
             self.net.connect()
             try:
-                return Forecast(self.net, self.temp)
+                return Forecast(self.net, self.temp, self.rh)
             except OSError:
                 return None
 

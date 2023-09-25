@@ -100,7 +100,7 @@ class Forecast:
     Home = namedtuple("Home", ("temp", "rh"))
     Status = namedtuple("Status", ("sleep_time",))
 
-    def __init__(self, connection, in_temp):
+    def __init__(self, connection, in_temp, in_rh):
         logger.info("Reading forecast data")
         self._read1(connection)
 
@@ -109,7 +109,7 @@ class Forecast:
         else:
             self._read2_long(connection, 96)
 
-        self._get_dht(in_temp)
+        self.home = Forecast.Home(in_temp, in_rh)
         self._get_status()
 
     @staticmethod
@@ -341,23 +341,3 @@ class Forecast:
             sleep_time = 30 // DISPLAY_REFRESH_DIV
 
         self.status = Forecast.Status(sleep_time)
-
-    def _get_dht(self, in_temp):
-        # DHT22 is powered only when display is powered
-        # (network is not connected)
-        p = hw["pins"]["dht"]
-
-        if p >= 0:
-            sensor = dht.DHT22(Pin(p))
-
-            try:
-                sensor.measure()
-                self.home = Forecast.Home(
-                    sensor.temperature(),
-                    sensor.humidity(),
-                )
-                return
-            except:
-                ...
-
-        self.home = Forecast.Home(in_temp, None)
