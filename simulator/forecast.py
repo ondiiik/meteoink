@@ -2,11 +2,10 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-import dht
-from machine import Pin, deepsleep, RTC
+from machine import deepsleep, RTC
 from micropython import const
 from collections import namedtuple
-from config import api, location, hw
+from config import api, location
 from ltime import Time
 from buzzer import play
 

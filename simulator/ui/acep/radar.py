@@ -80,10 +80,10 @@ class RadarMap:
             crit0 = self._swp_map0
             crit1 = self._swp_map1
             self._load_file(
-                "https://stamen-tiles.a.ssl.fastly.net/toner/{}/{}/{}.png",
+                "https://tile.openstreetmap.de/{}/{}/{}.png",
                 self.map.x,
                 self.map.y,
-                lambda a, n: crit1[a] if n[0] > 127 else crit0[a],
+                lambda a, n: crit1[a] if n[0] > 185 else crit0[a],
             )
             with open(path, "wb") as f:
                 f.write(self.bitmap.buf)
@@ -137,6 +137,17 @@ class RadarMap:
         imgstr = urequests.get(url)
         logger.debug(f"Decoding PNG ...")
         width, height, data, meta = Reader(imgstr.content).read()
+        planes = meta["planes"]
+        palette = meta.get("palette", None)
+
+        def rgb_conv(row, i):
+            return row[i : i + 4]
+
+        def pal_conv(row, i):
+            return palette[row[i]]
+
+        cconv = pal_conv if palette else rgb_conv
+
         gc.collect()
 
         missing = 0
@@ -153,14 +164,14 @@ class RadarMap:
                 cv = bool(yy % 2)
                 row = memoryview(row)
                 xofs = self.dim2.x - self.origin.x + ofs.x
-                for i, xx in zip(range(0, len(row), 4), range(xofs, xofs + width)):
+                for i, xx in zip(range(0, len(row), planes), range(xofs, xofs + width)):
                     if 0 > xx:
                         missing |= _LEFT_OF
                     elif xx >= 256:
                         missing |= _RIGHT_OF
                     else:
                         cv = not cv
-                        c = conv(cv, row[i : i + 4])
+                        c = conv(cv, cconv(row, i))
                         if c != ALPHA:
                             fb.pixel(yy, ww - xx, c)
 

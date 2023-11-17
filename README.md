@@ -16,8 +16,8 @@ It also uses [DHT22](https://github.com/semestrinis/Arduino/wiki/DHT22-temperatu
 sensor for measuring indoor temperature and humidity. Whole system is powered from one
 [18650 Li-On battery](https://en.wikipedia.org/wiki/List_of_battery_sizes#Lithium-ion_batteries_(rechargeable))
 charged through the USB on ESP board. Meteostation is usually operating half a year when refresh time is set to
-20 minutes and there is good WiFi access to internet (depends on used battery capacity - also note that showing
-the radar data on `acep` variant shorten this time 3-times).
+30 minutes and there is good WiFi signal and internet connection with battery stronger then 4000 mAh. This time
+significantly reduces when e.g. radar data on `acep` are displayed.
 
 
 ## Wiring
@@ -26,7 +26,7 @@ the radar data on `acep` variant shorten this time 3-times).
 
 Some pins can be moved to another position by changing config file [pins.py](https://github.com/ondiiik/meteoink/blob/master/esp32/micropython/acep/setup/pins.py).
 
-but keep in mind that not all pins are available for any operation (some are not capable of ADC, some are not capable of SPI, ...).
+However keep in mind that not all pins are available for any operation (some are not capable of ADC, some are not capable of SPI, ...).
 Also battery is not displayed in wiring as it has its own connector so its connection is obvious.
 
 Just note that variant `epd47` ([T5-4.7 Inch E-paper](https://www.lilygo.cc/products/t5-4-7-inch-e-paper))
