@@ -244,7 +244,7 @@ class Forecast:
 
             id = (
                 701
-                if current["visibility"] < 500 and weather["id"] in range(800, 802)
+                if current.get("visibility", 0) < 500 and weather["id"] in range(800, 802)
                 else weather["id"]
             )
             self.forecast.append(
@@ -285,7 +285,7 @@ class Forecast:
         srt = self.weather.srt
         sst = self.weather.sst
 
-        for current in fcast["list"]:
+        for idx, current in enumerate(fcast["list"]):
             main = current["main"]
             weather = current["weather"][0]
             wind = current["wind"]
@@ -310,7 +310,7 @@ class Forecast:
 
             id = (
                 701
-                if current["visibility"] < 500 and weather["id"] in range(800, 802)
+                if current.get("visibility", 0) < 500 and weather["id"] in range(800, 802)
                 else weather["id"]
             )
             self.forecast.append(

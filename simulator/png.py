@@ -35,7 +35,8 @@ logger = getLogger(__name__)
 import itertools
 import math
 from struct import pack, unpack
-from uzlib import decompress
+from deflate import DeflateIO
+from io import BytesIO
 from array import array
 
 
@@ -493,7 +494,9 @@ class Reader:
                 l = len(data)
                 alldata[idx : idx + l] = data
                 idx += l
-            yield decompress(alldata)
+            with DeflateIO(BytesIO(alldata)) as gz:
+                alldata = gz.read()
+            yield alldata
 
         self.preamble()
         raw = iterdecomp(iteridat())

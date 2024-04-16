@@ -105,5 +105,5 @@ if not sys["exception_dump"]:
 
 _print(f"Loading module {__name__}")
 _print("+-----------------+")
-_print("|  Meteoink v2.4  |")
+_print("|  Meteoink v2.5  |")
 _print("+-----------------+")

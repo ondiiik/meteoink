@@ -8,7 +8,7 @@
 Meteoink is home meteostation based on several variants of E-Ink displays such as
 [5.65inch 7-color (F) E-Ink display](https://www.waveshare.com/wiki/5.65inch_e-Paper_Module_(F)_Manual) (variant `acep`),
 [4.2 inch dual color E-Ink display](https://www.waveshare.com/4.2inch-e-paper-module-c.htm) (variant `bwy`) or
-[T5-4.7 Inch E-paper](https://www.lilygo.cc/products/t5-4-7-inch-e-paper) (variant `epd47`). Platform running this meteostation is [micropython 1.20](https://micropython.org/) runningt on [TTGO-T8-ESP32](https://github.com/LilyGO/TTGO-T8-ESP32/tree/master)
+[T5-4.7 Inch E-paper](https://www.lilygo.cc/products/t5-4-7-inch-e-paper) (variant `epd47`). Platform running this meteostation is [micropython 1.22.2](https://micropython.org/) runningt on [TTGO-T8-ESP32](https://github.com/LilyGO/TTGO-T8-ESP32/tree/master)
 compatible board.
 
 Meteostation is connected to your home WiFi and uses data from [OpenWeatherMap](https://openweathermap.org/).
@@ -58,7 +58,7 @@ outside the box). When you glue it, apply glue very carefully as it shall not pa
 
 ### EPD47 (EPD 4.7)
 
-Just note thatthere is many of possible frames e.g. on [Thingiverse](https://www.thingiverse.com/search?q=T5-4.7&page=1&type=things&sort=relevant) for this model of display.
+Just note that there is many of possible frames e.g. on [Thingiverse](https://www.thingiverse.com/search?q=T5-4.7&page=1&type=things&sort=relevant) for this model of display.
 
 ## Micropython
 

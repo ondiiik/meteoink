@@ -596,8 +596,6 @@ def length_in_bits(mode, version):
 def make_lost_point(modules):
     modules_count = len(modules)
 
-    lost_point = 0
-
     lost_point = _lost_point_level1(modules, modules_count)
     lost_point += _lost_point_level2(modules, modules_count)
     lost_point += _lost_point_level3(modules, modules_count)
