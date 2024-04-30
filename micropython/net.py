@@ -57,7 +57,7 @@ class Connection:
             for n in sc:
                 self.nets.append(Wifi(n[0].decode(), n[1]))
 
-            self._ifc.active(False)
+            # self._ifc.active(False)
 
             # Start requested variant of connection
             if self.is_hotspot:
@@ -92,8 +92,6 @@ class Connection:
         for _ in range(CONN_RETRY_CNT):
             try:
                 return urequests.get(url).json()
-                collect()
-                return
             except OSError as e:
                 if e.errno == ECONNRESET:
                     logger.warning("ECONNRESET -> retry")

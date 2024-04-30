@@ -181,6 +181,10 @@ def _check_events():
             print("EVENT:", event)
 
 
+def unique_id():
+    return b"12345678987654321"
+
+
 class MeteoDeepSleep(SystemExit):
     ...
 

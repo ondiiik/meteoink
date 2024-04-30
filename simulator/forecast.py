@@ -99,23 +99,23 @@ class Forecast:
     Home = namedtuple("Home", ("temp", "rh"))
     Status = namedtuple("Status", ("sleep_time",))
 
-    def __init__(self, connection, in_temp, in_rh):
+    def __init__(self, connection, **kw):
         logger.info("Reading forecast data")
-        self._read1(connection)
+        self._read1(connection, **kw)
 
         if api["variant"] == 2:
             self._read2_short(connection)
         else:
             self._read2_long(connection, 96)
 
-        self.home = Forecast.Home(in_temp, in_rh)
+        self.home = Forecast.Home(kw["in_temp"], kw["in_humi"])
         self._get_status()
 
     @staticmethod
-    def _mk_id(id, rain):
-        return id if id != 500 or rain < 2 else 520
+    def _mk_id(fid, rain):
+        return fid if fid != 500 or rain < 2 else 520
 
-    def _read1(self, connection):
+    def _read1(self, connection, **kw):
         # Download hourly weather forecast for today
         url = "http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}"
         fcast = connection.http_get_json(
@@ -185,9 +185,9 @@ class Forecast:
             current["dt"],
             current["sunrise"],
             current["sunset"],
-            current["temp"],
+            kw.get("out_temp", None) or current["temp"],
             current["feels_like"],
-            current["humidity"],
+            kw.get("out_humi", None) or current["humidity"],
             rain,
             rpb,
             snow,
@@ -244,7 +244,8 @@ class Forecast:
 
             id = (
                 701
-                if current.get("visibility", 0) < 500 and weather["id"] in range(800, 802)
+                if current.get("visibility", 0) < 500
+                and weather["id"] in range(800, 802)
                 else weather["id"]
             )
             self.forecast.append(
@@ -285,7 +286,7 @@ class Forecast:
         srt = self.weather.srt
         sst = self.weather.sst
 
-        for idx, current in enumerate(fcast["list"]):
+        for current in fcast["list"]:
             main = current["main"]
             weather = current["weather"][0]
             wind = current["wind"]
@@ -308,14 +309,15 @@ class Forecast:
                 srt += 86400
                 sst += 86400
 
-            id = (
+            fid = (
                 701
-                if current.get("visibility", 0) < 500 and weather["id"] in range(800, 802)
+                if current.get("visibility", 0) < 500
+                and weather["id"] in range(800, 802)
                 else weather["id"]
             )
             self.forecast.append(
                 Forecast.Weather(
-                    "{}{}".format(id2icon[self._mk_id(id, rain)], weather["icon"][-1]),
+                    "{}{}".format(id2icon[self._mk_id(fid, rain)], weather["icon"][-1]),
                     dt,
                     srt,
                     sst,

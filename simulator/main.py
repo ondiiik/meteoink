@@ -21,6 +21,6 @@ try:
 
         machine.reset()
 except OSError:
-    print("#############################################")
-    print("### Please upload bitmaps (folder bitmap) ###")
-    print("#############################################")
+    print("##############################################")
+    print("### Please upload bitmaps (folder bitmaps) ###")
+    print("##############################################")

@@ -90,12 +90,12 @@ class RadarMap:
 
         # Load clouds forecast
         crit = self._swp_cld
-        self._load_file(
-            f"https://tile.openweathermap.org/map/clouds_new/{{}}/{{}}/{{}}?appid={api['apikey']}",
-            self.map.x,
-            self.map.y,
-            lambda a, n: crit[a] if n[3] > 64 else ALPHA,
-        )
+        # self._load_file(
+        #     f"https://tile.openweathermap.org/map/clouds_new/{{}}/{{}}/{{}}?appid={api['apikey']}",
+        #     self.map.x,
+        #     self.map.y,
+        #     lambda a, n: crit[a] if n[3] > 64 else ALPHA,
+        # )
 
         # Load rain forecast
         def scale(a, n):

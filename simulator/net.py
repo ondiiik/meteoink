@@ -57,8 +57,6 @@ class Connection:
         for _ in range(CONN_RETRY_CNT):
             try:
                 return urequests.get(url).json()
-                collect()
-                return
             except OSError as e:
                 if e.errno == ECONNRESET:
                     logger.warning("ECONNRESET -> retry")

@@ -11,7 +11,7 @@ logger = getLogger(__name__)
 from jumpers import jumpers
 from net import Connection
 from config import alert, display, beep, temp, vbat, behavior, hw, spot
-from machine import deepsleep, reset, WDT, reset_cause, PWRON_RESET, Pin
+from machine import deepsleep, reset, WDT, reset_cause, PWRON_RESET, Pin, unique_id
 from dht import DHT22
 from battery import battery
 from buzzer import play
@@ -19,7 +19,21 @@ from led import Led
 from display import Canvas
 from forecast import Forecast
 from socket import socket, getaddrinfo
-from ujson import dumps
+from ujson import dumps, loads
+from umqtt.simple import MQTTClient, hexlify
+from utime import sleep_ms
+
+
+class MqttSession:
+    def __init__(self, **kw):
+        self.mqtt = MQTTClient(**kw)
+
+    def __enter__(self):
+        self.mqtt.connect()
+        return self.mqtt
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.mqtt.disconnect()
 
 
 def run():
@@ -54,7 +68,7 @@ def run():
             # Once we are connected to network, we can download forecast.
             # Just note that once forecast is download, WiFi is disconnected
             # to save as much battery capacity as possible.
-            forecast = app.forecast()
+            forecast = app.forecast(**app.mqtt())
 
             # Most time consuming part when we have all data is to draw them
             # on user interface - screen.
@@ -278,15 +292,99 @@ class App:
         except Exception as e:
             dump_exception(f"Unable to connect display server at {address}", e)
 
-    def forecast(self):
+    def forecast(self, **kw):
         if self.net is None:
             return None
         else:
             self.net.connect()
             try:
-                return Forecast(self.net, self.temp, self.rh)
+                kw.setdefault("in_temp", self.temp)
+                kw.setdefault("in_humi", self.rh)
+                return Forecast(self.net, **kw)
             except OSError:
                 return None
+
+    def mqtt(self):
+        try:
+            # parse MQTT configuration
+            mqtt_cfg = self.net.config.get("mqtt", None)
+
+            if mqtt_cfg is None:
+                return dict()
+
+            parts = mqtt_cfg.split(":")
+
+            if parts[1].startswith("//"):
+                ssl = parts[0] == "ssl"
+                parts = parts[1:]
+                parts[0] = parts[0][2:]
+            else:
+                ssl = False
+
+            if "@" in parts[0]:
+                user, password = parts[0].split("@")
+                parts = parts[1:]
+            else:
+                user, password = None, None
+
+            client_id = hexlify(unique_id())
+            server = parts[0]
+            port = int(parts[1])
+            print(parts[2].split(";"))
+            topics = [
+                dict(map(lambda i: i.split("=", 1), t.split(",")))
+                for t in parts[2].split(";")
+            ]
+
+            # Read sensor value from MQTT
+            with MqttSession(
+                client_id=client_id,
+                server=server,
+                port=port,
+                user=user,
+                password=password,
+                ssl=ssl,
+            ) as mqtt:
+                received = dict()
+
+                def _v(topic, msg):
+                    nonlocal received
+                    received[topic.decode()] = loads(msg.decode())
+
+                mqtt.set_callback(_v)
+
+                for topic in topics:
+                    mqtt.subscribe(topic["topic"])
+
+                for _ in range(40):
+                    try:
+                        mqtt.check_msg()
+                    except Exception as err:
+                        logger.warning(f"MQTT check: {err=}")
+
+                    if len(received) == len(topics):
+                        break
+
+                    sleep_ms(100)
+
+            if len(received) == 0:
+                # Nothing received - leave with values measured by openweathermap
+                logger.warning("MQTT timeout - using original forecast values")
+                return dict()
+
+            mqtt = dict()
+
+            for topic, msg in map(lambda i: (i, received[i["topic"]]), topics):
+                for k, v in topic.items():
+                    if k == "topic":
+                        continue
+                    mqtt[k] = msg[v]
+
+            logger.info(f"Got MQTT sensors: {mqtt}")
+            return mqtt
+        except Exception as err:
+            logger.warning(f"Skipping MQTT sensor: {type(err)}: {err}")
+            return dict()
 
     def repaint(self, forecast):
         from ui.main import MeteoUi
