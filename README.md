@@ -136,7 +136,7 @@ Following files needs to be copied according to variant you use:
 
 ![EPD 4.2 inch meteostation](graphics/doc/meteostation.jpeg "EPD 4.2 inch meteostation")
 
-  - all files from folder [esp32/micropython/acep](https://github.com/ondiiik/meteoink/tree/master/esp32/micropython/bwy).
+  - all files from folder [esp32/micropython/bwy](https://github.com/ondiiik/meteoink/tree/master/esp32/micropython/bwy).
   - following `JSON` file into `cfg/hw.json`.
 
 ```
@@ -167,7 +167,7 @@ Following files needs to be copied according to variant you use:
 
 ![EPD 4.7 inch meteostation](graphics/doc/meteostation_epd47.jpeg "EPD 4.7 inch meteostation")
 
-  - all files from folder [esp32/micropython/acep](https://github.com/ondiiik/meteoink/tree/master/esp32/micropython/gs).
+  - all files from folder [esp32/micropython/gs](https://github.com/ondiiik/meteoink/tree/master/esp32/micropython/gs).
   - following `JSON` file into `cfg/hw.json`.
 
 ```
@@ -349,7 +349,7 @@ This JSON file holds information about WiFi connections. Items here are created 
             "ssid": "my great WiFi",
             "bssid": "12:34:56:78:9A:BC",
             "passwd": "123456789ABC",
-            "mqtt": "ssl://mqtt_user@mqtt_password:broker_ip:broker_port:topic:temperature=temperature_json_name,humidity=humidity_json_name"
+            "mqtt": "ssl://mq_user@123456789:10.11.12.13:1883:topic=zigbee2mqtt/temperature_outside,out_temp=temperature,out_humi=humidity;topic=zigbee2mqtt/temperature_indoor,in_temp=temperature,in_humi=humidity"
         },
         .
         .
@@ -364,10 +364,11 @@ This JSON file holds information about WiFi connections. Items here are created 
   then SSID. This can be useful if there are more then one WiFi networks with the same `SSID`.
 - `"passwd"` - Password used to connect the WiFi.
 
-#### MQTT outer sensor
+#### MQTT external sensor
 
 In `connection.json` file there can be added `"mqtt"` tag to tell that this WiFi can be used to access `MQTT` broker
-with temperature and humidity sensors. Payload of this sensor shall be in [JSON](https://www.json.org) format.
+with temperature and humidity sensors. **Payload of this sensor shall be in [JSON](https://www.json.org) format and sensor
+has to propagate its data as [retained](https://www.hivemq.com/blog/mqtt-essentials-part-8-retained-messages/)**.
 With this tag e.g. [ZigBee2MQTT](https://www.zigbee2mqtt.io) outdoor and/or indoor sensors can be read (there can be even some
 ZigBee indoor sensors used as outdoor when some shielding added). This even allow an absence of internal measuring sensor
 such as `DTH22` and similar as indoor temperature can be obtained from some of ZigBee (or another `MQTT`) device.
@@ -387,7 +388,7 @@ There are several parts where separated by `:` delimiter.
 - Then follows sets of topics and aliases (`topic=some_topic,value1=json_name,...`). This part can be repeated.
   Parts are separated by `;` delimiter.
 
-Each topic part consists of several items separated by `,`. Each item has format `item=value`. Each topic part have to
+Each MQTT topic part consists of several items separated by `,`. Each item has format `item=value`. Each topic part has to
 contain at least one `topic` item telling which `MQTT` topic settle our sensor. Then each other item tells which `JSON`
 value from `MQTT` payload will be interpreted as which variable. Following variables are supported:
 
@@ -428,17 +429,17 @@ When we need to specify user name (e.g. `mq_user`) and password (e.g. `123456789
 "mq_user@123456789:10.11.12.13:1883:topic=zigbee2mqtt/temperature_outside,out_temp=temperature,out_humi=humidity"
 ```
 
-If we want to tell that our broker uses `TLS`, then we can use following:
+If we want to tell that our broker uses `TLS` on port `8883`, then we can use following:
 
 ```
-"ssl://mq_user@123456789:10.11.12.13:1883:topic=zigbee2mqtt/temperature_outside,out_temp=temperature,out_humi=humidity"
+"ssl://mq_user@123456789:10.11.12.13:8883:topic=zigbee2mqtt/temperature_outside,out_temp=temperature,out_humi=humidity"
 ```
 
 In the case that we have also one more indoor sensor on topic `zigbee2mqtt/temperature_indoor`, we can add it to replace
 built in meteostation sensor:
 
 ```
-"ssl://mq_user@123456789:10.11.12.13:1883:topic=zigbee2mqtt/temperature_outside,out_temp=temperature,out_humi=humidity;topic=zigbee2mqtt/temperature_indoor,in_temp=temperature,in_humi=humidity"
+"ssl://mq_user@123456789:10.11.12.13:8883:topic=zigbee2mqtt/temperature_outside,out_temp=temperature,out_humi=humidity;topic=zigbee2mqtt/temperature_indoor,in_temp=temperature,in_humi=humidity"
 ```
 
 
