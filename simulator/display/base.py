@@ -10,7 +10,6 @@ from config import hw
 v2d = {
     "acep": "bitmaps/acep/{}.bin",
     "bwy": "bitmaps/bwy/{}.bin",
-    "epd47": "bitmaps/gs/{}.bin",
 }
 bmpd = v2d[hw["variant"]]
 

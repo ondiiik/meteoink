@@ -54,10 +54,7 @@ def run():
         # or configuration. In this case we can not rely on existing WiFi connection
         # and we rather go to hot-spot mode.
         if app.net and app.net.is_hotspot:
-            if hw["variant"] == "epd47":
-                app.hotspot_epd47()
-            else:
-                app.hotspot()
+            app.hotspot()
 
         # And finally - meteostation display - basic functionality ;-)
         else:
@@ -187,28 +184,6 @@ class App:
         ui.repaint_config(self.volt)
 
         self.web_server()
-
-    def hotspot_epd47(self):
-        if reset_cause() == PWRON_RESET:
-            # EPD47 needs special handling as it have to draw screen and then
-            # reboot to reach WiFi.
-            play((2093, 30), 120, (2093, 30), 120, (2093, 30))
-            self.led.mode(Led.DOWNLOAD)
-
-            from ui.main import MeteoUi
-
-            ui = MeteoUi(self.canvas, None, self.net, self.led, self.wdt)
-            ui.repaint_config(self.volt)
-            ui.canvas.epd.display_frame_now()
-
-            deepsleep(1)
-        else:
-            # We are after deepsleep reset - screen is displayed,
-            # so we can start server.
-            play((2093, 30), 120, (2093, 30))
-            self.net.connect()
-            self.web_server()
-            reset()
 
     def web_server(self):
         self.led.mode(Led.DOWNLOAD)

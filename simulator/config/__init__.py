@@ -92,7 +92,7 @@ behavior = Json(
 hw = Json(
     "cfg/hw.json",
     {
-        "variant": "acep",  # Can be one of "acep", "bwy", "epd47" or "lilygo_epd47"
+        "variant": "acep",  # Can be one of "acep" or "bwy"
         "pins": {
             "sck": 13,
             "mosi": 14,
@@ -109,19 +109,3 @@ hw = Json(
         "buttons": {"hotspot": 32, "alert": -1, "sleep": -1},
     },
 )
-
-# Override settings for EPD47 if we uses TTGo version
-if hw["variant"] == "lilygo_epd47":
-    hw["variant"] = "epd47"
-    p = hw["pins"]
-    p["dht"] = 15
-    p["led"] = -1
-    p["vbat"] = 36
-    p["buzzer"] = 14
-    p = hw["buttons"]
-    p["hotspot"] = 39
-    p["alert"] = 34
-    p["sleep"] = 35
-    hw.flush()
-    vbat["adc2volt"] = 0.001706822
-    vbat.flush()

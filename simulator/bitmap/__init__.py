@@ -10,11 +10,5 @@ elif v == "bwy":
     from .bwy.fonts import FONTS
     from .bwy.bmp import BMP
     from .bwy.wind import WIND
-elif v == "epd47":
-    from .gs.fonts import FONTS
-    from .gs.bmp import BMP
-
-    WIND = None
-    # from .bwy.wind import WIND
 else:
     raise TypeError(f"Don't know display type for variant {v}")

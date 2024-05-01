@@ -15,13 +15,7 @@ class Battery:
 
     @property
     def voltage(self):
-        # Need to switch power on when EPD47 is used
-        if hw["variant"] == "epd47":
-            EPD.epd.on()
-            sleep_ms(100)
-
         return self.adc.read() * vbat["adc2volt"]
-        EPD.epd.off()
 
 
 battery = Battery()
