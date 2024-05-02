@@ -86,6 +86,7 @@ class Forecast:
             "srt",
             "sst",
             "temp",
+            "temp_mqtt",
             "feel",
             "rh",
             "rain",
@@ -175,8 +176,8 @@ class Forecast:
         self.descr = dsc[0].upper() + dsc[1:]
 
         # Fix rain icon according to amount of rain
-        def _mk_id(id, rain):
-            return id if id != 500 or rain < 0.5 else 520
+        def _mk_id(fid, rain):
+            return fid if fid != 500 or rain < 0.5 else 520
 
         self.weather = Forecast.Weather(
             "{}{}".format(
@@ -185,7 +186,8 @@ class Forecast:
             current["dt"],
             current["sunrise"],
             current["sunset"],
-            kw.get("out_temp", None) or current["temp"],
+            current["temp"],
+            kw.get("out_temp", None),
             current["feels_like"],
             kw.get("out_humi", None) or current["humidity"],
             rain,
@@ -255,6 +257,7 @@ class Forecast:
                     srt,
                     sst,
                     current["temp"],
+                    None,
                     current["feels_like"],
                     current["humidity"],
                     rain,
@@ -322,6 +325,7 @@ class Forecast:
                     srt,
                     sst,
                     main["temp"],
+                    None,
                     main["feels_like"],
                     main["humidity"],
                     rain,

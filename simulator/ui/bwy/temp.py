@@ -14,7 +14,15 @@ class UiTemp(UiFrame):
 
     @with_forecast
     def draw(self, forecast):
-        t = forecast.weather.temp if self.outside else forecast.home.temp
+        t = (
+            (
+                forecast.weather.temp
+                if forecast.weather.temp_mqtt is None
+                else forecast.weather.temp_mqtt
+            )
+            if self.outside
+            else forecast.home.temp
+        )
         color = WHITE
 
         if t is None:

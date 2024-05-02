@@ -3,7 +3,7 @@ from ulogging import getLogger
 logger = getLogger(__name__)
 
 from ui import UiFrame, Vect, with_forecast
-from display.epd import BLACK, RED
+from display.epd import BLACK, RED, GREEN
 from config import temp
 
 
@@ -38,4 +38,10 @@ class UiTemp(UiFrame):
             self.canvas.bitmap(Vect(x - 25, self.height - 24), bitmap)
         else:
             p = self.ui.text(60, t, Vect(5, -5), color)
-            self.ui.text(35, s, p + Vect(6, 16))
+            m = forecast.weather.temp_mqtt
+            if m is None:
+                self.ui.text(35, s, p + Vect(6, 16))
+            else:
+                p = self.ui.text(35, "/", Vect(p.x, 0) + Vect(8, 14), GREEN)
+                p = self.ui.text(35, f"{m:.1f}", Vect(p.x, 0) + Vect(3, 20), color)
+                self.ui.text(35, s, p + Vect(6, -12))
