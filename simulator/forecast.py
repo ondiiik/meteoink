@@ -103,11 +103,7 @@ class Forecast:
     def __init__(self, connection, **kw):
         logger.info("Reading forecast data")
         self._read1(connection, **kw)
-
-        if api["variant"] == 2:
-            self._read2_short(connection)
-        else:
-            self._read2_long(connection, 96)
+        self._read2(connection, api["variant"] * 24)
 
         self.home = Forecast.Home(kw["in_temp"], kw["in_humi"])
         self._get_status()
@@ -117,46 +113,19 @@ class Forecast:
         return fid if fid != 500 or rain < 2 else 520
 
     def _read1(self, connection, **kw):
-        # Download hourly weather forecast for today
-        url = "http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}"
-        fcast = connection.http_get_json(
+        # Download weather now for today
+        url = "https://api.openweathermap.org/data/2.5/weather?lat={}&lon={}&appid={}&mode=json&units={}&lang={}"
+        current = connection.http_get_json(
             url.format(
                 location["locations"][connection.config["location"]]["lat"],
                 location["locations"][connection.config["location"]]["lon"],
                 api["apikey"],
                 api["units"],
                 api["language"],
-                "minutely,hourly,daily",
             )
         )
 
         # Parse todays forecast
-        try:
-            if not fcast["cod"] == 0:
-                logger.info("Server commu8nication error - can not load forecast!")
-
-                try:
-                    logger.info("Server reported:")
-                    logger.info("    ", fcast["message"])
-                    logger.info("")
-                    logger.info("Go into configuration mode to set server correctly")
-                except:
-                    ...
-
-                play(
-                    (400, 1000),
-                    (200, 1000),
-                    (400, 1000),
-                    (200, 1000),
-                    (400, 1000),
-                    (200, 1000),
-                )
-                deepsleep()
-        except:
-            ...
-
-        current = fcast["current"]
-
         try:
             rain = current["rain"]["1h"]
         except KeyError:
@@ -169,7 +138,7 @@ class Forecast:
         except KeyError:
             snow = 0.0
 
-        self.time_zone = fcast["timezone_offset"]
+        self.time_zone = current["timezone"]
 
         weather = current["weather"][0]
         dsc = weather["description"]
@@ -184,17 +153,17 @@ class Forecast:
                 id2icon[self._mk_id(weather["id"], rain)], weather["icon"][-1]
             ),
             current["dt"],
-            current["sunrise"],
-            current["sunset"],
-            current["temp"],
+            current["sys"]["sunrise"],
+            current["sys"]["sunset"],
+            current["main"]["temp"],
             kw.get("out_temp", None),
-            current["feels_like"],
+            current["main"]["feels_like"],
             kw.get("out_humi", None) or current["humidity"],
             rain,
             rpb,
             snow,
-            current["wind_speed"],
-            current["wind_deg"],
+            current["wind"]["speed"],
+            current["wind"]["deg"],
             current["clouds"],
         )
         self.time = Time(self.time_zone)
@@ -204,74 +173,9 @@ class Forecast:
         dt = self.time.get_date_time(self.weather.dt)
         rtc.init((dt[0], dt[1], dt[2], 0, dt[3], dt[4], dt[5], 0))
 
-    def _read2_short(self, connection):
-        # Download hourly weather forecast for today
-        url = "http://api.openweathermap.org/data/2.5/onecall?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&exclude={}"
-        fcast = connection.http_get_json(
-            url.format(
-                location["locations"][connection.config["location"]]["lat"],
-                location["locations"][connection.config["location"]]["lon"],
-                api["apikey"],
-                api["units"],
-                "EN",
-                "current,minutely,daily",
-            )
-        )
-
-        # Build 2 days forecast
-        self.forecast = []
-        self.step = 3600
-        srt = self.weather.srt
-        sst = self.weather.sst
-
-        for current in fcast["hourly"]:
-            weather = current["weather"][0]
-
-            try:
-                rain = current["rain"]["1h"]
-            except KeyError:
-                rain = 0.0
-
-            rpb = current.get("pop", 0) * 100
-
-            try:
-                snow = current["snow"]["1h"]
-            except KeyError:
-                snow = 0.0
-
-            dt = current["dt"]
-            if dt > sst:
-                srt += 86400
-                sst += 86400
-
-            id = (
-                701
-                if current.get("visibility", 0) < 500
-                and weather["id"] in range(800, 802)
-                else weather["id"]
-            )
-            self.forecast.append(
-                Forecast.Weather(
-                    "{}{}".format(id2icon[self._mk_id(id, rain)], weather["icon"][-1]),
-                    dt,
-                    srt,
-                    sst,
-                    current["temp"],
-                    None,
-                    current["feels_like"],
-                    current["humidity"],
-                    rain,
-                    rpb,
-                    snow,
-                    current["wind_speed"],
-                    current["wind_deg"],
-                    current["clouds"],
-                )
-            )
-
-    def _read2_long(self, connection, hours):
+    def _read2(self, connection, hours):
         # Download hourly weather forecast for 5 days
-        url = "http://api.openweathermap.org/data/2.5/forecast?lat={}&lon={}&APPID={}&mode=json&units={}&lang={}&cnt={}"
+        url = "http://api.openweathermap.org/data/2.5/forecast?lat={}&lon={}&appid={}&mode=json&units={}&lang={}&cnt={}"
         fcast = connection.http_get_json(
             url.format(
                 location["locations"][connection.config["location"]]["lat"],
