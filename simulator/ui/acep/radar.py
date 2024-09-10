@@ -103,15 +103,15 @@ class RadarMap:
             return (
                 ALPHA
                 if v < 1
-                else crit[a]
-                if v < 15
-                else GREEN
-                if v < 25
-                else BLUE
-                if v < 70
-                else ORANGE
-                if v < 85
-                else RED
+                else (
+                    crit[a]
+                    if v < 15
+                    else (
+                        GREEN
+                        if v < 25
+                        else BLUE if v < 70 else ORANGE if v < 85 else RED
+                    )
+                )
             )
 
         self._load_file(

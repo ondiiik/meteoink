@@ -135,12 +135,14 @@ class EPD:
         self._sleep()
 
     @micropython.native
-    def deghost(self):
-        ...
+    def deghost(self): ...
 
     @micropython.native
     def deepsleep(self, t):
-        deepsleep(t)
+        if t:
+            deepsleep(t)
+        else:
+            deepsleep()
 
     @micropython.native
     def _cmd(self, command, data=None):

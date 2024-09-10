@@ -2,8 +2,7 @@
 import usocket
 
 
-class Request:
-    ...
+class Request: ...
 
 
 class Response:

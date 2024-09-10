@@ -72,9 +72,11 @@ class Builder:
         cmd = (
             f"rm -Rf {dst}",
             f"mkdir -p {dst if src.is_dir() else dst.parent}",
-            f'rsync -avL --exclude="__pycache__" "{src}/." "{dst}/."'
-            if src.is_dir()
-            else f'cp "{src}" "{dst}"',
+            (
+                f'rsync -avL --exclude="__pycache__" "{src}/." "{dst}/."'
+                if src.is_dir()
+                else f'cp "{src}" "{dst}"'
+            ),
         )
 
         for c in cmd:

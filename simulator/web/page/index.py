@@ -63,9 +63,11 @@ def _pg_wifi(page):
                 (
                     i["ssid"],
                     bssid,
-                    location["locations"][loc]["name"]
-                    if loc < len(location["locations"])
-                    else "...",
+                    (
+                        location["locations"][loc]["name"]
+                        if loc < len(location["locations"])
+                        else "..."
+                    ),
                     web.button(trn("Edit"), "wifiedt", idx),
                     web.button(trn("Delete"), "wifidlt", idx),
                 ),

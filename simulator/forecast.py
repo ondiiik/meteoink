@@ -2,7 +2,7 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from machine import deepsleep, RTC
+from machine import RTC
 from micropython import const
 from collections import namedtuple
 from config import api, location

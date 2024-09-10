@@ -27,16 +27,14 @@ class EPD:
             self._fb = bytearray(self.width * self.height // 2)
 
     @micropython.native
-    def init(self):
-        ...
+    def init(self): ...
 
     @micropython.native
     def fb(self):
         return self._fb
 
     @micropython.native
-    def display_frame(self):
-        ...
+    def display_frame(self): ...
 
     @micropython.native
     def display_frame_now(self):
@@ -46,8 +44,7 @@ class EPD:
         self._reload_frame()
 
     @micropython.native
-    def deghost(self):
-        ...
+    def deghost(self): ...
 
     @micropython.native
     def deepsleep(self, t):

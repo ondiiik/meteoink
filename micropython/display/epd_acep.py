@@ -116,7 +116,10 @@ class EPD:
 
     @micropython.native
     def deepsleep(self, t):
-        deepsleep(t)
+        if t:
+            deepsleep(t)
+        else:
+            deepsleep()
 
     @micropython.native
     def _cmd(self, command, data=None):

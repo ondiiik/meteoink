@@ -71,12 +71,10 @@ class Error(Exception):
         return self.__class__.__name__ + ": " + " ".join(self.args)
 
 
-class FormatError(Error):
-    ...
+class FormatError(Error): ...
 
 
-class ChunkError(FormatError):
-    ...
+class ChunkError(FormatError): ...
 
 
 class Reader:

@@ -21,7 +21,9 @@ def www(page, args):
         form.label(
             trn("Location"),
             "loc",
-            location["locations"][config["location"]]["name"]
-            if config["location"] < len(location["locations"])
-            else "...",
+            (
+                location["locations"][config["location"]]["name"]
+                if config["location"] < len(location["locations"])
+                else "..."
+            ),
         )

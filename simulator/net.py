@@ -44,8 +44,7 @@ class Connection:
 
         self.nets = [Wifi("mynet1", b"aaaaaa"), Wifi("mynet2", b"bbbbbb")]
 
-    def connect(self):
-        ...
+    def connect(self): ...
 
     @property
     def ifconfig(self):
@@ -69,8 +68,7 @@ class Connection:
 
         raise OSError("Page does not respond")
 
-    def disconnect(self):
-        ...
+    def disconnect(self): ...
 
 
 def bytes2bssid(bssid):

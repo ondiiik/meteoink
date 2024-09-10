@@ -52,8 +52,7 @@ class EPD:
 
         pygame.display.set_caption("EPD {} x {} - ACEP".format(self.width, self.height))
 
-    def init(self):
-        ...
+    def init(self): ...
 
     def fb(self):
         return self._fb
@@ -67,11 +66,13 @@ class EPD:
         pygame.display.flip()
         self._clock.tick(2)
 
-    def deghost(self):
-        ...
+    def deghost(self): ...
 
     def deepsleep(self, t):
-        deepsleep(t)
+        if t:
+            deepsleep(t)
+        else:
+            deepsleep()
 
     def _draw_pixel(self, x, y, c):
         pygame.draw.rect(
