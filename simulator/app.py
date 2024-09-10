@@ -11,7 +11,7 @@ logger = getLogger(__name__)
 from jumpers import jumpers
 from net import Connection
 from config import alert, display, beep, temp, vbat, behavior, hw, spot
-from machine import deepsleep, reset, WDT, reset_cause, PWRON_RESET, Pin, unique_id
+from machine import deepsleep, reset, WDT, Pin, unique_id
 from dht import DHT22
 from battery import battery
 from buzzer import play
@@ -305,7 +305,6 @@ class App:
             client_id = hexlify(unique_id())
             server = parts[0]
             port = int(parts[1])
-            print(parts[2].split(";"))
             topics = [
                 dict(map(lambda i: i.split("=", 1), t.split(",")))
                 for t in parts[2].split(";")

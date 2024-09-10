@@ -4,7 +4,7 @@ logger = getLogger(__name__)
 
 from jumpers import jumpers
 from network import WLAN, STA_IF, AP_IF
-from config import connection, location, spot, api
+from config import connection, location, spot, api, beep
 from utime import sleep
 import urequests
 from uerrno import ECONNRESET

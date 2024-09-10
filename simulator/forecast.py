@@ -158,7 +158,7 @@ class Forecast:
             current["main"]["temp"],
             kw.get("out_temp", None),
             current["main"]["feels_like"],
-            kw.get("out_humi", None) or current["humidity"],
+            kw.get("out_humi", None) or current["main"]["humidity"],
             rain,
             rpb,
             snow,
