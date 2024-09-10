@@ -137,9 +137,10 @@ class UiBase(Ui):
             x2 += block
 
     class Drawing:
-        def __init__(self, name, epd):
+        def __init__(self, name, epd, deghost=True):
             self.name = name
             self.epd = epd
+            self.deghost = deghost
 
         def __enter__(self):
             logger.info(f"Drawing {self.name} ...")
@@ -149,7 +150,7 @@ class UiBase(Ui):
         def __exit__(self, *args):
             logger.info(f"Flushing {self.name} ...")
             self.epd.led.mode(self.epd.led.FLUSHING)
-            self.epd.canvas.flush()
+            self.epd.canvas.flush(self.deghost)
 
 
 def with_forecast(fn):

@@ -26,7 +26,10 @@ class MeteoUi(UiBase):
 
     def repaint_forecast(self, volt):
         if self.connection is not None:
-            with self.Drawing("weather", self):
+            forecast = self.forecast
+            dt = forecast.time.get_date_time(forecast.weather.dt)
+            hour = dt[3]
+            with self.Drawing("weather", self, hour == 3):
                 # We have forecast, so lets draw it on screen. Don't draw
                 # always everything as forecast is changing not so often,
                 # but temperature is.
