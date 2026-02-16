@@ -249,7 +249,7 @@ class App:
             logger.debug("Receiving response ...")
             f = cl.makefile("rb", 0)
 
-            minutes, _, _, _ = [i for i in f.read(4)]
+            minutes, flags, _, _ = [i for i in f.read(4)]
 
             logger.debug("Receiving frame-buffer ...")
             while r:
@@ -261,7 +261,7 @@ class App:
 
             logger.info(f"Frame buffer received")
 
-            self.canvas.flush()
+            self.canvas.flush(flags & 1)
             self.sleep(minutes=minutes)
 
         except Exception as e:

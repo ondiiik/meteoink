@@ -82,7 +82,7 @@ on your PC you can install `esptool` by following command:
 pip install esptool
 ```
 
-Then you can run [flash.sh](https://github.com/ondiiik/meteoink/raw/master/esp32/flash.sh) script to flash firmware into your
+Then you can run [flash.sh](https://github.com/ondiiik/meteoink/raw/master/tools/flash_firmware.sh) script to flash firmware into your
 ESP32 board. You can use first argument to specify custom USB UART port where board is connected (otherwise `/dev/ttyUSB0`
 is used by default). Just note that this script will erase flash on ESP32 including file system, so you can be sure that
 your previous data will be definitely lost (good idea to backup them before flashing). 
