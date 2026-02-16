@@ -12,7 +12,7 @@ there has been support also for [T5-4.7 Inch E-paper](https://www.lilygo.cc/prod
 but this has been dropped as there is no support for later variant of Micropython (unfortunately several last versions
 does not support it due to Micropython version upgrade).
 
-Platform running this meteostation is [Micropython 1.22.2](https://micropython.org/) running on
+Platform running this meteostation is [Micropython 1.27.0](https://micropython.org/) running on
 [TTGO-T8-ESP32](https://github.com/LilyGO/TTGO-T8-ESP32/tree/master) compatible board.
 
 Meteostation is connected to your home WiFi and uses data from [OpenWeatherMap](https://openweathermap.org/).
@@ -66,14 +66,10 @@ reduce battery consumption.
 
 ### Flashing of micropython
 
-All necessary files and upload script can be found in repository folder [esp32](https://github.com/ondiiik/meteoink/tree/master/esp32).
-Basically this 3 files are required:
+All necessary files can be found in [Release section](https://github.com/ondiiik/meteoink/releases). Currently
+only `meteoink.bin` file is required.
 
-- [micropython.bin](https://github.com/ondiiik/meteoink/raw/master/esp32/micropython.bin)
-- [bootloader.bin](https://github.com/ondiiik/meteoink/raw/master/esp32/bootloader.bin)
-- [partition-table.bin](https://github.com/ondiiik/meteoink/raw/master/esp32/partition-table.bin)
-
-To flash firmware to your ESP32 board you can use [flash.sh](https://github.com/ondiiik/meteoink/raw/master/esp32/flash.sh)
+To flash firmware to your ESP32 board you can use [flash\_firmware.sh](https://github.com/ondiiik/meteoink/blob/master/tools/flash_firmware.sh)
 shell script. Just note that you will need to have installed [python interpreter](https://www.python.org/downloads/) first. 
 You also need to have [esptool](https://pypi.org/project/esptool/) installed in your `python`. Once you have `python` installed
 on your PC you can install `esptool` by following command:
@@ -82,10 +78,10 @@ on your PC you can install `esptool` by following command:
 pip install esptool
 ```
 
-Then you can run [flash.sh](https://github.com/ondiiik/meteoink/raw/master/tools/flash_firmware.sh) script to flash firmware into your
+Then you can run [flash\_firmware.sh](https://github.com/ondiiik/meteoink/blob/master/tools/flash_firmware.sh) script to flash firmware into your
 ESP32 board. You can use first argument to specify custom USB UART port where board is connected (otherwise `/dev/ttyUSB0`
-is used by default). Just note that this script will erase flash on ESP32 including file system, so you can be sure that
-your previous data will be definitely lost (good idea to backup them before flashing). 
+is used by default) and second to locate firmware file (default is `meteoink.bin`) . Just note that this script will erase flash on ESP32 including
+file system, so you can be sure that your previous data will be definitely lost (good idea to backup them before flashing). 
 
 
 ## Upload binary files
