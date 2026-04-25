@@ -23,7 +23,7 @@ fi
 # Download MicroPyhon sources
 if [ ! -d "$BUILD_ROOT/micropython" ]
 then
-    git clone https://github.com/micropython/micropython.git --recursive -b v1.27.0
+    git clone https://github.com/micropython/micropython.git --recursive -b v1.28.0
 fi
 
 # Install esp-idf

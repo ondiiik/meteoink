@@ -37,11 +37,12 @@ class UiTemp(UiFrame):
             bitmap = self.ui.bitmap(1, "in")
             self.canvas.bitmap(Vect(x - 25, self.height - 24), bitmap)
         else:
-            p = self.ui.text(60, t, Vect(5, -5), color)
             m = forecast.weather.temp_mqtt
             if m is None:
+                p = self.ui.text(60, t, Vect(5, -5), color)
                 self.ui.text(35, s, p + Vect(6, 16))
             else:
+                p = self.ui.text(60, f"{m:.1f}", Vect(5, -5), color)
                 p = self.ui.text(35, "/", Vect(p.x, 0) + Vect(8, 14), GREEN)
-                p = self.ui.text(35, f"{m:.1f}", Vect(p.x, 0) + Vect(3, 20), color)
+                p = self.ui.text(35, t, Vect(p.x, 0) + Vect(3, 20), color)
                 self.ui.text(35, s, p + Vect(6, -12))
