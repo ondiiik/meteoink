@@ -18,10 +18,13 @@ from buzzer import play
 from led import Led
 from display import Canvas
 from forecast import Forecast
-from socket import socket, getaddrinfo
-from ujson import dumps, loads
+from rpc import Rpc
+from socket import socket, getaddrinfo, SOCK_STREAM
+from ujson import loads
 from umqtt.simple import MQTTClient, hexlify
 from utime import sleep_ms
+from deflate import DeflateIO, ZLIB
+from io import BytesIO
 
 
 class MqttSession:
@@ -41,7 +44,7 @@ def run():
         # Init all peripheries
         app = App()
 
-        # It can happen that we want only to move meteostation somewhere
+        # It can happen that we want only to move meteo-station somewhere
         # and don't want to let it wake up during transport. In this case
         # we can put it to greetings mode, where only picture is displayed
         # and station kept sleeping till reset button is pressed
@@ -50,34 +53,35 @@ def run():
             play((800, 30), 500, (400, 30))
             app.greetings()
 
-        # It may happen that user wants to attach with HTTP for update of firmware
-        # or configuration. In this case we can not rely on existing WiFi connection
+        # It may happen that user wants to attach with HTTP for configuration.
+        # In this case we can not rely on existing Wi-Fi connection,
         # and we rather go to hot-spot mode.
         if app.net and app.net.is_hotspot:
             app.hotspot()
+            return
 
-        # And finally - meteostation display - basic functionality ;-)
-        else:
-            # Checks if we will display RAW image from remote display server
-            # or makes own meteostation screen based on openweathermap data.
-            app.remote_display()
+        # And finally - meteo-station display - basic functionality ;-)
 
-            # Once we are connected to network, we can download forecast.
-            # Just note that once forecast is download, WiFi is disconnected
-            # to save as much battery capacity as possible.
-            forecast = app.forecast(**app.mqtt())
+        # Checks if we will display RAW image from remote display server
+        # or makes own meteo-station screen based on openweathermap data.
+        app.remote_display()
 
-            # Most time consuming part when we have all data is to draw them
-            # on user interface - screen.
-            app.repaint(forecast)
+        # Once we are connected to network, we can download forecast.
+        # Just note that once forecast is download, Wi-Fi is disconnected
+        # to save as much battery capacity as possible.
+        forecast = app.forecast(**app.mqtt())
 
-            # Forecast is painted. Now we shall checks for alerts if there are some
-            # activated
-            app.allerts(forecast)
+        # Most time-consuming part when we have all data is to draw them
+        # on user interface - screen.
+        app.repaint(forecast)
 
-            # When all is displayed, then go to deep sleep. Sleep time is obtained
-            # according to current weather forecast and UI needs and is in minutes.
-            app.sleep(forecast)
+        # Forecast is painted. Now we shall check for alerts if there are some
+        # activated
+        app.allerts(forecast)
+
+        # When all is displayed, then go to deep sleep. Sleep time is obtained
+        # according to current weather forecast and UI needs and is in minutes.
+        app.sleep(forecast)
 
     except Exception as e:
         dump_exception("FATAL - RECOVERY REQUIRED !!!", e)
@@ -96,7 +100,7 @@ class App:
         self.wdt = WDT(timeout=120000)
 
         # Try to read DHT sensor to get better temperature and humidity values.
-        # Otherwise use at least less precise CPU temperature.
+        # Otherwise, use at least less precise CPU temperature.
         try:
             p = hw["pins"]["dht"]
             if p >= 0:
@@ -107,13 +111,13 @@ class App:
             else:
                 raise RuntimeError("No DHT")
         except:
-            self.temp = ((raw_temperature() - 32) / 1.8) - 26.0
+            self.temp = ((raw_temperature - 32) / 1.8) - 26.0
             self.rh = None
 
         # There is LED driver for debugging purposes. LED control
         # is running on background and can be disabled to save
-        # piece of battery capacity. However then there is no
-        # other way how to signalizes in which state meteostation
+        # piece of battery capacity. However, then there is no
+        # other way how to signalize in which state meteostation
         # is then UART.
         self.led = Led()
 
@@ -123,7 +127,7 @@ class App:
         if self.volt < vbat["low_voltage"]:
             self.led.disable()
 
-        # As we uses E-Ink display, the most comfortable way
+        # As we use E-Ink display, the most comfortable way
         # how to work with it is to define canvas object for
         # drawing objects and flushing them later on screen.
         self.led.mode(Led.WARM_UP)
@@ -156,7 +160,7 @@ class App:
             display.flush()
 
         # Now we can create connection instance. Instance will not
-        # connect immediately but only when it is needed as WiFi
+        # connect immediately but only when it is needed as Wi-Fi
         # heavily increase consumption of chip.
         self.led.mode(Led.DOWNLOAD)
         self.net = Connection()
@@ -170,7 +174,7 @@ class App:
         display["greetings"] = False
         display.flush()
         logger.info("Going to deep sleep ...")
-        self.canvas.epd.deepsleep(0)
+        deepsleep()
 
     def hotspot(self):
         play((2093, 30), 120, (2093, 30))
@@ -213,56 +217,60 @@ class App:
         logger.info(f"Connecting to display server: {address}")
 
         try:
-            logger.debug(f"Opening framebuff server at: 0.0.0.0:{display_port}")
-            rs = socket()
-            rs.bind(getaddrinfo("0.0.0.0", display_port)[0][-1])
-            rs.listen(1)
-
-            rq = socket()
             addr, port = address.split(":")
             port = int(port)
-            rq.connect(getaddrinfo(addr, port)[0][-1])
-            info = dumps(
+            ai = getaddrinfo(addr, port, 0, SOCK_STREAM)[0]
+            s = socket(ai[0], ai[1], ai[2])
+
+            logger.debug("Connecting server ...")
+            s.connect(ai[-1])
+
+            logger.debug("Querying screen ...")
+            rpc = Rpc(s)
+            rpc.call(
                 {
-                    "id": spot["ssid"],
-                    "port": display_port,
-                    "display": {
-                        "variant": hw["variant"],
-                        "size": [self.canvas.width, self.canvas.height],
-                        "rotation": self.canvas.rotation,
-                    },
-                    "sensors": {
-                        "vbat": self.volt,
-                        "temp": self.temp,
-                        "rh": self.rh,
-                    },
+                    "id": "hello",
+                    "host": self.net.hostname,
+                    "uniq": unique_id().hex(),
+                    "model": "epd_acep565",
+                    "orientation": 90,
                 }
             )
-            logger.debug(f"Sending request: {info}")
-            rq.sendall(info.encode())
-            rq.close()
+            r = rpc.call(
+                {
+                    "id": "getscr",
+                    "event_wake": False,
+                    "event": None,
+                    "bat": {
+                        "voltage": self.volt,
+                        "percent": round(min(max((self.volt - vbat["low_voltage"]) / (4.2 - vbat["low_voltage"]), 0), 1) * 100),
+                        "charging": False,
+                    },
+                    "rssi": self.net.rssi,
+                }
+            )
 
-            cl, addr = rs.accept()
-            r = len(self.canvas.buf)
+            if not r["compressed"]:
+                assert False, "Only compressed for now"
+
+            logger.debug("Receiving screen ...")
+            d = rpc.call_bin(
+                {
+                    "id": "getdata",
+                    "size": r["size"],
+                }
+            )
+
+            s.close()
+
+            logger.debug("Decompressing screen ...")
             b = memoryview(self.canvas.buf)
-
-            logger.debug("Receiving response ...")
-            f = cl.makefile("rb", 0)
-
-            minutes, flags, _, _ = [i for i in f.read(4)]
-
-            logger.debug("Receiving frame-buffer ...")
-            while r:
-                logger.debug(f"   remaining {r}B ...")
-                r -= f.readinto(b[-r:])
-
-            logger.debug(f"   remaining sleep time & flags ...")
-            rs.close()
+            with DeflateIO(BytesIO(d), ZLIB) as d:
+                d.readinto(b)
 
             logger.info(f"Frame buffer received")
-
-            self.canvas.flush(flags & 1)
-            self.sleep(minutes=minutes)
+            self.canvas.flush(deghost=True)
+            self.sleep(minutes=10)
 
         except Exception as e:
             dump_exception(f"Unable to connect display server at {address}", e)
@@ -407,8 +415,8 @@ class App:
 
     def sleep(self, forecast=None, minutes=0):
         if self.net is None:
-            logger.info("No WiFi connection, retry in 5 minutes ...")
-            self.canvas.epd.deepsleep(300000)
+            logger.info("No Wi-Fi connection, retry in 5 minutes ...")
+            deepsleep(300000)
 
         if 0 == minutes:
             minutes = behavior["refresh"]
@@ -428,4 +436,4 @@ class App:
                 minutes *= 2
 
         logger.info("Going to deep sleep for {} minutes ...".format(minutes))
-        self.canvas.epd.deepsleep(minutes * 60000)
+        deepsleep(minutes * 60000)

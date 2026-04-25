@@ -3,7 +3,8 @@ from ulogging import getLogger, dump_exception
 logger = getLogger(__name__)
 
 from jumpers import jumpers
-from network import WLAN, STA_IF, AP_IF
+from machine import unique_id
+from network import WLAN, STA_IF, AP_IF, hostname
 from config import connection, location, spot, api, beep
 from utime import sleep
 import urequests
@@ -21,6 +22,8 @@ class Wifi:
 
 class Connection:
     def __init__(self):
+        hostname(f"meteoink-{unique_id().hex()}")
+
         self.is_hotspot = False
         self._ifc = None
 
@@ -85,6 +88,14 @@ class Connection:
     @property
     def ifconfig(self):
         return self._ifc.ifconfig()
+
+    @property
+    def hostname(self) -> str:
+        return hostname()
+
+    @property
+    def rssi(self) -> int:
+        return self._ifc.status("rssi")
 
     def http_get_json(self, url):
         logger.info(f"HTTP GET: {url}")

@@ -2,7 +2,6 @@ from ulogging import getLogger
 
 logger = getLogger(__name__)
 
-from gc import collect
 from jumpers import jumpers
 from micropython import const
 from uerrno import ECONNRESET
@@ -49,6 +48,14 @@ class Connection:
     @property
     def ifconfig(self):
         return ("192.168.1.254", "255.255.255.0", "192.168.1.255")
+
+    @property
+    def hostname(self) -> str:
+        return "meteoink-123456789"
+
+    @property
+    def rssi(self) -> int:
+        return 55
 
     def http_get_json(self, url):
         logger.debug("HTTP GET: " + url)

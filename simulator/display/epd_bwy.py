@@ -63,12 +63,6 @@ class EPD:
 
     def deghost(self): ...
 
-    def deepsleep(self, t):
-        if t:
-            deepsleep(t)
-        else:
-            deepsleep()
-
     def _draw_pixel(self, x, y, c):
         pygame.draw.rect(
             self._screen,
