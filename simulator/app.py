@@ -243,7 +243,17 @@ class App:
                     "event": None,
                     "bat": {
                         "voltage": self.volt,
-                        "percent": round(min(max((self.volt - vbat["low_voltage"]) / (4.2 - vbat["low_voltage"]), 0), 1) * 100),
+                        "percent": round(
+                            min(
+                                max(
+                                    (self.volt - vbat["low_voltage"])
+                                    / (4.2 - vbat["low_voltage"]),
+                                    0,
+                                ),
+                                1,
+                            )
+                            * 100
+                        ),
                         "charging": False,
                     },
                     "rssi": self.net.rssi,
@@ -379,7 +389,7 @@ class App:
         if not beep["temp_balanced"]:
             return
 
-        # Is temperature outside lower then inside?
+        # Is temperature outside lower than inside?
         if temp["indoor_high"] > forecast.home.temp:
             return
 
@@ -392,10 +402,11 @@ class App:
             alert.flush()
             return
 
-        # Didn't we already triggered alert?
-        if (
-            not alert["already_triggered"]
-            and forecast.home.temp > forecast.weather.temp
+        # Didn't we already trigger alert?
+        if not alert["already_triggered"] and forecast.home.temp > (
+            forecast.weather.temp
+            if forecast.weather.temp_mqtt is None
+            else forecast.weather.temp_mqtt
         ):
             # Play alert and set that it has been triggered already
             for i in range(3):
