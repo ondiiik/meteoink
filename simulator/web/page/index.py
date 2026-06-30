@@ -83,13 +83,13 @@ def _pg_set(page):
     page.heading(2, trn("Confort temperatures"))
     with page.table(None, 'frame="hsides"') as table:
         table.row(
-            (trn("Indoor high"), "{:.1f} °C".format(temp["indoor_high"])), web.SPACES
+            (trn("Indoor high"), f"{temp['indoor_high']:.1f} °C"), web.SPACES
         )
         table.row(
-            (trn("Outdoor high"), "{:.1f} °C".format(temp["outdoor_high"])), web.SPACES
+            (trn("Outdoor high"), f"{temp['outdoor_high']:.1f} °C"), web.SPACES
         )
         table.row(
-            (trn("Outdoor low"), "{:.1f} °C".format(temp["outdoor_low"])), web.SPACES
+            (trn("Outdoor low"), f"{temp['outdoor_low']:.1f} °C"), web.SPACES
         )
         table.row((web.button(trn("Edit temperatures"), "tempedt"), ""), web.SPACES)
 
@@ -119,9 +119,7 @@ def _pg_set(page):
         table.row(
             (
                 trn("Refresh time"),
-                trn("{} min (doubled from {}:00 to {}:00)").format(
-                    behavior["refresh"], behavior["dbl"][0], behavior["dbl"][1]
-                ),
+                trn(f"{behavior['refresh']} min (doubled from {behavior['dbl'][0]}:00 to {behavior['dbl'][1]}:00)"),
                 web.button(trn("Edit"), "refredt"),
             ),
             web.SPACES,
@@ -156,12 +154,12 @@ def _pg_set(page):
     page.heading(2, trn("Battery setup"))
     with page.table(None, 'frame="hsides"') as table:
         table.row(
-            (trn("Current voltage"), "{:.2f} V".format(battery.voltage), ""), web.SPACES
+            (trn("Current voltage"), f"{battery.voltage:.2f} V", ""), web.SPACES
         )
         table.row(
             (
                 trn("Critical voltage"),
-                "{:.2f} V".format(vbat["low_voltage"]),
+                f"{vbat['low_voltage']:.2f} V",
                 web.button(trn("Edit"), "battedt"),
             ),
             web.SPACES,

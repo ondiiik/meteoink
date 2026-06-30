@@ -79,4 +79,4 @@ class Connection:
 
 
 def bytes2bssid(bssid):
-    return ":".join("{:02X}".format(b) for b in bssid)
+    return ":".join(f"{b:02X}" for b in bssid)

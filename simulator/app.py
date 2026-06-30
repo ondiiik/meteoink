@@ -446,5 +446,5 @@ class App:
             if h in range(b, font):
                 minutes *= 2
 
-        logger.info("Going to deep sleep for {} minutes ...".format(minutes))
+        logger.info(f"Going to deep sleep for {minutes} minutes ...")
         deepsleep(minutes * 60000)

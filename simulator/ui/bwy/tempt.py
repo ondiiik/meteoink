@@ -13,7 +13,7 @@ class UiTempTxt(UiFrame):
             if (fl.temp < f.temp) and (f.temp > fr.temp):
                 self.ui.text_center(
                     16,
-                    "{:.0f}°C".format(f.temp),
+                    f"{f.temp:.0f}°C",
                     Vect(x, graph_temp.chart_y(f.temp) - 20),
                     BLACK,
                     WHITE,
@@ -22,7 +22,7 @@ class UiTempTxt(UiFrame):
             if (fl.temp > f.temp) and (f.temp < fr.temp):
                 self.ui.text_center(
                     16,
-                    "{:.0f}°C".format(f.temp),
+                    f"{f.temp:.0f}°C",
                     Vect(x, graph_temp.chart_y(f.temp) + 4),
                     BLACK,
                     WHITE,

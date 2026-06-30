@@ -53,9 +53,7 @@ class _Select:
         self.name = name
 
     def __enter__(self):
-        self.page += '<label for="{1}">{0}</label><select name="{1}" id="{1}">'.format(
-            self.label, self.name
-        )
+        self.page += f'<label for="{self.name}">{self.label}</label><select name="{self.name}" id="{self.name}">'
         return self
 
     def __exit__(self, type, value, traceback):
@@ -96,7 +94,7 @@ class _Table:
         space = "&nbsp;" * space
 
         for cell in cells:
-            self.page += "<td>{}{}</td>".format(cell, space)
+            self.page += f"<td>{cell}{space}</td>"
 
         self.page += "</tr>"
 
@@ -123,9 +121,7 @@ class _Form(_Table):
         self.row(
             (
                 f"<label>{txt}</label>",
-                '<input type="{3}" value="{2}" disabled="1"><input type="hidden" name="{0}" value="{2}" />'.format(
-                    var, txt, dfl, tp
-                ),
+                f'<input type="{tp}" value="{dfl}" disabled="1"><input type="hidden" name="{var}" value="{dfl}" />'
             ),
             space,
         )
@@ -193,7 +189,7 @@ class Page:
         return _Select(self, label, name)
 
     def heading(self, level, txt):
-        self.doc += "<h{0}>{1}</h{0}>".format(level, txt)
+        self.doc += f"<h{level}>{txt}</h{level}>"
 
     def br(self, cnt=1):
         self.doc += "<br>" * cnt

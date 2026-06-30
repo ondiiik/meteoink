@@ -114,18 +114,11 @@ class Forecast:
 
     def _read1(self, connection, **kw):
         # Download weather now for today
-        url = "https://api.openweathermap.org/data/2.5/weather?lat={}&lon={}&appid={}&mode=json&units={}&lang={}"
         current = connection.http_get_json(
-            url.format(
-                location["locations"][connection.config["location"]]["lat"],
-                location["locations"][connection.config["location"]]["lon"],
-                api["apikey"],
-                api["units"],
-                api["language"],
-            )
+            f"https://api.openweathermap.org/data/2.5/weather?lat={location['locations'][connection.config['location']]['lat']}&lon={location['locations'][connection.config['location']]['lon']}&appid={api['apikey']}&mode=json&units={api['units']}&lang={api['language']}"
         )
 
-        # Parse todays forecast
+        # Parse today's forecast
         try:
             rain = current["rain"]["1h"]
         except KeyError:
@@ -149,9 +142,7 @@ class Forecast:
             return fid if fid != 500 or rain < 0.5 else 520
 
         self.weather = Forecast.Weather(
-            "{}{}".format(
-                id2icon[self._mk_id(weather["id"], rain)], weather["icon"][-1]
-            ),
+            f"{id2icon[self._mk_id(weather['id'], rain)]}{weather['icon'][-1]}",
             current["dt"],
             current["sys"]["sunrise"],
             current["sys"]["sunset"],
@@ -175,16 +166,8 @@ class Forecast:
 
     def _read2(self, connection, hours):
         # Download hourly weather forecast for 5 days
-        url = "http://api.openweathermap.org/data/2.5/forecast?lat={}&lon={}&appid={}&mode=json&units={}&lang={}&cnt={}"
         fcast = connection.http_get_json(
-            url.format(
-                location["locations"][connection.config["location"]]["lat"],
-                location["locations"][connection.config["location"]]["lon"],
-                api["apikey"],
-                api["units"],
-                "EN",
-                (hours + 2) // 3,
-            )
+            f"http://api.openweathermap.org/data/2.5/forecast?lat={location['locations'][connection.config['location']]['lat']}&lon={location['locations'][connection.config['location']]['lon']}&appid={api['apikey']}&mode=json&units={api['units']}&lang={api['language']}&cnt={(hours + 2) // 3}"
         )
 
         # Build 2 days forecast
@@ -224,7 +207,7 @@ class Forecast:
             )
             self.forecast.append(
                 Forecast.Weather(
-                    "{}{}".format(id2icon[self._mk_id(fid, rain)], weather["icon"][-1]),
+                    f"{id2icon[self._mk_id(fid, rain)]}{weather['icon'][-1]}",
                     dt,
                     srt,
                     sst,

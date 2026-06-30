@@ -22,9 +22,9 @@ class WebServer(Server):
             self.page = "index"
 
         try:
-            page = __import__("web.{}".format(self.page), None, None, ("page",), 0).page
+            page = __import__(f"web.{self.page}", None, None, ("page",), 0).page
         except ImportError:
-            logger.info("!!! Page {} not found !!!".format(self.page))
+            logger.info("!!! Page {self.page} not found !!!")
             return
 
         if not self.last == self.page:

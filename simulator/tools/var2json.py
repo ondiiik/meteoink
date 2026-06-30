@@ -17,7 +17,7 @@ class Location(dict):
 
 class Connection(dict):
     def __init__(self, **kw):
-        kw["bssid"] = ":".join("{:02X}".format(b) for b in kw["bssid"])
+        kw["bssid"] = ":".join(f"{b:02X}" for b in kw["bssid"])
         super().__init__(**kw)
 """
     )

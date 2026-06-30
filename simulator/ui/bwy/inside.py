@@ -14,7 +14,7 @@ class UiInside(UiFrame):
         if None == forecast.home.rh:
             t = "--"
         else:
-            t = "{:.0f}".format(forecast.home.rh)
+            t = f"{forecast.home.rh:.0f}"
 
         self.ui.text(25, t, ZERO)
         self.ui.text(10, "%", Vect(32, 11))
@@ -29,7 +29,7 @@ class UiInside(UiFrame):
         dt = forecast.time.get_date_time(forecast.weather.dt)
         self.ui.text_right(
             10,
-            "{:d}.{:d}.{:d} {:d}:{:02d}".format(dt[2], dt[1], dt[0], dt[3], dt[4]),
+            f"{dt[2]:d}.{dt[1]:d}.{dt[0]:d} {dt[3]:d}:{dt[4]:02d}",
             Vect(self.dim.x, 25),
         )
 

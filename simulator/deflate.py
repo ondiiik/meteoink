@@ -2,6 +2,9 @@ from zlib import decompress
 from io import BytesIO
 
 
+ZLIB = 2
+
+
 class DeflateIO:
     def __init__(self, byte_stream: BytesIO) -> None:
         self._byte_stream = byte_stream

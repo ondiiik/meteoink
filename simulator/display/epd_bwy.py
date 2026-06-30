@@ -45,7 +45,7 @@ class EPD:
 
         self._clock = pygame.time.Clock()
 
-        pygame.display.set_caption("EPD {} x {} - BWY".format(self.width, self.height))
+        pygame.display.set_caption(f"EPD {self.width} x {self.height} - BWY")
 
     def init(self): ...
 
