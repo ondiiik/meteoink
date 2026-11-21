@@ -15,6 +15,9 @@ import urequests
 import gc
 from micropython import const
 from config import location, api, behavior
+from version import VERSION
+
+_HEADERS = {"User-Agent": f"Meteoink/{VERSION} (https://github.com/ondiiik/meteoink)"}
 
 _pow2 = (
     1,
@@ -80,10 +83,11 @@ class RadarMap:
             crit0 = self._swp_map0
             crit1 = self._swp_map1
             self._load_file(
-                "https://tile.openstreetmap.de/{}/{}/{}.png",
+                "https://tile.openstreetmap.org/{}/{}/{}.png",
                 self.map.x,
                 self.map.y,
-                lambda a, n: crit1[a] if n[0] > 185 else crit0[a],
+                lambda a, n: crit1[a] if ((abs(n[0]-0x9B) + abs(n[1] - 0x9D) + abs(n[2] - 0xA3)) > 72) else crit0[a],
+                # store_png=True,
             )
             with open(path, "wb") as f:
                 f.write(self.bitmap.buf)
@@ -129,14 +133,26 @@ class RadarMap:
         fb.fill_rect(self.dim2.y - 4, self.dim2.x - 4, 9, 9, BLACK)
         fb.fill_rect(self.dim2.y - 2, self.dim2.x - 2, 5, 5, WHITE)
 
-    def _load_file(self, fmt, x, y, conv, ofs=ZERO):
+    def _load_file(self, fmt, x, y, conv, ofs=ZERO, store_png=False):
         # Load requested tile
         self.wdt.feed()
         url = fmt.format(self.z, x, y)
         logger.info(f"Loading {url} ...")
-        imgstr = urequests.get(url)
+        if store_png:
+            fname = url.replace(".png", "~png").replace(":", "_").replace("/", "_").replace("?", "_").replace("=", "_").replace(".", "_").replace("~png", ".png")
+            try:
+                with open(fname, "rb") as f:
+                    img = f.read()
+                    logger.debug(f"Reusing {fname}")
+            except Exception:
+                logger.debug(f"Downloading {fname}")
+                img = urequests.get(url, headers=_HEADERS).content
+                with open(fname, "wb") as f:
+                    f.write(img)
+        else:
+            img = urequests.get(url, headers=_HEADERS).content
         logger.debug(f"Decoding PNG ...")
-        width, height, data, meta = Reader(imgstr.content).read()
+        width, height, data, meta = Reader(img).read()
         planes = meta["planes"]
         palette = meta.get("palette", None)
 
@@ -184,7 +200,7 @@ class RadarMap:
             if (missing & mask) == mask:
                 p = pos + shift
                 o = shift * 256
-                self._load_file(fmt, p.x, p.y, conv, o)
+                self._load_file(fmt, p.x, p.y, conv, o, store_png)
 
     @staticmethod
     def _deg2tile(lat, lon, z):

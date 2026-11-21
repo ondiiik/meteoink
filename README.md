@@ -9,35 +9,35 @@ Meteoink is home meteostation based on several variants of E-Ink displays such a
 [5.65inch 7-color (F) E-Ink display](https://www.waveshare.com/wiki/5.65inch_e-Paper_Module_(F)_Manual) (variant `acep`) or
 [4.2 inch dual color E-Ink display](https://www.waveshare.com/4.2inch-e-paper-module-c.htm) (variant `bwy`). In past
 there has been support also for [T5-4.7 Inch E-paper](https://www.lilygo.cc/products/t5-4-7-inch-e-paper) (variant `epd47`)
-but this has been dropped as there is no support for later variant of Micropython (unfortunately several last versions
-does not support it due to Micropython version upgrade).
+but this has been dropped as there is no support for later variant of MicroPython (unfortunately several last versions
+does not support it due to MicroPython version upgrade).
 
-Platform running this meteostation is [Micropython 1.27.0](https://micropython.org/) running on
+Platform running this meteostation is [MicroPython 1.29.0](https://micropython.org/) running on
 [TTGO-T8-ESP32](https://github.com/LilyGO/TTGO-T8-ESP32/tree/master) compatible board.
 
 Meteostation is connected to your home WiFi and uses data from [OpenWeatherMap](https://openweathermap.org/).
 It also may use [DHT22](https://github.com/semestrinis/Arduino/wiki/DHT22-temperature-humidity-sensor)
-sensor for measuring indoor temperature and humidity, however advanced users may use some other MQTT sensor for
-this purpose. Whole system is powered from one [Li-On battery](https://en.wikipedia.org/wiki/List_of_battery_sizes#Lithium-ion_batteries_(rechargeable)) charged through the USB on ESP board. Meteostation is usually operating in between 2 to 6 mounts
+sensor for measuring indoor temperature and humidity. However advanced users may use some other MQTT sensor for
+this purpose, e.g. some sensors provided by [Zigbee2MQTT](https://www.zigbee2mqtt.io/). Whole system is powered from one [Li-On battery](https://en.wikipedia.org/wiki/List_of_battery_sizes#Lithium-ion_batteries_(rechargeable)) charged through the USB on ESP board. Meteostation is usually operating in between 2 to 6 mounts
 when refresh time is set to 15 minutes and there is good WiFi signal and internet connection with battery stronger then 3000 mAh.
-This time may reduce when e.g. radar data or `acep` variant of display with longer refresh are used.
+This time may reduce when e.g. radar data or `acep` variant of display with longer display refresh times.
 
 
 ## Wiring
 
 ![Meteostation wiring](graphics/doc/wiring.png "Meteostation wiring")
 
-Some pins can be moved to another position by changing config file [pins.py](https://github.com/ondiiik/meteoink/blob/master/esp32/micropython/acep/setup/pins.py).
+Some pins can be moved to another position by changing config file `cfg/hw.json` (automatically created on device on first boot).
 
-However keep in mind that not all pins are available for any operation (some are not capable of ADC, some are not capable of SPI, ...).
-Also battery is not displayed in wiring as it has its own connector so its connection is obvious.
+However, keep in mind that not all pins are available for any operation (some are not capable of ADC, some are not capable of SPI, ...).
+Also, battery is not displayed in wiring as it has its own connector so its connection is obvious.
 
 
 ## Box
 
 Files for 3D printed parts are stored [here](https://github.com/ondiiik/meteoink/tree/master/box).
 
-Both variants of box are partialy screwed and partially glued as well as electronics. To stitch processor board or battery
+Both variants of box are partially screwed and partially glued as well as electronics. To stitch processor board or battery
 you can use acrylate 3M double side tape. DHT22 sensor is glued to chassis (grid for air access shall be on the side pointing
 outside the box). When you glue it, apply glue very carefully as it shall not pass inside electronics
 (especially in the case of buttons or DHT sensor). When all electronics is inside, then chassis shall be either glued to frame
@@ -57,20 +57,21 @@ outside the box). When you glue it, apply glue very carefully as it shall not pa
 ![3D printed frame](graphics/doc/frame14.jpeg "3D printed frame")
 
 
-## Micropython
+## MicroPython
 
-To make software running on ESP32, you have to install Micropython first on it. You shall use
-[custom built of Micropython](https://github.com/ondiiik/meteoink/blob/master/esp32/micropython.bin) which contains
-all necessary, including required python code. This also allow meteostation to startup way faster, what significantly
-reduce battery consumption.
+Unlike in the past, there is MicroPython firmware already precompiled in [Release section](releases).
+This firmware already contains all Python code bundled inside in form of frozen modules. This
+significantly reduce time necessary for meteostation to boot up, what saves some battery juice.
 
-### Flashing of micropython
 
-All necessary files can be found in [Release section](https://github.com/ondiiik/meteoink/releases). Currently
+### Flashing of MicroPython
+
+All necessary files can be found in [Release section](releases). Currently
 only `meteoink.bin` file is required.
 
-To flash firmware to your ESP32 board you can use [flash\_firmware.sh](https://github.com/ondiiik/meteoink/blob/master/tools/flash_firmware.sh)
-shell script. Just note that you will need to have installed [python interpreter](https://www.python.org/downloads/) first. 
+For those who don't want to install any ESP32 stuff can use [online WEB based flasher](https://www.espboards.dev/tools/program/). For the rest, to flash the firmware
+to your ESP32 board you can use [flash\_firmware.sh](https://github.com/ondiiik/meteoink/blob/master/tools/flash_firmware.sh) shell script.
+Just note that you will need to have installed [python interpreter](https://www.python.org/downloads/) first. 
 You also need to have [esptool](https://pypi.org/project/esptool/) installed in your `python`. Once you have `python` installed
 on your PC you can install `esptool` by following command:
 
@@ -86,19 +87,20 @@ file system, so you can be sure that your previous data will be definitely lost 
 
 ## Upload binary files
 
-Each meteostation variant needs to upload also files with web content and binaries with graphics. This binaries are located in repository folder [esp32/micropython](https://github.com/ondiiik/meteoink/tree/master/esp32/micropython) for each variant of
-display. There shall be also uploaded file `hw.json` into `cfg` describing in which mode and with which pins the meteostation
-will work.
+Each meteostation variant needs to upload also files with web content and binaries with graphics. These binaries are located in [Release section](releases) in file `fs_data.zip` for each variant of display. There shall be also uploaded file `hw.json` into `cfg` describing in which mode and with which pins the meteostation will work.
 
-Once you have installed `python` on your PC you can use [ampy](https://techtutorialsx.com/2017/06/04/esp32-esp8266-micropython-uploading-files-to-the-file-system/) or
+For those who don't want again install anythink, you can use WEB based [ViperIDE](https://viper-ide.org/).
+
+For the others, once you have installed `python` on your PC you can use [mpremote](https://docs.micropython.org/en/latest/reference/mpremote.html) or
 [Thonny IDE](https://randomnerdtutorials.com/getting-started-thonny-micropython-python-ide-esp32-esp8266/) to do this job for you.
 Following files needs to be copied according to variant you use:
+
 
 #### Files for variant ACEP
 
 ![EPD 5.65 ACEP inch meteostation](graphics/doc/meteostation_acep.jpeg "EPD 5.65 ACEP inch meteostation")
 
-  - all files from folder [esp32/micropython/acep](https://github.com/ondiiik/meteoink/tree/master/esp32/micropython/acep).
+  - all files from folder `acep` from `fs_data.zip` from [Release section](releases).
   - following `JSON` file into `cfg/hw.json` (this is also created automatically by default when this file is missing).
 
 ```
@@ -125,11 +127,12 @@ Following files needs to be copied according to variant you use:
 }
 ```
 
+
 #### Files for variant BWY
 
 ![EPD 4.2 inch meteostation](graphics/doc/meteostation.jpeg "EPD 4.2 inch meteostation")
 
-  - all files from folder [esp32/micropython/bwy](https://github.com/ondiiik/meteoink/tree/master/esp32/micropython/bwy).
+  - all files from folder [esp32/micropython/bwy](bwy` from `fs_data.zip` from [Release section](releases).
   - following `JSON` file into `cfg/hw.json`.
 
 ```
@@ -159,7 +162,7 @@ Following files needs to be copied according to variant you use:
 
 ## Initial configuration
 
-When all files are uploaded and meteostation restarted, it creates all missing `JSON` files in folder `cfg`. However
+When all files are uploaded and meteostation restarted, it creates all missing `JSON` files in folder `cfg`. However,
 this initial data are missing some important data (API key, WiFi setup, location, ...). This causes that metostation
 automatically switch to WiFi AP mode. You can use QR codes displayed on screen to setup your mobile phone WiFi to attach
 to meteostation AP and open suitable WEB page.
@@ -172,16 +175,19 @@ Once you are connected to meteostation, you shall see webpage similar to this on
 
 To make station into operation you have to do following steps:
 
+
 ### Add your location
 
 You shall add at least one location at the beginning. This location will be later used in WiFi configuration.
 You can use more locations and bind them later to various WiFi, so when you are taking your weather station on holiday,
 it choose location according to WiFi in your location.
 
+
 ### Add WiFi
 
 Next step is to connect WiFi. When you attempt to connect WiFi, the list of available networks will be displayed.
 Then you can choose one you want to use, assign suitable location and store it.
+
 
 ### Set OpenWeatherMap API key
 
@@ -214,6 +220,7 @@ and they are then used after restart. However be careful when editing them, espe
 and `location.json`, where `connection.json` which uses index to `location.json` as reference and is easy to break binding between them.
 
 Items in some of this files are described here:
+
 
 ### hw.json
 
@@ -318,6 +325,7 @@ This JSON file holds information about WiFi connections. Items here are created 
   then SSID. This can be useful if there are more then one WiFi networks with the same `SSID`.
 - `"passwd"` - Password used to connect the WiFi.
 
+
 #### MQTT external sensor
 
 In `connection.json` file there can be added `"mqtt"` tag to tell that this WiFi can be used to access `MQTT` broker
@@ -353,6 +361,7 @@ value from `MQTT` payload will be interpreted as which variable. Following varia
 - `in_humi` - Value represents indoor humidity. If there is internal sensor inside meteostation (e.g. `DHT22`)
   it's value vill be overwritten.
 
+
 ##### Examples
 
 Lets imagine we have `MQTT` broker on address `10.11.12.13` and port `1883` and have one
@@ -377,7 +386,7 @@ In this case we can use its value as external value by following `"mqtt"` tag:
 "10.11.12.13:1883:topic=zigbee2mqtt/temperature_outside,out_temp=temperature,out_humi=humidity"
 ```
 
-When we need to specify user name (e.g. `mq_user`) and password (e.g. `123456789`) use following:
+When we need to specify username (e.g. `mq_user`) and password (e.g. `123456789`) use following:
 
 ```
 "mq_user@123456789:10.11.12.13:1883:topic=zigbee2mqtt/temperature_outside,out_temp=temperature,out_humi=humidity"
@@ -398,6 +407,7 @@ built in meteostation sensor:
 
 
 ## Others
+
 
 ### Translations
 

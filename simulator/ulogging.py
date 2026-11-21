@@ -2,6 +2,7 @@ from usys import print_exception
 from machine import RTC
 from micropython import const
 from config import sys
+from version import VERSION
 
 
 CRITICAL = const(5)
@@ -104,6 +105,9 @@ if not sys["exception_dump"]:
     _print = print
 
 _print(f"Loading module {__name__}")
-_print("+-----------------+")
-_print("|  Meteoink v2.11 |")
-_print("+-----------------+")
+m = f"Meteoink v{VERSION}"
+f = "-" * len(m)
+_print(f"+-{f}-+")
+_print(f"| {m} |")
+_print(f"+-{f}-+")
+del f, m
