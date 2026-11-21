@@ -7,7 +7,7 @@ class Rpc:
         self._s = s
 
     def call(self, msg: dict[str, any]) -> dict[str, any]:
-        self._s.send(dumps(msg))
+        self._s.send(dumps(msg).encode())
 
         r = self._rcv_id(msg["id"])
         if "status" not in r:
@@ -22,7 +22,7 @@ class Rpc:
         return r
 
     def call_bin(self, msg: dict[str, any]) -> bytes:
-        self._s.send(dumps(msg))
+        self._s.send(dumps(msg).encode())
         r = bytearray()
         while len(r) < msg["size"]:
             r += self._rcv()

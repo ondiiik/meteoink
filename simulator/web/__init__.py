@@ -103,7 +103,7 @@ class _Form(_Table):
     def __init__(
         self, page, action, label_submit=trn("Submit"), label_cancel=trn("Cancel")
     ):
-        super().__init__(page, ("", ""))
+        super().__init__(page, ("", ""), 'class="form"')
         self.action = action
         self.label_submit = label_submit
         self.label_cancel = label_cancel
@@ -115,7 +115,7 @@ class _Form(_Table):
 
     def __exit__(self, type, value, traceback):
         super().__exit__(type, value, traceback)
-        self.page += f'<br><br><input type="submit" class="button" value="{self.label_submit}"><button class="button"><a href="/">{self.label_cancel}</a></button></form>'
+        self.page += f'<div class="form-buttons"><input type="submit" class="button" value="{self.label_submit}"><button class="button"><a href="/">{self.label_cancel}</a></button></div></form>'
 
     def label(self, txt, var, dfl="", tp="text", space=4):
         self.row(
@@ -136,10 +136,7 @@ class _Form(_Table):
         )
 
     def variable(self, var, val):
-        self.row(
-            (f'<input type="hidden" id="{var}" name="{var}" value="{val}" />',),
-            0,
-        )
+        self.page += f'<tr class="hidden-row"><td><input type="hidden" id="{var}" name="{var}" value="{val}" /></td></tr>'
 
     def checkbox(self, txt, var, checked=False, space=4):
         self.row(
@@ -151,7 +148,7 @@ class _Form(_Table):
         )
 
     def spacer(self):
-        self.row(("", ""), 1)
+        self.page += '<tr class="spacer"><td></td></tr>'
 
 
 class Page:
@@ -160,7 +157,7 @@ class Page:
         self.response = response
 
     def __enter__(self):
-        self.doc += '<!DOCTYPE html><html><head><link rel="stylesheet" href="microweb.css"></head><body>'
+        self.doc += '<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Meteostation</title><link rel="stylesheet" href="microweb.css"></head><body>'
         return self
 
     def __exit__(self, type, value, traceback):

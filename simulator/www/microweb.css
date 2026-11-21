@@ -1,35 +1,222 @@
+* {
+    box-sizing:            border-box;
+}
+
 html {
-    font-family:        Helvetica;
-    display:            inline-block;
-    margin:             0px auto;
-    font-size:          14px;
+    font-family:           Helvetica, Arial, sans-serif;
+    font-size:             19px;
+    -webkit-text-size-adjust: 100%;
+}
+
+body {
+    max-width:             480px;
+    margin:                0 auto;
+    padding:               12px;
+    color:                 #222;
+    background:            #fff;
 }
 
 h1 {
-    color:              #0F3376;
+    color:                 #0F3376;
+    font-size:             1.5rem;
+}
+
+h2 {
+    color:                 #0F3376;
+    font-size:             1.3rem;
+    margin:                1.6em 0 0.5em;
+    padding-bottom:        0.25em;
+    border-bottom:         2px solid #0F3376;
+}
+
+h2:first-of-type {
+    margin-top:            0.5em;
 }
 
 p {
-    font-size:          1.5rem;
+    font-size:             1rem;
 }
 
+table {
+    width:                 100%;
+    border-collapse:       collapse;
+    margin:                8px 0;
+}
+
+th {
+    text-align:            left;
+    font-weight:           bold;
+    padding:               10px 8px;
+}
+
+td {
+    padding:               10px 8px;
+    vertical-align:        middle;
+}
+
+/* Data and choice tables: scroll horizontally on narrow screens */
+table[frame] {
+    display:               block;
+    overflow-x:            auto;
+    -webkit-overflow-scrolling: touch;
+    white-space:           nowrap;
+}
+
+table[frame] thead tr {
+    border-top:            2px solid #ddd;
+}
+
+table[frame] tbody tr {
+    border-top:            1px solid #ddd;
+}
+
+/* Settings forms: stack labels above fields on small screens */
+table.form,
+table.form thead,
+table.form tbody,
+table.form tr,
+table.form td {
+    display:               block;
+    width:                 100%;
+}
+
+table.form thead {
+    display:               none;
+}
+
+table.form tr {
+    margin-bottom:         10px;
+}
+
+table.form tr.hidden-row,
+table.form tr.spacer {
+    display:               none;
+}
+
+table.form td {
+    padding:               2px 0;
+    border:                none;
+}
+
+table.form td:first-child {
+    font-weight:           bold;
+    padding-top:           12px;
+}
+
+table.form label {
+    display:               block;
+    margin-bottom:         6px;
+    font-weight:           bold;
+}
+
+table.form input[type="text"],
+table.form input[type="password"],
+table.form input[type="number"],
+table.form select {
+    width:                 100%;
+}
+
+/* Fields */
+input[type="text"],
+input[type="password"],
+input[type="number"],
+input[type="email"],
+input[type="url"],
+select {
+    width:                 100%;
+    padding:               12px;
+    font-size:             1rem;
+    line-height:           1.3;
+    color:                 #222;
+    background:            #fff;
+    border:                1px solid #bbb;
+    border-radius:         6px;
+}
+
+input[disabled] {
+    background:            #eee;
+    color:                 #555;
+    border-color:          #ddd;
+}
+
+input[type="checkbox"] {
+    width:                 1.5em;
+    height:                1.5em;
+    margin:                6px 0;
+    accent-color:          #0074d9;
+}
+
+/* Buttons */
 .button {
-    display:            inline-block;
-    background-color:   #0074d9;
-    border:             none;
-    border-radius:      4px;
-    color:              white;
-    padding:            4px 14px;
-    text-decoration:    none;
-    font-size:          12px;
-    margin:             2px;
-    cursor:             pointer;
+    display:               inline-block;
+    background-color:      #0074d9;
+    border:                none;
+    border-radius:         6px;
+    color:                 #fff;
+    padding:               12px 16px;
+    font-size:             1rem;
+    font-family:           inherit;
+    line-height:           1.3;
+    min-height:            44px;
+    margin:                4px 4px 4px 0;
+    cursor:                pointer;
+    text-decoration:       none;
+}
+
+.button:active {
+    background-color:      #005ea6;
+}
+
+.button a {
+    display:               inline-block;
+    color:                 #fff;
+    text-decoration:       none;
+    padding:               12px 16px;
+    margin:                -12px -16px;
+}
+
+/* Standalone action buttons (direct children of body) fill the row */
+body > form.inline {
+    display:               block;
+    margin:                6px 0;
+}
+
+body > form.inline .button {
+    width:                 100%;
+}
+
+/* Form action buttons */
+.form-buttons {
+    margin-top:            1.2em;
+}
+
+.form-buttons input[type="submit"],
+.form-buttons button {
+    display:               block;
+    width:                 100%;
+    margin:                8px 0;
+}
+
+.form-buttons input[type="submit"] {
+    background-color:      #2e9e44;
 }
 
 .butt_on {
-    background-color:   #42f486;
+    background-color:      #42f486;
+    color:                 #222;
 }
 
 .butt_off {
-    background-color:   #4286f4;
+    background-color:      #4286f4;
+}
+
+/* Small screens: tighten padding without shrinking text */
+@media (max-width: 340px) {
+    body {
+        padding:           8px;
+    }
+
+    th, td {
+        padding:           8px 4px;
+    }
 }
