@@ -19,6 +19,7 @@ from led import Led
 from display import Canvas
 from forecast import Forecast
 from rpc import Rpc
+from secsock import SecureSocket
 from socket import socket, getaddrinfo, SOCK_STREAM
 from ujson import loads
 from umqtt.simple import MQTTClient, hexlify
@@ -216,6 +217,7 @@ class App:
 
         logger.info(f"Connecting to display server: {address}")
 
+        s = None
         try:
             addr, port = address.split(":")
             port = int(port)
@@ -224,6 +226,16 @@ class App:
 
             logger.debug("Connecting server ...")
             s.connect(ai[-1])
+
+            logger.debug("Opening encrypted channel ...")
+            s = SecureSocket.client(
+                s,
+                bytes.fromhex(behavior["display_key"]),
+                unique_id(),
+                # Screen is received at once - compressed data can be slightly
+                # bigger than frame buffer in the worst case
+                max_frame=len(self.canvas.buf) + 1024,
+            )
 
             logger.debug("Querying screen ...")
             rpc = Rpc(s)
@@ -271,6 +283,12 @@ class App:
                 }
             )
 
+            r = rpc.call(
+                {
+                    "id": "wantsleep",
+                }
+            )
+
             s.close()
 
             logger.debug("Decompressing screen ...")
@@ -280,9 +298,11 @@ class App:
 
             logger.info(f"Frame buffer received")
             self.canvas.flush(deghost=True)
-            self.sleep(minutes=10)
+            self.sleep(minutes=r.get("minutes", 10))
 
         except Exception as e:
+            if s is not None:
+                s.close()
             dump_exception(f"Unable to connect display server at {address}", e)
 
     def forecast(self, **kw):

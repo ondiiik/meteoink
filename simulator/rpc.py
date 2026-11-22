@@ -1,9 +1,10 @@
 from json import dumps, loads
-from socket import socket
 
 
 class Rpc:
-    def __init__(self, s: socket) -> None:
+    """JSON RPC over message channel (`secsock.SecureSocket`)"""
+
+    def __init__(self, s: "SecureSocket") -> None:
         self._s = s
 
     def call(self, msg: dict[str, any]) -> dict[str, any]:
@@ -21,15 +22,17 @@ class Rpc:
 
         return r
 
-    def call_bin(self, msg: dict[str, any]) -> bytes:
+    def call_bin(self, msg: dict[str, any]) -> memoryview:
         self._s.send(dumps(msg).encode())
-        r = bytearray()
-        while len(r) < msg["size"]:
-            r += self._rcv()
+        r = self._s.recv()
+        if len(r) != msg["size"]:
+            raise ValueError(
+                f"Received {len(r)} bytes of binary data, but {msg['size']} expected"
+            )
         return r
 
     def _rcv_id(self, mid: str) -> dict[str, any]:
-        m = self._rcv()
+        m = bytes(self._s.recv())
         try:
             r = loads(m)
         except ValueError as e:
@@ -43,9 +46,3 @@ class Rpc:
             )
 
         return r
-
-    def _rcv(self) -> bytes:
-        m = self._s.recv(4096)
-        if not m:
-            raise RuntimeError(f"Connection closed by server!")
-        return m

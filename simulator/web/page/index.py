@@ -140,6 +140,14 @@ def _pg_set(page):
         table.row(
             ("API key", api["apikey"], web.button(trn("Edit"), "apiedt")), web.SPACES
         )
+        table.row(
+            (
+                trn("Remote display key"),
+                f'<code style="word-break:break-all">{behavior.get("display_key", "")}</code>',
+                "",
+            ),
+            web.SPACES,
+        )
 
     page.heading(2, trn("Hotspot setup"))
     with page.table(None, 'frame="hsides"') as table:

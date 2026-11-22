@@ -48,6 +48,7 @@ _trn = {
     "Outside temperature balanced": "Vyrovnání vnitřní a vnější teploty",
     "Password": "Heslo",
     "Refresh time": "Četnost překreslování",
+    "Remote display key": "Klíč vzdáleného displeje",
     "Set hotspot password": "Nastavit heslo pro hotspot",
     "Software bug detected": "Zjištěna softwarová chyba",
     "Submit": "Potvrdit",

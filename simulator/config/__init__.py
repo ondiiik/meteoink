@@ -2,7 +2,7 @@ print("Reading database ...")
 
 from .base import Json
 from random import choice
-from os import mkdir
+from os import mkdir, urandom
 
 
 try:
@@ -88,6 +88,12 @@ behavior = Json(
     "cfg/behavior.json",
     {"refresh": 15, "dbl": (0, 7), "show_radar": 5, "display_port": 6627},
 )
+
+# Key for encrypted communication with remote display server (AES-256). It is
+# generated randomly once per station and the same key has to be stored on server.
+if not behavior.get("display_key"):
+    behavior["display_key"] = urandom(32).hex()
+    behavior.flush()
 
 hw = Json(
     "cfg/hw.json",
