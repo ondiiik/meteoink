@@ -268,6 +268,8 @@ class App:
                         ),
                         "charging": False,
                     },
+                    "temp": self.temp,
+                    "rh": self.rh,
                     "rssi": self.net.rssi,
                 }
             )
