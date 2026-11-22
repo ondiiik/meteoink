@@ -34,6 +34,7 @@ logger = getLogger(__name__)
 
 import itertools
 import math
+import micropython
 from struct import pack, unpack
 from deflate import DeflateIO
 from io import BytesIO
@@ -75,6 +76,57 @@ class FormatError(Error): ...
 
 
 class ChunkError(FormatError): ...
+
+
+# Undo of PNG scanline filters (in place). These are the hottest loops
+# of PNG decoding, so they are compiled to machine code by viper.
+@micropython.viper
+def _undo_sub(line: ptr8, n: int, fu: int):
+    for i in range(fu, n):
+        line[i] = (int(line[i]) + int(line[i - fu])) & 0xFF
+
+
+@micropython.viper
+def _undo_up(line: ptr8, prev: ptr8, n: int):
+    for i in range(n):
+        line[i] = (int(line[i]) + int(prev[i])) & 0xFF
+
+
+@micropython.viper
+def _undo_average(line: ptr8, prev: ptr8, n: int, fu: int):
+    m = fu if fu < n else n
+    for i in range(m):
+        line[i] = (int(line[i]) + (int(prev[i]) >> 1)) & 0xFF
+    for i in range(m, n):
+        line[i] = (int(line[i]) + ((int(line[i - fu]) + int(prev[i])) >> 1)) & 0xFF
+
+
+@micropython.viper
+def _undo_paeth(line: ptr8, prev: ptr8, n: int, fu: int):
+    # Left (and upper left) pixels are zero here, so predictor is just upper pixel
+    m = fu if fu < n else n
+    for i in range(m):
+        line[i] = (int(line[i]) + int(prev[i])) & 0xFF
+    for i in range(m, n):
+        a = int(line[i - fu])
+        b = int(prev[i])
+        c = int(prev[i - fu])
+        pa = b - c
+        pb = a - c
+        pc = pa + pb
+        if pa < 0:
+            pa = -pa
+        if pb < 0:
+            pb = -pb
+        if pc < 0:
+            pc = -pc
+        if pa <= pb and pa <= pc:
+            pr = a
+        elif pb <= pc:
+            pr = b
+        else:
+            pr = c
+        line[i] = (int(line[i]) + pr) & 0xFF
 
 
 class Reader:
@@ -155,14 +207,9 @@ class Reader:
         result will be returned as a fresh sequence of bytes.
         """
 
-        # :todo: Would it be better to update scanline in place?
-        # Yes, with the Cython extension making the undo_filter fast,
-        # updating scanline inplace makes the code 3 times faster
-        # (reading 50 images of 800x800 went from 40s to 16s)
-        result = scanline
-
+        # Filters are undone in place (`scanline` is modified)
         if filter_type == 0:
-            return result
+            return scanline
 
         if filter_type not in (1, 2, 3, 4):
             raise FormatError("Invalid filter")
@@ -171,25 +218,26 @@ class Reader:
         # byte from the previous pixel.  Normally this is the pixel
         # size in bytes, but when this is smaller than 1, the previous
         # byte is used instead.
-        fu = max(1, self.psize)
+        fu = int(max(1, self.psize))
+        n = len(scanline)
 
-        # For the first line of a ..., synthesize a dummy previous
-        # line.  An alternative approach would be to observe that on the
-        # first line 'up' is the same as 'null', 'paeth' is the same
-        # as 'sub', with only 'average' requiring any special case.
+        if filter_type == 1:
+            _undo_sub(scanline, n, fu)
+            return scanline
+
+        # For the first line synthesize a dummy (zero) previous line
         if not previous:
-            previous = array("B", bytearray(scanline))
+            if filter_type == 2:
+                return scanline
+            previous = bytearray(n)
 
-        # Call appropriate filter algorithm.  Note that 0 has already
-        # been dealt with.
-        (
-            None,
-            pngfilters.undo_filter_sub,
-            pngfilters.undo_filter_up,
-            pngfilters.undo_filter_average,
-            pngfilters.undo_filter_paeth,
-        )[filter_type](fu, scanline, previous, result)
-        return result
+        if filter_type == 2:
+            _undo_up(scanline, previous, n)
+        elif filter_type == 3:
+            _undo_average(scanline, previous, n, fu)
+        else:
+            _undo_paeth(scanline, previous, n, fu)
+        return scanline
 
     def deinterlace(self, raw):
         """
@@ -256,7 +304,7 @@ class Reader:
             """
 
             if self.bitdepth == 8:
-                return bytearray(raw)
+                return raw
             if self.bitdepth == 16:
                 raw = bytes(raw)
                 return array("H", unpack("!%dH" % (len(raw) // 2), raw))
@@ -774,71 +822,6 @@ def check_bitdepth_colortype(bitdepth, colortype):
 
 
 class pngfilters:
-    @staticmethod
-    def undo_filter_sub(filter_unit, scanline, previous, result):
-        """Undo sub filter."""
-
-        ai = 0
-        # Loops starts at index fu.  Observe that the initial part
-        # of the result is already filled in correctly with
-        # scanline.
-        for i in range(filter_unit, len(result)):
-            x = scanline[i]
-            a = result[ai]
-            result[i] = (x + a) & 0xFF
-            ai += 1
-
-    @staticmethod
-    def undo_filter_up(filter_unit, scanline, previous, result):
-        """Undo up filter."""
-
-        for i in range(len(result)):
-            x = scanline[i]
-            b = previous[i]
-            result[i] = (x + b) & 0xFF
-
-    @staticmethod
-    def undo_filter_average(filter_unit, scanline, previous, result):
-        """Undo up filter."""
-
-        ai = -filter_unit
-        for i in range(len(result)):
-            x = scanline[i]
-            if ai < 0:
-                a = 0
-            else:
-                a = result[ai]
-            b = previous[i]
-            result[i] = (x + ((a + b) >> 1)) & 0xFF
-            ai += 1
-
-    @staticmethod
-    def undo_filter_paeth(filter_unit, scanline, previous, result):
-        """Undo Paeth filter."""
-
-        # Also used for ci.
-        ai = -filter_unit
-        for i in range(len(result)):
-            x = scanline[i]
-            if ai < 0:
-                a = c = 0
-            else:
-                a = result[ai]
-                c = previous[ai]
-            b = previous[i]
-            p = a + b - c
-            pa = abs(p - a)
-            pb = abs(p - b)
-            pc = abs(p - c)
-            if pa <= pb and pa <= pc:
-                pr = a
-            elif pb <= pc:
-                pr = b
-            else:
-                pr = c
-            result[i] = (x + pr) & 0xFF
-            ai += 1
-
     @staticmethod
     def convert_la_to_rgba(row, result):
         for i in range(3):
