@@ -231,7 +231,8 @@ class App:
             s = SecureSocket.client(
                 s,
                 bytes.fromhex(behavior["display_key"]),
-                unique_id(),
+                # Station is identified on server by its device name (hotspot SSID)
+                spot["ssid"].encode(),
                 # Screen is received at once - compressed data can be slightly
                 # bigger than frame buffer in the worst case
                 max_frame=len(self.canvas.buf) + 1024,
@@ -243,7 +244,6 @@ class App:
                 {
                     "id": "hello",
                     "host": self.net.hostname,
-                    "uniq": unique_id().hex(),
                     "model": "epd_acep565",
                     "orientation": 90,
                 }

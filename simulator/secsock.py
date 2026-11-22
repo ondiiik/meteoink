@@ -1,7 +1,7 @@
 # Encrypted channel over TCP socket (used for remote display)
 #
 # Both sides share 256-bit key (`behavior["display_key"]` on meteostation, stored
-# on server for each station under its unique ID). Module works in MicroPython
+# on server for each station under its device name). Module works in MicroPython
 # (`cryptolib`, HW accelerated AES on ESP32) and in PC Python, so it can be used
 # also as reference implementation for server side (`SecureSocket.server`).
 #
@@ -13,7 +13,7 @@
 #       client -> server:  b"MINK" | version (1B) | Nc (16B random) | len(id) (1B) | id
 #       server -> client:  b"MINK" | version (1B) | Ns (16B random)
 #
-#    `id` is station unique ID (`machine.unique_id()`), so server can select the key.
+#    `id` is station device name (e.g. `metoink_LYDd`), so server can select the key.
 #
 # 2. Session keys (separate for each direction, `dir` is b"c2s" or b"s2c"):
 #
@@ -111,7 +111,7 @@ class SecureSocket:
 
         :param sock:       Connected socket.
         :param key:        Shared 32 bytes key.
-        :param ident:      Station identifier (max 255 bytes) used by server for key selection.
+        :param ident:      Station device name (max 255 bytes) used by server for key selection.
         :param max_frame:  Maximal size of received message (e.g. size of display frame buffer).
         """
         hello_c = _MAGIC + bytes((_VERSION,)) + urandom(_NONCE_LEN) + bytes((len(ident),)) + ident
@@ -128,7 +128,7 @@ class SecureSocket:
         """Establish channel from server side
 
         :param sock:        Accepted socket.
-        :param key_lookup:  Callable returning 32 bytes key for station ID (bytes),
+        :param key_lookup:  Callable returning 32 bytes key for station device name (bytes),
                             or `None` for unknown station.
         :param max_frame:   Maximal size of received message.
         """
@@ -141,7 +141,11 @@ class SecureSocket:
         hello_c = r + ident
         key = key_lookup(ident)
         if key is None:
-            raise SecureError(f"Unknown station {ident.hex()}")
+            try:
+                name = ident.decode()
+            except UnicodeError:
+                name = ident.hex()
+            raise SecureError(f"Unknown station '{name}'")
 
         hello_s = _MAGIC + bytes((_VERSION,)) + urandom(_NONCE_LEN)
         sock.sendall(hello_s)
