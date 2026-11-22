@@ -1,0 +1,3 @@
+[submodule "libs/ueink"]
+	path = libs/ueink
+	url = https://github.com/ondiiik/ueink.git

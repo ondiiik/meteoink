@@ -1,4 +1,5 @@
 GS4_HMSB = 0
+MONO_HLSB = 3  # Only for ueink import compatibility (RAW conversion is not simulated)
 
 
 class FrameBuffer:

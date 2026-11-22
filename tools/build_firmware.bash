@@ -23,7 +23,7 @@ fi
 # Download MicroPyhon sources
 if [ ! -d "$BUILD_ROOT/micropython" ]
 then
-    git clone https://github.com/micropython/micropython.git --recursive -b v1.29.0
+    git clone https://github.com/micropython/micropython.git -b v1.29.0
 fi
 
 # Install esp-idf
@@ -49,7 +49,7 @@ sed 's~$(METEOINK_SRC_ROOT)~'"$SRC_ROOT/micropython"'~g' < "$SRC_ROOT/tools/mani
 
 # Build MicroPython firmware
 rm -rf "$BUILD_ROOT/micropython/ports/esp32/build-ESP32_GENERIC-SPIRAM"
-rm -f "$BUILD_ROOT/vindriktning-mpy.bin"
+rm -f "$BUILD_ROOT/meteoink.bin"
 cd "$BUILD_ROOT/micropython"
 make -C mpy-cross
 cd "$BUILD_ROOT/micropython/ports/esp32"

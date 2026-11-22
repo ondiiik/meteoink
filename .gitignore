@@ -1,5 +1,7 @@
 # Some meteostation runtime files
-/simulator/~
+/micropython/cfg
+/simulator/bitmaps/*.bin
+/simulator/cfg
 /simulator/config/alert.py
 /simulator/config/connection.py
 /simulator/config/display.py
@@ -13,9 +15,9 @@
 /simulator/hotspot.txt
 /simulator/onecall.json
 /simulator/reset_cause.txt
-/simulator/cfg
+/simulator/ui/cfg
 /simulator/var
-/simulator/bitmaps/*.bin
+/simulator/~
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -137,6 +139,9 @@ venv.bak/
 
 # mkdocs documentation
 /site
+
+# vim
+*.swp
 
 # mypy
 .mypy_cache/
