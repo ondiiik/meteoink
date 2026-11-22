@@ -49,6 +49,3 @@ class Rpc:
         if not m:
             raise RuntimeError(f"Connection closed by server!")
         return m
-
-
-__all__ = ("Rpc",)
