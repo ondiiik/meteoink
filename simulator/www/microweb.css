@@ -12,6 +12,9 @@ body {
     max-width:             480px;
     margin:                0 auto;
     padding:               12px;
+    /* Space at the end of page, so last buttons can be scrolled above browser
+       toolbar at the bottom of screen (e.g. Firefox on Android) */
+    padding-bottom:        calc(120px + env(safe-area-inset-bottom, 0px));
     color:                 #222;
     background:            #fff;
 }

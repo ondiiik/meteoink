@@ -1,10 +1,27 @@
-from ulogging import getLogger
+from ulogging import getLogger, dump_exception
 
 logger = getLogger(__name__)
 
 from lang import trn
+from version import VERSION
+from os import stat
 from micropython import const
 from net import bytes2bssid
+from utime import ticks_ms
+import gc
+
+try:
+    from utime import ticks_diff
+except ImportError:  # Simulator
+
+    def ticks_diff(a, b):
+        return a - b
+
+
+try:
+    from network import WLAN, AP_IF
+except ImportError:  # Simulator
+    WLAN = AP_IF = None
 from .microweb.microWebSrv import MicroWebSrv
 
 
@@ -32,8 +49,35 @@ class WebServer:
         server = MicroWebSrv(webPath=f"{www_dir}/", port=5555)
         server.MaxWebSocketRecvLen = 256
         server.WebSocketThreaded = False
+        server.IdleCallback = self._idle
+        self._stations = set()
+        self._heartbeat = ticks_ms()
         self.wdt.feed()
         server.Start()
+
+    def _idle(self):
+        # Server waits for connection - keep watchdog happy and report what
+        # is happening around (helps with diagnostics of connection troubles)
+        self.wdt.feed()
+
+        try:
+            stations = set(bytes2bssid(s[0]) for s in WLAN(AP_IF).status("stations"))
+        except Exception:
+            stations = self._stations  # Not supported (e.g. simulator)
+
+        for mac in stations - self._stations:
+            logger.info(f"WiFi client joined hotspot: {mac}")
+        for mac in self._stations - stations:
+            logger.info(f"WiFi client left hotspot: {mac}")
+        self._stations = stations
+
+        now = ticks_ms()
+        if ticks_diff(now, self._heartbeat) >= 30000:
+            self._heartbeat = now
+            mem = gc.mem_free() if hasattr(gc, "mem_free") else "?"
+            logger.info(
+                f"Waiting for connections ({len(stations)} WiFi clients, free mem {mem} B)"
+            )
 
 
 def button(caption, action, args_list={}):
@@ -151,17 +195,37 @@ class _Form(_Table):
         self.page += '<tr class="spacer"><td></td></tr>'
 
 
+# Static files are cached by browser "forever", so version of style sheet is
+# part of its URL - any change of firmware or of the file itself loads it again
+try:
+    _st = stat("/www/microweb.css")
+    _CSS_VER = f"{VERSION}-{_st[6]}-{_st[8]}"
+    del _st
+except OSError:
+    _CSS_VER = VERSION
+
+
 class Page:
     def __init__(self, response):
-        self.doc = ""
+        # Page is collected from parts and joined at once at the end (appending
+        # to one big string copies and re-hashes whole string each time, which
+        # is very slow in MicroPython)
+        self._parts = []
+        self._t0 = ticks_ms()
         self.response = response
 
+    @property
+    def doc(self):
+        if len(self._parts) > 1:
+            self._parts = ["".join(self._parts)]
+        return self._parts[0] if self._parts else ""
+
     def __enter__(self):
-        self.doc += '<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Meteostation</title><link rel="stylesheet" href="microweb.css"></head><body>'
+        self._parts.append(f'<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"><title>Meteostation</title><link rel="stylesheet" href="microweb.css?v={_CSS_VER}"></head><body>')
         return self
 
     def __exit__(self, type, value, traceback):
-        self.doc += "</body></html>"
+        self._parts.append("</body></html>")
         self.response.WriteResponseOk(
             headers=None,
             contentType="text/html",
@@ -173,7 +237,7 @@ class Page:
         return self.doc
 
     def __iadd__(self, other):
-        self.doc += other
+        self._parts.append(other)
         return self
 
     def table(self, cells, table_attr="", heading_attr=""):
@@ -186,13 +250,14 @@ class Page:
         return _Select(self, label, name)
 
     def heading(self, level, txt):
-        self.doc += f"<h{level}>{txt}</h{level}>"
+        logger.info(f"Page section '{txt}' started at {ticks_diff(ticks_ms(), self._t0)} ms")
+        self._parts.append(f"<h{level}>{txt}</h{level}>")
 
     def br(self, cnt=1):
-        self.doc += "<br>" * cnt
+        self._parts.append("<br>" * cnt)
 
     def button(self, caption, url, args_list={}):
-        self.doc += button(caption, url, args_list)
+        self._parts.append(button(caption, url, args_list))
 
 
 def webpage_handler(name, method="POST"):
@@ -202,13 +267,20 @@ def webpage_handler(name, method="POST"):
         @decorate
         def wrapper(client, response):
             WebServer.wdt.feed()
+            t0 = ticks_ms()
             args = (
                 client.ReadRequestPostedFormData()
                 if method == "POST"
                 else client.GetRequestQueryParams()
             )
+            logger.info(f"Page {name}: args {list(args)} read in {ticks_diff(ticks_ms(), t0)} ms")
             with Page(response) as page:
-                fn(page, args)
+                try:
+                    fn(page, args)
+                except Exception as e:
+                    dump_exception(f"Page {name} failed", e)
+                    raise
+                logger.info(f"Page {name}: {len(page.doc)} chars built in {ticks_diff(ticks_ms(), t0)} ms")
             WebServer.wdt.feed()
 
         return wrapper
@@ -249,6 +321,8 @@ from .page.apiedt import www
 from .page.apiset import www
 from .page.battedt import www
 from .page.battset import www
+from .page.dkeyedt import www
+from .page.dkeyset import www
 from .page.langedt import www
 from .page.languse import www
 from .page.locdlt import www

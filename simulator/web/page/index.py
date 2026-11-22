@@ -144,7 +144,7 @@ def _pg_set(page):
             (
                 trn("Remote display key"),
                 f'<code style="word-break:break-all">{behavior.get("display_key", "")}</code>',
-                "",
+                web.button(trn("Edit"), "dkeyedt"),
             ),
             web.SPACES,
         )

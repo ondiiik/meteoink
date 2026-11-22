@@ -10,6 +10,26 @@ from _thread import start_new_thread
 import socket
 import gc
 import re
+from ulogging import getLogger
+from utime import ticks_ms, sleep_ms
+
+try:
+    from utime import ticks_diff
+except ImportError:
+
+    def ticks_diff(a, b):
+        return a - b
+
+
+logger = getLogger(__name__)
+
+
+def _codec(name):
+    # MicroPython (1.29+) accepts only "utf-8" / "utf8" / "ascii" codec names
+    # (case sensitive). UTF-8 is superset of ASCII and only text we send in
+    # HTTP headers is ASCII, so any other charset name is mapped to UTF-8.
+    name = (name or "utf-8").lower()
+    return "ascii" if name == "ascii" else "utf-8"
 
 try:
     from microWebTemplate import MicroWebTemplate
@@ -138,7 +158,7 @@ class MicroWebSrv:
                     b += bytes([int(r[i][:2], 16)]) + r[i][2:].encode()
                 except:
                     b += b"%" + r[i].encode()
-            return b.decode("UTF-8")
+            return b.decode(_codec("UTF-8"))
         except:
             return str(s)
 
@@ -179,6 +199,9 @@ class MicroWebSrv:
 
         self.MaxWebSocketRecvLen = 1024
         self.WebSocketThreaded = True
+        # Called approx. every second when server waits for connection
+        # (e.g. for watchdog feeding or diagnostics)
+        self.IdleCallback = None
         self.AcceptWebSocketCallback = None
         self.LetCacheStaticContentLevel = 2
 
@@ -209,12 +232,19 @@ class MicroWebSrv:
 
     def _serverProcess(self):
         self._started = True
+        logger.info(f"Listening on {self._srvAddr[0]}:{self._srvAddr[1]}")
         while True:
             try:
                 client, cliAddr = self._server.accept()
             except Exception as ex:
                 if ex.args and ex.args[0] == 113:
+                    logger.warning("Server socket aborted - stopping server")
                     break
+                if not (ex.args and ex.args[0] in (11, 110, 116)) and str(ex) != "timed out":
+                    # Not just accept timeout (EAGAIN / ETIMEDOUT)
+                    logger.warning(f"Accept failed: {ex!r}")
+                if self.IdleCallback:
+                    self.IdleCallback()
                 continue
             self._client(self, client, cliAddr)
         self._started = False
@@ -229,6 +259,8 @@ class MicroWebSrv:
             self._server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self._server.bind(self._srvAddr)
             self._server.listen(16)
+            if self.IdleCallback:
+                self._server.settimeout(1)
             if threaded:
                 MicroWebSrv._startThread(self._serverProcess)
             else:
@@ -308,6 +340,9 @@ class MicroWebSrv:
         # ------------------------------------------------------------------------
 
         def __init__(self, microWebSrv, socket, addr):
+            self._t0 = ticks_ms()
+            self._peer = f"{addr[0]}:{addr[1]}" if isinstance(addr, tuple) else str(addr)
+            logger.info(f"[{self._peer}] Connection accepted (free mem {gc.mem_free() if hasattr(gc, 'mem_free') else '?'} B)")
             socket.settimeout(2)
             self._microWebSrv = microWebSrv
             self._socket = socket
@@ -336,17 +371,20 @@ class MicroWebSrv:
                 response = MicroWebSrv._response(self)
                 if self._parseFirstLine(response):
                     if self._parseHeader(response):
+                        logger.info(f"[{self._peer}] Headers received ({len(self._headers)}) after {ticks_diff(ticks_ms(), self._t0)} ms")
                         upg = self._getConnUpgrade()
                         if not upg:
                             routeHandler, routeArgs = self._microWebSrv.GetRouteHandler(
                                 self._resPath, self._method
                             )
                             if routeHandler:
+                                logger.info(f"[{self._peer}] Calling handler of {self._method} {self._resPath}")
                                 try:
                                     if routeArgs is not None:
                                         routeHandler(self, response, routeArgs)
                                     else:
                                         routeHandler(self, response)
+                                    logger.info(f"[{self._peer}] Handler finished after {ticks_diff(ticks_ms(), self._t0)} ms")
                                 except Exception as ex:
                                     print(
                                         "MicroWebSrv handler exception:\r\n  - In route %s %s\r\n  - %s"
@@ -358,6 +396,7 @@ class MicroWebSrv:
                                 filepath = self._microWebSrv._physPathFromURLPath(
                                     self._resPath
                                 )
+                                logger.info(f"[{self._peer}] No handler - static file: {filepath}")
                                 if filepath:
                                     if MicroWebSrv._isPyHTMLFile(filepath):
                                         response.WriteResponsePyHTMLFile(filepath)
@@ -414,21 +453,45 @@ class MicroWebSrv:
                         else:
                             response.WriteResponseNotImplemented()
                     else:
+                        logger.warning(f"[{self._peer}] Malformed headers")
                         response.WriteResponseBadRequest()
-            except:
-                response.WriteResponseInternalServerError()
+            except Exception as ex:
+                logger.error(f"[{self._peer}] Request processing failed: {ex!r}")
+                print_exception(ex)
+                try:
+                    response.WriteResponseInternalServerError()
+                except Exception as ex2:
+                    logger.warning(f"[{self._peer}] Unable to send error response: {ex2!r}")
             try:
                 if self._socketfile is not self._socket:
                     self._socketfile.close()
                 self._socket.close()
             except:
                 ...
+            logger.info(f"[{self._peer}] Connection closed after {ticks_diff(ticks_ms(), self._t0)} ms")
 
         # ------------------------------------------------------------------------
 
         def _parseFirstLine(self, response):
             try:
-                elements = self._socketfile.readline().decode().strip().split()
+                line = self._socketfile.readline()
+            except Exception as ex:
+                logger.warning(f"[{self._peer}] No request received ({ex!r}) - idle/pre-connected socket?")
+                return False
+            if not line:
+                logger.warning(f"[{self._peer}] Connection closed by client without request")
+                return False
+            if line[0] == 0x16:
+                logger.warning(f"[{self._peer}] TLS handshake received - client tries HTTPS on HTTP port")
+                return False
+            try:
+                text = line.decode().strip()
+            except Exception:
+                logger.warning(f"[{self._peer}] Unreadable request line: {bytes(line[:16])}")
+                return False
+            logger.info(f"[{self._peer}] Request: {text}")
+            try:
+                elements = text.split()
                 if len(elements) == 3:
                     self._method = elements[0].upper()
                     self._path = elements[1]
@@ -596,12 +659,23 @@ class MicroWebSrv:
         def _write(self, data, strEncoding="ISO-8859-1"):
             if data:
                 if type(data) == str:
-                    data = data.encode(strEncoding)
+                    data = data.encode(_codec(strEncoding))
                 data = memoryview(data)
+                stalls = 0
                 while data:
                     n = self._client._socketfile.write(data)
-                    if n is None:
-                        return False
+                    if not n:
+                        # Socket send buffer is full (MicroPython returns None) -
+                        # wait a while instead of silently dropping rest of data
+                        stalls += 1
+                        if stalls > 500:  # ~5 s
+                            logger.warning(
+                                f"[{self._client._peer}] Sending stalled - {len(data)} bytes not sent"
+                            )
+                            return False
+                        sleep_ms(10)
+                        continue
+                    stalls = 0
                     data = data[n:]
                 return True
             return False
@@ -610,6 +684,7 @@ class MicroWebSrv:
 
         def _writeFirstLine(self, code):
             reason = self._responseCodes.get(code, ("Unknown reason",))[0]
+            logger.info(f"[{self._client._peer}] Response: {code} {reason}")
             return self._write("HTTP/1.1 %s %s\r\n" % (code, reason))
 
         # ------------------------------------------------------------------------
@@ -672,7 +747,7 @@ class MicroWebSrv:
             try:
                 if content:
                     if type(content) == str:
-                        content = content.encode(contentCharset)
+                        content = content.encode(_codec(contentCharset))
                     contentLength = len(content)
                 else:
                     contentLength = 0
@@ -682,7 +757,9 @@ class MicroWebSrv:
                 if content:
                     return self._write(content)
                 return True
-            except:
+            except Exception as ex:
+                logger.error(f"[{self._client._peer}] Writing response {code} failed: {ex!r}")
+                print_exception(ex)
                 return False
 
         # ------------------------------------------------------------------------
